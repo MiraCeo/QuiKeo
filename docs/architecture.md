@@ -30,6 +30,7 @@ core/model       — Pure Kotlin data classes, no Android deps
 | `:core:overlay` | WindowManager overlay utils |
 | `:core:routing` | OSRM client, route interpolation, roaming engine, replay engine |
 | `:core:testing` | Shared test utils, fakes |
+| `:lint:checks` | Custom Android Lint rules (`HardcodedComposeStringDetector` flags hardcoded user-facing strings in Compose) |
 | `:feature:favorites:api` / `:impl` | Favorites list, MapPicker, teleport |
 | `:feature:group:api` / `:impl` | Group Sync screen — leader/follower Wi-Fi location sync |
 | `:feature:joystick:impl` | Floating joystick overlay |

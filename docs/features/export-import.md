@@ -14,6 +14,8 @@ Each entry in `favoriteLocations` includes the optional `category` field (`Favor
 
 Each entry in `routes` includes the optional `speedProfileId` field (`Route.speedProfileId`), round-tripping the same way `FavoriteLocation.category` does. Old exports without it import cleanly — a missing or `null` `speedProfileId` defaults to `null`.
 
+Each waypoint in a route includes `waitSeconds` (`Waypoint.waitSeconds`, used by teleport routes — see @docs/features/routes.md, "Teleport Routes"). Old exports without it import cleanly — a missing `waitSeconds` defaults to `0`.
+
 Schema version: `AppConstants.ExportConstants.SCHEMA_VERSION`.
 
 ## Settings Screen Entry Point
@@ -65,7 +67,7 @@ Key function: `parseGpxRoutes` in `:feature:routes:impl/RoutesViewModel.kt`.
 
 Settings screen → "More actions" overflow menu → Import section offers:
 
-- **Import from GPS Joystick** — imports routes from GPS Joystick app format.
+- **Import from GPS Joystick** — imports routes and favorites from a GPS Joystick export (its Realm database, parsed structurally by `GpsJoystickMigrator`). Keeps the original list order.
 - **Import from YAMLA** — imports routes from YAMLA JSON format.
 
 All imported routes are saved as `RouteType.STRAIGHT` segments.
