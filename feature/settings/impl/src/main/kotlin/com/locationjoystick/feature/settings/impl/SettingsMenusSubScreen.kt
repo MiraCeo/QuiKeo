@@ -48,6 +48,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
@@ -365,6 +366,12 @@ private fun AccessibilityDisclosureDialog(
         confirmButton = { LjTextButton(onClick = onAccept) { Text("Agree") } },
         dismissButton = { LjTextButton(onClick = onDecline) { Text("No thanks") } },
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AccessibilityDisclosureDialogPreview() {
+    AccessibilityDisclosureDialog(onAccept = {}, onDecline = {})
 }
 
 @Composable
