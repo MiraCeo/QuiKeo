@@ -45,6 +45,14 @@ class RoamingRepository
             locationRepository.setSpeedInternal(speedMs.toFloat())
         }
 
+        private fun resetRoamingState() {
+            _isRoaming.value = false
+            _isRoamingPaused.value = false
+            locationRepository.setMockMode(MockMode.TELEPORT)
+            locationRepository.setRouteWaypoints(null)
+            locationRepository.setSpeedInternal(0f)
+        }
+
         fun startRoaming(
             config: RoamingConfig,
             speedMs: Double,
@@ -67,11 +75,7 @@ class RoamingRepository
                     locationRepository.setRouteWaypoints(waypoints.ifEmpty { null })
                 },
                 onComplete = {
-                    _isRoaming.value = false
-                    _isRoamingPaused.value = false
-                    locationRepository.setMockMode(MockMode.TELEPORT)
-                    locationRepository.setRouteWaypoints(null)
-                    locationRepository.setSpeedInternal(0f)
+                    resetRoamingState()
                     locationRepository.emitCompletion("Roaming complete")
                     Log.d(TAG, "Roaming completed or cancelled")
                 },
@@ -83,11 +87,7 @@ class RoamingRepository
 
         suspend fun stopRoaming() {
             roamingEngine.stopRoaming()
-            _isRoaming.value = false
-            _isRoamingPaused.value = false
-            locationRepository.setMockMode(MockMode.TELEPORT)
-            locationRepository.setRouteWaypoints(null)
-            locationRepository.setSpeedInternal(0f)
+            resetRoamingState()
         }
 
         /**
@@ -97,10 +97,6 @@ class RoamingRepository
         fun resetOnServiceDestroy() {
             roamingEngine.resumeRoaming()
             roamingEngine.stop()
-            _isRoaming.value = false
-            _isRoamingPaused.value = false
-            locationRepository.setMockMode(MockMode.TELEPORT)
-            locationRepository.setRouteWaypoints(null)
-            locationRepository.setSpeedInternal(0f)
+            resetRoamingState()
         }
     }
