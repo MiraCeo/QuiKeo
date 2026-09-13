@@ -19,6 +19,7 @@
     { href: 'https://github.com/shortcuts/locationjoystick/blob/main/CONTRIBUTING.md', label: 'Contributing' },
     { href: 'https://github.com/shortcuts/locationjoystick/issues/new?labels=enhancement', label: 'Request a feature' },
     { href: 'https://github.com/shortcuts/locationjoystick/issues/new?labels=bug', label: 'Report a bug' },
+    { href: 'https://discord.gg/r9DRnkwbMf', label: 'Discord' },
   ];
 
   var currentFile = location.pathname.split('/').pop() || 'index.html';

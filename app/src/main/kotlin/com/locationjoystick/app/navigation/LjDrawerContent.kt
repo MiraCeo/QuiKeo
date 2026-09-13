@@ -154,5 +154,24 @@ fun LjDrawerContent(
                 scope.launch { drawerState.close() }
             },
         )
+        NavigationDrawerItem(
+            icon = { Icon(LjIcons.Forum, "Discord") },
+            label = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Discord")
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        imageVector = LjIcons.OpenInNew,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                    )
+                }
+            },
+            selected = false,
+            onClick = {
+                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://discord.gg/r9DRnkwbMf")))
+                scope.launch { drawerState.close() }
+            },
+        )
     }
 }

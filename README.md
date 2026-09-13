@@ -4,6 +4,7 @@
 ![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
 ![minSdk](https://img.shields.io/badge/minSdk-28%20(Android%209)-green?style=flat-square)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.x-purple?style=flat-square)
+[![Discord](https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/r9DRnkwbMf)
 
 Spoof your GPS location on Android. Point your phone anywhere on the map using a floating joystick, saved routes, or automatic roaming while your other apps keep running normally.
 
