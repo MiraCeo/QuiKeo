@@ -1,5 +1,8 @@
 package com.locationjoystick.core.routing
 
+import android.content.Context
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -9,10 +12,18 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RoutingErrorReporterTest {
+    private fun fakeContext(): Context {
+        val context: Context = mockk()
+        every {
+            context.getString(R.string.routing_road_following_partial_fallback, 2, 5)
+        } returns "Road-following partially unavailable — 2 of 5 legs used straight-line paths"
+        return context
+    }
+
     @Test
     fun `report emits to all collectors`() =
         runTest(UnconfinedTestDispatcher()) {
-            val reporter = RoutingErrorReporter()
+            val reporter = RoutingErrorReporter(fakeContext())
             val received1 = mutableListOf<String>()
             val received2 = mutableListOf<String>()
 
@@ -31,7 +42,7 @@ class RoutingErrorReporterTest {
     @Test
     fun `reportRoadFollowingFallbacks emits formatted summary when fallbackCount is positive`() =
         runTest(UnconfinedTestDispatcher()) {
-            val reporter = RoutingErrorReporter()
+            val reporter = RoutingErrorReporter(fakeContext())
             val received = mutableListOf<String>()
             val job = backgroundScope.launch { reporter.errors.collect { received.add(it) } }
 
@@ -47,7 +58,7 @@ class RoutingErrorReporterTest {
     @Test
     fun `reportRoadFollowingFallbacks emits nothing when fallbackCount is zero`() =
         runTest(UnconfinedTestDispatcher()) {
-            val reporter = RoutingErrorReporter()
+            val reporter = RoutingErrorReporter(fakeContext())
             val received = mutableListOf<String>()
             val job = backgroundScope.launch { reporter.errors.collect { received.add(it) } }
 

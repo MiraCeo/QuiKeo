@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.common.util.toLocaleDoubleOrNull
@@ -30,6 +31,7 @@ import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.designsystem.component.LjSegmentedControl
 import com.locationjoystick.core.model.RoamingDefaults
 import com.locationjoystick.core.model.SpeedUnit
+import com.locationjoystick.feature.settings.impl.R
 
 @Composable
 internal fun SettingsRoamingSubScreen(
@@ -84,10 +86,10 @@ private fun RoamingSection(
     isMph: Boolean,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("Roaming", style = MaterialTheme.typography.headlineSmall)
+    Text(stringResource(R.string.settings_roaming_roaming), style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        "Default settings used when starting a roaming session from the map.",
+        stringResource(R.string.settings_roaming_default_settings_used_when_starting_a),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -145,7 +147,7 @@ private fun RoamingSection(
 
     Spacer(modifier = Modifier.height(4.dp))
 
-    Text("Speed profile", style = MaterialTheme.typography.labelLarge)
+    Text(stringResource(R.string.settings_roaming_speed_profile), style = MaterialTheme.typography.labelLarge)
     Spacer(modifier = Modifier.height(4.dp))
     LjSegmentedControl(
         options =

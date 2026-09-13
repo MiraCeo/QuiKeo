@@ -84,7 +84,7 @@ class MapControllerWalkCancellationTest {
                 }
             val walkToEngine = WalkToEngine(settingsRepository, locationRepository)
             val walkCoordinator = WalkCoordinator(locationRepository, walkToEngine)
-            val routingErrorReporter = RoutingErrorReporter()
+            val routingErrorReporter = RoutingErrorReporter(mockk<android.content.Context>(relaxed = true))
             val ephemeralController =
                 EphemeralReplayController(
                     locationRepository,

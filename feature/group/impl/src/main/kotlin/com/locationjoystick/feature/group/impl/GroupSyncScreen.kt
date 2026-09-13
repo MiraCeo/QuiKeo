@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
@@ -64,6 +65,7 @@ import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.model.GroupRole
 import com.locationjoystick.core.model.GroupState
 import com.locationjoystick.core.model.LatLng
+import com.locationjoystick.feature.group.impl.R
 
 @Composable
 fun GroupSyncRoute(
@@ -231,11 +233,11 @@ private fun NoGroupContent(
             tint = MaterialTheme.colorScheme.primary,
         )
         Text(
-            text = "Group Sync",
+            text = stringResource(R.string.group_sync_group_sync),
             style = MaterialTheme.typography.headlineSmall,
         )
         Text(
-            text = "Sync your fake location across multiple devices on the same Wi-Fi network. No account needed.",
+            text = stringResource(R.string.group_sync_sync_your_fake_location_across_multiple),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -246,11 +248,11 @@ private fun NoGroupContent(
             onClick = onCreateGroup,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text("Create group — I'm the leader")
+            Text(stringResource(R.string.group_sync_create_group_i_m_the_leader))
         }
 
         Text(
-            text = "— or join an existing group —",
+            text = stringResource(R.string.group_sync_or_join_an_existing_group),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -266,7 +268,7 @@ private fun NoGroupContent(
             ) {
                 Icon(Icons.Rounded.QrCodeScanner, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.size(6.dp))
-                Text("Scan QR")
+                Text(stringResource(R.string.group_sync_scan_qr))
             }
             LjOutlinedButton(
                 onClick = { showCodeDialog = true },
@@ -276,7 +278,7 @@ private fun NoGroupContent(
                 if (isDiscovering) {
                     CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                 } else {
-                    Text("Enter code")
+                    Text(stringResource(R.string.group_sync_enter_code))
                 }
             }
         }
@@ -302,18 +304,18 @@ private fun EnterCodeDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Enter group code") },
+        title = { Text(stringResource(R.string.group_sync_enter_group_code)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Ask the leader for their 6-character group code.",
+                    text = stringResource(R.string.group_sync_ask_the_leader_for_their_6),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 OutlinedTextField(
                     value = code,
                     onValueChange = { code = it.uppercase().take(6) },
-                    label = { Text("Code") },
+                    label = { Text(stringResource(R.string.group_sync_code)) },
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = FontFamily.Monospace),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -327,11 +329,11 @@ private fun EnterCodeDialog(
                 onClick = { onConfirm(code) },
                 enabled = code.length == 6,
             ) {
-                Text("Join")
+                Text(stringResource(R.string.group_sync_join))
             }
         },
         dismissButton = {
-            LjTextButton(onClick = onDismiss) { Text("Cancel") }
+            LjTextButton(onClick = onDismiss) { Text(stringResource(R.string.group_sync_cancel)) }
         },
     )
 }
@@ -351,7 +353,7 @@ private fun LeaderContent(
         modifier = Modifier.fillMaxWidth(),
     ) {
         Text(
-            text = "Role: Leader",
+            text = stringResource(R.string.group_sync_role_leader),
             style = MaterialTheme.typography.titleMedium,
         )
 
@@ -365,7 +367,7 @@ private fun LeaderContent(
                 modifier = Modifier.padding(16.dp).fillMaxWidth(),
             ) {
                 Text(
-                    text = "Group code",
+                    text = stringResource(R.string.group_sync_group_code),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
@@ -377,7 +379,7 @@ private fun LeaderContent(
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
                 Text(
-                    text = "Followers can scan the QR or type this code",
+                    text = stringResource(R.string.group_sync_followers_can_scan_the_qr_or),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     textAlign = TextAlign.Center,
@@ -401,7 +403,7 @@ private fun LeaderContent(
                 ) {
                     Image(
                         bitmap = qrBitmap.asImageBitmap(),
-                        contentDescription = "Group invite QR code",
+                        contentDescription = stringResource(R.string.group_sync_group_invite_qr_code_cd),
                         modifier = Modifier.size(200.dp),
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -411,14 +413,14 @@ private fun LeaderContent(
                         ) {
                             Icon(Icons.Rounded.QrCode, contentDescription = null, modifier = Modifier.size(16.dp))
                             Text(
-                                text = " Scan to join",
+                                text = stringResource(R.string.group_sync_scan_to_join),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                         Spacer(modifier = Modifier.weight(1f))
                         IconButton(onClick = onRegenerateQr) {
-                            Icon(Icons.Rounded.Refresh, contentDescription = "Regenerate QR")
+                            Icon(Icons.Rounded.Refresh, contentDescription = stringResource(R.string.group_sync_regenerate_qr_cd))
                         }
                     }
                 }
@@ -442,7 +444,7 @@ private fun LeaderContent(
                     containerColor = MaterialTheme.colorScheme.error,
                 ),
         ) {
-            Text("Leave group")
+            Text(stringResource(R.string.group_sync_leave_group))
         }
     }
 }
@@ -465,7 +467,7 @@ private fun FollowerContent(
         modifier = Modifier.fillMaxWidth(),
     ) {
         Text(
-            text = "Role: Follower",
+            text = stringResource(R.string.group_sync_role_follower),
             style = MaterialTheme.typography.titleMedium,
         )
 
@@ -491,7 +493,7 @@ private fun FollowerContent(
         )
 
         Text(
-            text = "Follower mode resumes when you open the app after a reboot.",
+            text = stringResource(R.string.group_sync_follower_mode_resumes_when_you_open),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -504,7 +506,7 @@ private fun FollowerContent(
                 onClick = onTeleportToLeaderNow,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Teleport to leader now")
+                Text(stringResource(R.string.group_sync_teleport_to_leader_now))
             }
         }
 
@@ -518,7 +520,7 @@ private fun FollowerContent(
                     containerColor = MaterialTheme.colorScheme.error,
                 ),
         ) {
-            Text("Leave group")
+            Text(stringResource(R.string.group_sync_leave_group_2))
         }
     }
 }

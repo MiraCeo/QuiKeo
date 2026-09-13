@@ -29,12 +29,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.common.util.parseRawLatLng
 import com.locationjoystick.core.designsystem.LjSpacing
+import com.locationjoystick.core.designsystem.R
 import com.locationjoystick.core.model.RecentSearch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -131,7 +133,7 @@ fun NominatimSearchBar(
                 Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surface),
-            placeholder = { Text("Search location...") },
+            placeholder = { Text(stringResource(R.string.search_bar_search_location)) },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
             singleLine = true,
             shape =
@@ -146,7 +148,7 @@ fun NominatimSearchBar(
             HorizontalDivider()
             if (showRecent) {
                 Text(
-                    text = "Recent",
+                    text = stringResource(R.string.search_bar_recent),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = LjSpacing.md, vertical = 6.dp),
@@ -183,7 +185,7 @@ fun NominatimSearchBar(
             }
             if (results.isEmpty() && query.length >= 2 && !isLoading) {
                 Text(
-                    text = "No results found",
+                    text = stringResource(R.string.search_bar_no_results_found),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier =

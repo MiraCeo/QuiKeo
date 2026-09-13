@@ -23,9 +23,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.designsystem.LjSpacing
+import com.locationjoystick.core.designsystem.R
 import com.locationjoystick.core.model.FavoriteLocation
 import com.locationjoystick.core.model.LatLng
 import java.util.Locale
@@ -68,7 +70,7 @@ fun FavoritesList(
                 Text(title, style = MaterialTheme.typography.headlineSmall, color = textColor)
                 if (onSaveCurrentLocation != null) {
                     IconButton(onClick = onSaveCurrentLocation) {
-                        Icon(Icons.Default.Add, contentDescription = "Save current location")
+                        Icon(Icons.Default.Add, contentDescription = stringResource(R.string.favorites_list_save_current_location_cd))
                     }
                 }
             }
@@ -76,7 +78,7 @@ fun FavoritesList(
 
         if (favorites.isEmpty()) {
             Text(
-                "No saved favorites yet",
+                stringResource(R.string.favorites_list_no_saved_favorites_yet),
                 style = MaterialTheme.typography.bodyMedium,
                 color = textColor,
                 modifier = Modifier.padding(top = LjSpacing.md),

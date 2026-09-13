@@ -66,6 +66,21 @@ class GroupSyncViewModelTest {
         every { Uri.parse(any()) } answers { fakeUri(firstArg()) }
 
         context = mockk(relaxed = true)
+        every {
+            context.getString(R.string.group_sync_leader_position_not_yet_known)
+        } returns "Leader position not yet known — try again in a moment"
+        every {
+            context.getString(R.string.group_sync_disconnected_from_group)
+        } returns "Disconnected from group — leader is no longer reachable"
+        every {
+            context.getString(R.string.group_sync_code_must_be_characters, any())
+        } answers { "Code must be ${(it.invocation.args[1] as Array<*>)[0]} characters" }
+        every {
+            context.getString(R.string.group_sync_no_group_found_for_code, any())
+        } answers { "No group found for code ${(it.invocation.args[1] as Array<*>)[0]}" }
+        every {
+            context.getString(R.string.group_sync_invalid_group_qr_code)
+        } returns "Invalid group QR code"
         groupRepository = mockk(relaxed = true)
         groupNsdManager = mockk()
         leaderSyncServer = mockk(relaxed = true)

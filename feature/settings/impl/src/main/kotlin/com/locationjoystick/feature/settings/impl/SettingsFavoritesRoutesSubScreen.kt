@@ -16,11 +16,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.component.LjCheckboxRow
 import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.model.SpeedUnit
+import com.locationjoystick.feature.settings.impl.R
 
 @Composable
 internal fun SettingsFavoritesRoutesSubScreen(
@@ -78,10 +80,10 @@ private fun FavoritesSection(
     hotLocationTree: HotItemTree,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("Favorites", style = MaterialTheme.typography.headlineSmall)
+    Text(stringResource(R.string.settings_favorites_routes_favorites), style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        "Options for the favorites list.",
+        stringResource(R.string.settings_favorites_routes_options_for_the_favorites_list),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -109,10 +111,10 @@ private fun RoutesSection(
     hotRouteTree: HotItemTree,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("Routes", style = MaterialTheme.typography.headlineSmall)
+    Text(stringResource(R.string.settings_favorites_routes_routes), style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        "Options for the routes list.",
+        stringResource(R.string.settings_favorites_routes_options_for_the_routes_list),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )

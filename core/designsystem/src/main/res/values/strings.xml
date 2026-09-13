@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="destination_card_locationjoystick">"locationjoystick"</string>
+    <string name="destination_card_version">"v%1$s"</string>
+    <string name="favorite_target_detail_set_location">"Set location"</string>
+    <string name="favorite_target_detail_walk_to_location">"Walk to location"</string>
+    <string name="favorite_target_detail_walk_via_roads">"Walk via roads"</string>
+    <string name="favorite_target_detail_do_nothing">"Do nothing"</string>
+    <string name="favorites_list_save_current_location_cd">"Save current location"</string>
+    <string name="favorites_list_no_saved_favorites_yet">"No saved favorites yet"</string>
+    <string name="delete_confirm_dialog_delete">"Delete"</string>
+    <string name="delete_confirm_dialog_cancel">"Cancel"</string>
+    <string name="route_start_options_teleport">"Teleport"</string>
+    <string name="route_start_options_cancel">"Cancel"</string>
+    <string name="common_start">"Start"</string>
+    <string name="top_bar_open_navigation_menu_cd">"Open navigation menu"</string>
+    <string name="top_bar_more_actions_cd">"More actions"</string>
+    <string name="search_bar_search_location">"Search location..."</string>
+    <string name="search_bar_recent">"Recent"</string>
+    <string name="search_bar_no_results_found">"No results found"</string>
+    <string name="roaming_sheet_roaming">"Roaming"</string>
+    <string name="roaming_sheet_view_on_map">"View on map"</string>
+    <string name="roaming_sheet_speed_profile">"Speed profile"</string>
+    <string name="roaming_sheet_follow_roads">"Follow roads"</string>
+    <string name="roaming_sheet_return_to_start">"Return to start"</string>
+    <string name="roaming_sheet_generate">"Generate"</string>
+    <string name="roaming_sheet_start_location_spoofing_first_to_enable">"Start location spoofing first to enable roaming"</string>
+    <string name="routes_picker_no_routes_saved">"No routes saved"</string>
+    <string name="routes_picker_start_route_cd">"Start route"</string>
+    <string name="theme_preview_lj">"Lj"</string>
+    <string name="theme_preview_design_system_preview">"Design System Preview"</string>
+    <string name="theme_preview_mock_location_active">"Mock Location Active"</string>
+    <string name="theme_preview_48_8566_n_2_3522_e">"48.8566° N, 2.3522° E"</string>
+    <string name="theme_preview_stop">"Stop"</string>
+</resources>

@@ -35,6 +35,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,6 +53,7 @@ import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.model.Route
 import com.locationjoystick.core.model.SpeedProfile
+import com.locationjoystick.feature.routes.impl.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -192,14 +194,14 @@ fun RouteDetailScreen(
             if (route != null && editedName != route!!.name) {
                 LjOverflowMenu { dismiss ->
                     DropdownMenuItem(
-                        text = { Text("Discard") },
+                        text = { Text(stringResource(R.string.route_detail_discard)) },
                         onClick = {
                             dismiss()
                             editedName = route!!.name
                         },
                     )
                     DropdownMenuItem(
-                        text = { Text("Save") },
+                        text = { Text(stringResource(R.string.route_detail_save)) },
                         onClick = {
                             dismiss()
                             coroutineScope.launch {
@@ -231,14 +233,14 @@ fun RouteDetailScreen(
                             OutlinedTextField(
                                 value = editedName,
                                 onValueChange = { editedName = it },
-                                label = { Text("Route name") },
+                                label = { Text(stringResource(R.string.route_detail_route_name)) },
                                 isError = nameError,
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                             )
                             if (nameError) {
                                 Text(
-                                    "Name cannot be empty",
+                                    stringResource(R.string.route_detail_name_cannot_be_empty),
                                     color = MaterialTheme.colorScheme.error,
                                     style = MaterialTheme.typography.labelSmall,
                                     modifier = Modifier.padding(top = 4.dp, start = 4.dp),
@@ -251,7 +253,7 @@ fun RouteDetailScreen(
                     item {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Text(
-                                "Speed profile",
+                                stringResource(R.string.route_detail_speed_profile),
                                 style = MaterialTheme.typography.labelLarge,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface,
@@ -280,7 +282,7 @@ fun RouteDetailScreen(
 
                     item {
                         Text(
-                            "Waypoints",
+                            stringResource(R.string.route_detail_waypoints),
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -294,7 +296,7 @@ fun RouteDetailScreen(
                                 IconButton(onClick = { viewModel.removeWaypoint(waypoint.id) }) {
                                     Icon(
                                         LjIcons.Delete,
-                                        contentDescription = "Remove waypoint",
+                                        contentDescription = stringResource(R.string.route_detail_remove_waypoint_cd),
                                         tint = MaterialTheme.colorScheme.error,
                                     )
                                 }

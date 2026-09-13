@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -65,6 +66,7 @@ import com.locationjoystick.core.model.AppFeature
 import com.locationjoystick.core.model.FeatureSurface
 import com.locationjoystick.core.model.SpeedProfile
 import com.locationjoystick.core.model.ThemeMode
+import com.locationjoystick.feature.settings.impl.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -142,10 +144,10 @@ private fun ThemeSection(
     uiState: SettingsUiState,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("Appearance", style = MaterialTheme.typography.headlineSmall)
+    Text(stringResource(R.string.settings_menus_appearance), style = MaterialTheme.typography.headlineSmall)
     Spacer(Modifier.height(4.dp))
     Text(
-        "Switch to a light theme for better readability in bright/sunny conditions.",
+        stringResource(R.string.settings_menus_switch_to_a_light_theme_for),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -155,7 +157,7 @@ private fun ThemeSection(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            "Light mode",
+            stringResource(R.string.settings_menus_light_mode),
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.weight(1f),
         )
@@ -178,10 +180,10 @@ private fun TapToWalkSection(
     var showWarning by rememberSaveable { mutableStateOf(false) }
     val enabled = uiState.tapToWalkOverlayEnabled
 
-    Text("Tap to Walk", style = MaterialTheme.typography.headlineSmall)
+    Text(stringResource(R.string.settings_menus_tap_to_walk), style = MaterialTheme.typography.headlineSmall)
     Spacer(Modifier.height(4.dp))
     Text(
-        "Walk to a location by tapping it — no confirmation needed.",
+        stringResource(R.string.settings_menus_walk_to_a_location_by_tapping),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -191,7 +193,7 @@ private fun TapToWalkSection(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            "Enable Tap to Walk",
+            stringResource(R.string.settings_menus_enable_tap_to_walk),
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.weight(1f),
         )
@@ -238,21 +240,21 @@ private fun TapToWalkSection(
     if (showWarning) {
         AlertDialog(
             onDismissRequest = { showWarning = false },
-            title = { Text("Enable Tap to Walk?") },
+            title = { Text(stringResource(R.string.settings_menus_enable_tap_to_walk_2)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("A screen overlay that intercepts taps may increase detection chance in some games. Use at your own risk.")
-                    Text("Accuracy depends on the scale setting — zoom out in the game for better results.")
+                    Text(stringResource(R.string.settings_menus_a_screen_overlay_that_intercepts_taps))
+                    Text(stringResource(R.string.settings_menus_accuracy_depends_on_the_scale_setting))
                 }
             },
             confirmButton = {
                 LjTextButton(onClick = {
                     showWarning = false
                     onAction(SettingsAction.SetTapToWalkOverlayEnabled(true))
-                }) { Text("Enable anyway") }
+                }) { Text(stringResource(R.string.settings_menus_enable_anyway)) }
             },
             dismissButton = {
-                LjTextButton(onClick = { showWarning = false }) { Text("Cancel") }
+                LjTextButton(onClick = { showWarning = false }) { Text(stringResource(R.string.common_cancel)) }
             },
         )
     }
@@ -263,7 +265,7 @@ private fun PrivacySection(
     uiState: SettingsUiState,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("Privacy", style = MaterialTheme.typography.headlineSmall)
+    Text(stringResource(R.string.settings_menus_privacy), style = MaterialTheme.typography.headlineSmall)
     Spacer(Modifier.height(4.dp))
     LjCheckboxRow(
         checked = uiState.hideTeleportFeatures,
@@ -320,7 +322,7 @@ private fun DebugSection(
     uiState: SettingsUiState,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("Debug", style = MaterialTheme.typography.headlineSmall)
+    Text(stringResource(R.string.settings_menus_debug), style = MaterialTheme.typography.headlineSmall)
     Spacer(Modifier.height(4.dp))
     LjCheckboxRow(
         checked = uiState.debugStatsEnabled,
@@ -341,30 +343,26 @@ private fun AccessibilityDisclosureDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDecline,
-        title = { Text("Accessibility service use") },
+        title = { Text(stringResource(R.string.settings_menus_accessibility_service_use)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    "locationjoystick uses Android's Accessibility Service API only for the optional " +
-                        "Compass orientation feature of Tap to Walk.",
+                    stringResource(R.string.settings_menus_locationjoystick_uses_android_s_accessib),
                 )
                 Text(
-                    "What it accesses: a screenshot of your screen, taken when you open the Tap to Walk " +
-                        "overlay or tap Test.",
+                    stringResource(R.string.settings_menus_what_it_accesses_a_screenshot_of),
                 )
                 Text(
-                    "Why: to find your game's compass icon and turn your tap into the correct walking direction.",
+                    stringResource(R.string.settings_menus_why_to_find_your_game_s),
                 )
                 Text(
-                    "The screenshot is processed on your device and deleted right away. It is never saved, " +
-                        "sent, or shared. The service does not read text, collect personal data, or act on " +
-                        "your behalf.",
+                    stringResource(R.string.settings_menus_the_screenshot_is_processed_on_your),
                 )
-                Text("You can turn the service off at any time in Android's accessibility settings.")
+                Text(stringResource(R.string.settings_menus_you_can_turn_the_service_off))
             }
         },
-        confirmButton = { LjTextButton(onClick = onAccept) { Text("Agree") } },
-        dismissButton = { LjTextButton(onClick = onDecline) { Text("No thanks") } },
+        confirmButton = { LjTextButton(onClick = onAccept) { Text(stringResource(R.string.settings_menus_agree)) } },
+        dismissButton = { LjTextButton(onClick = onDecline) { Text(stringResource(R.string.settings_menus_no_thanks)) } },
     )
 }
 
@@ -389,12 +387,10 @@ private fun CompassOrientationSection(
     var showDisclosure by rememberSaveable { mutableStateOf(false) }
     val selectedApp = launchableApps.find { it.packageName == uiState.compassTestTargetPackage }
 
-    Text("Compass orientation", style = MaterialTheme.typography.headlineSmall)
+    Text(stringResource(R.string.settings_menus_compass_orientation), style = MaterialTheme.typography.headlineSmall)
     Spacer(Modifier.height(4.dp))
     Text(
-        "When enabled, the app detects your game's compass (top-right corner, like most AR/GPS games) before each walk " +
-            "to correct the target position — no setup needed. Requires an Accessibility Service. Note: some games " +
-            "detect accessibility services.",
+        stringResource(R.string.settings_menus_when_enabled_the_app_detects_your),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -405,7 +401,7 @@ private fun CompassOrientationSection(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text("Accessibility Service", style = MaterialTheme.typography.bodyLarge)
+            Text(stringResource(R.string.settings_menus_accessibility_service), style = MaterialTheme.typography.bodyLarge)
             Text(
                 if (uiState.isCompassServiceGranted) "Enabled" else "Not enabled — tap to open Android Settings",
                 style = MaterialTheme.typography.bodySmall,
@@ -419,7 +415,7 @@ private fun CompassOrientationSection(
         }
         if (!uiState.isCompassServiceGranted) {
             Spacer(Modifier.width(8.dp))
-            LjButton(onClick = { showDisclosure = true }) { Text("Open Settings") }
+            LjButton(onClick = { showDisclosure = true }) { Text(stringResource(R.string.settings_menus_open_settings)) }
         }
     }
     if (showDisclosure) {
@@ -437,7 +433,7 @@ private fun CompassOrientationSection(
     }
     if (uiState.isCompassServiceGranted) {
         Spacer(Modifier.height(8.dp))
-        Text("Game app", style = MaterialTheme.typography.bodyLarge)
+        Text(stringResource(R.string.settings_menus_game_app), style = MaterialTheme.typography.bodyLarge)
         Spacer(Modifier.height(4.dp))
         Box(modifier = Modifier.fillMaxWidth()) {
             val chevronRotation by animateFloatAsState(
@@ -589,19 +585,28 @@ private fun AppFeaturesSection(
     isRooted: Boolean,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("App Features", style = MaterialTheme.typography.headlineSmall)
+    Text(stringResource(R.string.settings_menus_app_features), style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        "Choose which quick-access features appear in the floating widget and on the map screen, " +
-            "and drag to reorder them. Both surfaces share the same order by default.",
+        stringResource(R.string.settings_menus_choose_which_quick_access_features_appea),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
     Spacer(modifier = Modifier.height(8.dp))
 
     Row(modifier = Modifier.fillMaxWidth().padding(start = 48.dp), horizontalArrangement = Arrangement.End) {
-        Text("Widget", style = MaterialTheme.typography.labelSmall, modifier = Modifier.width(56.dp), textAlign = TextAlign.Center)
-        Text("Map", style = MaterialTheme.typography.labelSmall, modifier = Modifier.width(56.dp), textAlign = TextAlign.Center)
+        Text(
+            stringResource(R.string.settings_menus_widget),
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.width(56.dp),
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            stringResource(R.string.settings_menus_map),
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.width(56.dp),
+            textAlign = TextAlign.Center,
+        )
     }
 
     val order = uiState.featureOrder
@@ -672,10 +677,10 @@ private fun SpeedCycleSection(
     uiState: SettingsUiState,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("Speed Cycle", style = MaterialTheme.typography.headlineSmall)
+    Text(stringResource(R.string.settings_menus_speed_cycle), style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        "Choose which speed profiles the widget's Speed Cycle button cycles through.",
+        stringResource(R.string.settings_menus_choose_which_speed_profiles_the_widget),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )

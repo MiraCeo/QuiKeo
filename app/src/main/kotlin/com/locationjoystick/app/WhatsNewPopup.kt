@@ -41,10 +41,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.locationjoystick.app.R
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.designsystem.LjIcons
 
@@ -116,7 +118,7 @@ private fun WhatsNewBadge(
             modifier = Modifier.size(16.dp),
         )
         Text(
-            text = "What's new",
+            text = stringResource(R.string.whats_new_what_s_new),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onPrimary,
         )
@@ -132,7 +134,7 @@ private fun WhatsNewBadge(
         ) {
             Icon(
                 imageVector = LjIcons.Close,
-                contentDescription = "Dismiss",
+                contentDescription = stringResource(R.string.whats_new_dismiss_cd),
                 tint = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.size(16.dp),
             )
@@ -148,7 +150,14 @@ private fun WhatsNewDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("What's new in v${AppConstants.AppInfo.VERSION_NAME}") },
+        title = {
+            Text(
+                stringResource(
+                    R.string.whats_new_what_s_new_in_version,
+                    AppConstants.AppInfo.VERSION_NAME,
+                ),
+            )
+        },
         text = {
             when (loadState) {
                 is WhatsNewLoadState.Loading ->
@@ -157,7 +166,7 @@ private fun WhatsNewDialog(
                     }
                 is WhatsNewLoadState.Failed ->
                     Text(
-                        "Couldn't load what's new. Check your connection, or view the full changelog online.",
+                        stringResource(R.string.whats_new_couldn_t_load_what_s_new),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 is WhatsNewLoadState.Loaded ->
@@ -179,7 +188,7 @@ private fun WhatsNewDialog(
                                 )
                                 scopeGroup.entries.forEach { entry ->
                                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                        Text("•", style = MaterialTheme.typography.bodyMedium)
+                                        Text(stringResource(R.string.whats_new_bullet), style = MaterialTheme.typography.bodyMedium)
                                         Text(entry.summary, style = MaterialTheme.typography.bodyMedium)
                                     }
                                 }
@@ -190,12 +199,12 @@ private fun WhatsNewDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Got it")
+                Text(stringResource(R.string.whats_new_got_it))
             }
         },
         dismissButton = {
             TextButton(onClick = onViewFullChangelog) {
-                Text("View full changelog")
+                Text(stringResource(R.string.whats_new_view_full_changelog))
             }
         },
     )

@@ -4,6 +4,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.locationjoystick.core.designsystem.R
 
 /**
  * Shared "Delete X?" confirmation, used anywhere a named item (route, favorite, ...) can be
@@ -22,12 +24,12 @@ fun LjDeleteConfirmDialog(
         text = { Text("This $itemType will be permanently deleted and cannot be undone.") },
         confirmButton = {
             LjTextButton(onClick = onConfirm) {
-                Text("Delete", color = MaterialTheme.colorScheme.error)
+                Text(stringResource(R.string.delete_confirm_dialog_delete), color = MaterialTheme.colorScheme.error)
             }
         },
         dismissButton = {
             LjTextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.delete_confirm_dialog_cancel))
             }
         },
     )

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="map_floating_close_cd">"Close"</string>
+    <string name="map_floating_route_in_progress">"Route in progress"</string>
+    <string name="map_floating_stop_route_and_teleport">"Stop route and teleport"</string>
+    <string name="map_floating_stop_route_and_walk_here">"Stop route and walk here"</string>
+    <string name="map_floating_finish_route_and_walk_here">"Finish route and walk here"</string>
+    <string name="map_floating_move_to_this_location">"Move to this location?"</string>
+    <string name="map_floating_teleport_here">"Teleport here"</string>
+    <string name="map_floating_walk_here">"Walk here"</string>
+    <string name="map_floating_walk_here_via_roads">"Walk here via roads"</string>
+    <string name="map_floating_add_next_point">"Add next point"</string>
+    <string name="map_floating_add_next_point_via_roads">"Add next point via roads"</string>
+    <string name="map_floating_do_nothing">"Do nothing"</string>
+    <string name="tap_to_walk_overlay_tap_anywhere_to_walk_there">"Tap anywhere to walk there"</string>
+    <string name="tap_to_walk_overlay_cancel_tap_to_walk_cd">"Cancel tap-to-walk"</string>
+    <string name="widget_panel_altitude_m">"Altitude (m)"</string>
+    <string name="widget_panel_confirm_altitude_cd">"Confirm altitude"</string>
+    <string name="widget_panel_back_cd">"Back"</string>
+    <string name="widget_panel_close_cd">"Close"</string>
+    <string name="widget_panel_name">"Name"</string>
+    <string name="widget_panel_cancel">"Cancel"</string>
+    <string name="widget_panel_save">"Save"</string>
+    <string name="widget_panel_add_from_current_location">"Add from current location"</string>
+    <string name="widget_panel_leader_position_not_yet_known">"Leader position not yet known — try again in a moment"</string>
+    <string name="widget_panel_suggested_wait">"Suggested wait: %1$s"</string>
+</resources>

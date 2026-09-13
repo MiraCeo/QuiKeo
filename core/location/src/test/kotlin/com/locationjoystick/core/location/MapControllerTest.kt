@@ -87,7 +87,7 @@ class MapControllerTest {
             val osrmClient = mockk<OsrmClient>(relaxed = true)
             val walkToEngine = WalkToEngine(settingsRepository, locationRepository)
             val walkCoordinator = WalkCoordinator(locationRepository, walkToEngine)
-            val routingErrorReporter = RoutingErrorReporter()
+            val routingErrorReporter = RoutingErrorReporter(mockk<android.content.Context>(relaxed = true))
             val ephemeralController =
                 EphemeralReplayController(
                     locationRepository,
@@ -188,7 +188,7 @@ class MapControllerTest {
                 }
             val walkToEngine = WalkToEngine(settingsRepository, locationRepository)
             val walkCoordinator = WalkCoordinator(locationRepository, walkToEngine)
-            val routingErrorReporter = RoutingErrorReporter()
+            val routingErrorReporter = RoutingErrorReporter(mockk<android.content.Context>(relaxed = true))
             val ephemeralController =
                 EphemeralReplayController(
                     locationRepository,
@@ -283,7 +283,7 @@ class MapControllerTest {
                 }
             val walkToEngine = WalkToEngine(settingsRepository, locationRepository)
             val walkCoordinator = WalkCoordinator(locationRepository, walkToEngine)
-            val routingErrorReporter = RoutingErrorReporter()
+            val routingErrorReporter = RoutingErrorReporter(mockk<android.content.Context>(relaxed = true))
             val ephemeralController =
                 EphemeralReplayController(
                     locationRepository,
@@ -374,7 +374,7 @@ class MapControllerTest {
                 }
             val walkToEngine = WalkToEngine(settingsRepository, locationRepository)
             val walkCoordinator = WalkCoordinator(locationRepository, walkToEngine)
-            val routingErrorReporter = RoutingErrorReporter()
+            val routingErrorReporter = RoutingErrorReporter(mockk<android.content.Context>(relaxed = true))
             val ephemeralController =
                 EphemeralReplayController(
                     locationRepository,

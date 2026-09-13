@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -42,6 +43,7 @@ import com.locationjoystick.core.map.geojson.buildMarkerGeoJson
 import com.locationjoystick.core.map.maplibre.addPickerLayers
 import com.locationjoystick.core.model.RecentSearch
 import com.locationjoystick.core.overlay.OverlayService
+import com.locationjoystick.feature.favorites.impl.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -314,12 +316,12 @@ private fun SaveLocationDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Save Location") },
+        title = { Text(stringResource(R.string.map_picker_save_location)) },
         text = {
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Name") },
+                label = { Text(stringResource(R.string.common_name)) },
                 modifier = Modifier,
                 singleLine = true,
             )
@@ -332,12 +334,12 @@ private fun SaveLocationDialog(
                     }
                 },
             ) {
-                Text("Save")
+                Text(stringResource(R.string.common_save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.common_cancel))
             }
         },
     )

@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.data.CooldownState
 import com.locationjoystick.core.data.toBadgeText
@@ -40,6 +41,7 @@ import com.locationjoystick.core.designsystem.component.RouteStartSheetContent
 import com.locationjoystick.core.designsystem.component.RoutesPickerList
 import com.locationjoystick.core.model.RouteType
 import com.locationjoystick.core.model.startWaypoint
+import com.locationjoystick.feature.map.impl.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +64,7 @@ internal fun RoutesPickerSheet(
             Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = { selectedRouteId = null }) {
-                        Icon(LjIcons.ArrowBack, contentDescription = "Back")
+                        Icon(LjIcons.ArrowBack, contentDescription = stringResource(R.string.map_sheet_back_cd))
                     }
                     Text(
                         text = route?.name ?: "Start route",
@@ -178,14 +180,14 @@ internal fun PendingTapSheet(
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState()).padding(16.dp)) {
             if (isRouteReplay && !isEphemeralReplay) {
-                Text("Route in progress", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.map_sheet_route_in_progress), style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(16.dp))
                 if (!hideTeleportFeatures) {
                     LjButton(
                         onClick = { onAction(MapAction.StopRouteAndTeleport(position)) },
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Text("Stop route and teleport")
+                        Text(stringResource(R.string.map_sheet_stop_route_and_teleport))
                     }
                     Spacer(Modifier.height(8.dp))
                 }
@@ -193,17 +195,17 @@ internal fun PendingTapSheet(
                     onClick = { onAction(MapAction.StopRouteAndWalkTo(position)) },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Stop route and walk here")
+                    Text(stringResource(R.string.map_sheet_stop_route_and_walk_here))
                 }
                 Spacer(Modifier.height(8.dp))
                 LjOutlinedButton(
                     onClick = { onAction(MapAction.FinishRouteAndWalkTo(position)) },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Finish route and walk here")
+                    Text(stringResource(R.string.map_sheet_finish_route_and_walk_here))
                 }
             } else {
-                Text("Move to this location?", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.map_sheet_move_to_this_location), style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(12.dp))
                 CooldownAdvisoryBadge(
                     (cooldownState as? CooldownState.Cooling)?.toAdvisoryLabel() ?: "No wait needed",
@@ -214,7 +216,7 @@ internal fun PendingTapSheet(
                         onClick = { onAction(MapAction.ConfirmTeleport(position)) },
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Text("Teleport here")
+                        Text(stringResource(R.string.map_sheet_teleport_here))
                     }
                     Spacer(Modifier.height(8.dp))
                 }
@@ -229,7 +231,7 @@ internal fun PendingTapSheet(
                         },
                         modifier = Modifier.weight(1f),
                     ) {
-                        Text("Walk here")
+                        Text(stringResource(R.string.map_sheet_walk_here))
                     }
                     LjOutlinedButton(
                         onClick = {
@@ -242,7 +244,7 @@ internal fun PendingTapSheet(
                         if (isRoadRouteFetchInFlight) {
                             CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                         } else {
-                            Text("Walk via roads")
+                            Text(stringResource(R.string.map_sheet_walk_via_roads))
                         }
                     }
                 }
@@ -256,7 +258,7 @@ internal fun PendingTapSheet(
                             onClick = { onAction(MapAction.AddEphemeralWaypoint(position, followRoads = false)) },
                             modifier = Modifier.weight(1f),
                         ) {
-                            Text("Add next point")
+                            Text(stringResource(R.string.map_sheet_add_next_point))
                         }
                         LjOutlinedButton(
                             onClick = { onAction(MapAction.AddEphemeralWaypoint(position, followRoads = true)) },
@@ -266,7 +268,7 @@ internal fun PendingTapSheet(
                             if (isRoadRouteFetchInFlight) {
                                 CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                             } else {
-                                Text("Add next point via roads")
+                                Text(stringResource(R.string.map_sheet_add_next_point_via_roads))
                             }
                         }
                     }
@@ -278,7 +280,7 @@ internal fun PendingTapSheet(
                     onClick = onShare,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Share this location")
+                    Text(stringResource(R.string.map_sheet_share_this_location))
                 }
             }
             Spacer(Modifier.height(4.dp))
@@ -286,7 +288,7 @@ internal fun PendingTapSheet(
                 onClick = { onAction(MapAction.ClearPendingTap) },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Close")
+                Text(stringResource(R.string.map_sheet_close))
             }
         }
     }
@@ -301,12 +303,12 @@ internal fun SaveCurrentLocationDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Save current location") },
+        title = { Text(stringResource(R.string.map_sheet_save_current_location)) },
         text = {
             androidx.compose.material3.OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Name") },
+                label = { Text(stringResource(R.string.map_sheet_name)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
             )
@@ -316,12 +318,12 @@ internal fun SaveCurrentLocationDialog(
                 onClick = { onSave(name.trim()) },
                 enabled = name.isNotBlank(),
             ) {
-                Text("Save")
+                Text(stringResource(R.string.map_sheet_save))
             }
         },
         dismissButton = {
             LjTextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.map_sheet_cancel))
             }
         },
     )

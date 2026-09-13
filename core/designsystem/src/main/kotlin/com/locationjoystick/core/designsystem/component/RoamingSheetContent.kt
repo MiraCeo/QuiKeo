@@ -27,11 +27,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.common.util.toLocaleDoubleOrNull
 import com.locationjoystick.core.designsystem.LjSpacing
 import com.locationjoystick.core.designsystem.LjText
+import com.locationjoystick.core.designsystem.R
 import com.locationjoystick.core.model.RoamingDefaults
 import com.locationjoystick.core.model.SpeedUnit
 import kotlin.math.roundToInt
@@ -88,7 +90,7 @@ fun RoamingSheetContent(
                 .padding(horizontal = LjSpacing.md)
                 .padding(bottom = LjSpacing.lg),
     ) {
-        Text("Roaming", style = MaterialTheme.typography.headlineSmall, color = LjText)
+        Text(stringResource(R.string.roaming_sheet_roaming), style = MaterialTheme.typography.headlineSmall, color = LjText)
 
         Spacer(Modifier.height(LjSpacing.sm))
 
@@ -101,7 +103,7 @@ fun RoamingSheetContent(
                     .fillMaxWidth()
                     .then(if (!hasPreview) Modifier.alpha(0.4f) else Modifier),
         ) {
-            Text("View on map")
+            Text(stringResource(R.string.roaming_sheet_view_on_map))
         }
 
         Spacer(Modifier.height(12.dp))
@@ -157,7 +159,7 @@ fun RoamingSheetContent(
         Spacer(Modifier.height(12.dp))
 
         // Speed profile selector
-        Text("Speed profile", style = MaterialTheme.typography.labelLarge, color = LjText)
+        Text(stringResource(R.string.roaming_sheet_speed_profile), style = MaterialTheme.typography.labelLarge, color = LjText)
         Spacer(Modifier.height(LjSpacing.xs))
         SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
             SPEED_PROFILES.forEachIndexed { index, id ->
@@ -183,7 +185,7 @@ fun RoamingSheetContent(
                     checked = draft.followRoads,
                     onCheckedChange = { onDraftChange(draft.copy(followRoads = it)) },
                 )
-                Text("Follow roads", style = MaterialTheme.typography.bodyMedium, color = LjText)
+                Text(stringResource(R.string.roaming_sheet_follow_roads), style = MaterialTheme.typography.bodyMedium, color = LjText)
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -193,7 +195,7 @@ fun RoamingSheetContent(
                     checked = draft.returnToInitialLocation,
                     onCheckedChange = { onDraftChange(draft.copy(returnToInitialLocation = it)) },
                 )
-                Text("Return to start", style = MaterialTheme.typography.bodyMedium, color = LjText)
+                Text(stringResource(R.string.roaming_sheet_return_to_start), style = MaterialTheme.typography.bodyMedium, color = LjText)
             }
         }
 
@@ -212,7 +214,7 @@ fun RoamingSheetContent(
                         strokeWidth = 2.dp,
                     )
                 } else {
-                    Text("Generate")
+                    Text(stringResource(R.string.roaming_sheet_generate))
                 }
             }
             LjButton(
@@ -220,13 +222,13 @@ fun RoamingSheetContent(
                 enabled = hasCurrentPosition && isSpoofingActive && !isPreviewLoading,
                 modifier = Modifier.weight(1f).padding(start = LjSpacing.xs),
             ) {
-                Text("Start")
+                Text(stringResource(R.string.common_start))
             }
         }
 
         if (!hasCurrentPosition || !isSpoofingActive) {
             Text(
-                "Start location spoofing first to enable roaming",
+                stringResource(R.string.roaming_sheet_start_location_spoofing_first_to_enable),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = LjSpacing.xs),

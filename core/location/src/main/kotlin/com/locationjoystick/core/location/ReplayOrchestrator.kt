@@ -1,5 +1,6 @@
 package com.locationjoystick.core.location
 
+import android.content.Context
 import android.util.Log
 import com.locationjoystick.core.common.util.BearingTracker
 import com.locationjoystick.core.data.LocationRepository
@@ -40,6 +41,7 @@ private const val TAG = "ReplayOrchestrator"
  * - [startUpdateLoop]: restarts the idle update loop after replay ends
  */
 internal class ReplayOrchestrator(
+    private val context: Context,
     private val locationRepository: LocationRepository,
     private val routeRepository: RouteRepository,
     private val roamingRepository: RoamingRepository,
@@ -440,6 +442,8 @@ internal class ReplayOrchestrator(
     }
 
     private fun reportWalkToStartFallback(reason: OsrmFailureReason) {
-        routingErrorReporter.report("${osrmFailureMessage(reason)} — using straight walk to the route start")
+        routingErrorReporter.report(
+            context.getString(R.string.walk_to_start_fallback_message, osrmFailureMessage(context, reason)),
+        )
     }
 }

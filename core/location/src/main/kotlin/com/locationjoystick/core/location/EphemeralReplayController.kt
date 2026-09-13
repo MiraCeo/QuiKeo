@@ -100,7 +100,7 @@ class EphemeralReplayController
                                                     startPos,
                                                     walkTarget,
                                                     followRoads = true,
-                                                    onFallback = ::reportFallback,
+                                                    onFallback = { reportFallback(context, it) },
                                                 )
                                             }
                                         val b =
@@ -110,7 +110,7 @@ class EphemeralReplayController
                                                     walkTarget,
                                                     newPoint,
                                                     followRoads = true,
-                                                    onFallback = ::reportFallback,
+                                                    onFallback = { reportFallback(context, it) },
                                                 )
                                             }
                                         a.await() to b.await()
@@ -140,7 +140,7 @@ class EphemeralReplayController
                                         from,
                                         newPoint,
                                         followRoads = true,
-                                        onFallback = ::reportFallback,
+                                        onFallback = { reportFallback(context, it) },
                                     ).drop(1) // first point is `from`, already in the route
                             } finally {
                                 locationRepository.setRoadRouteFetchInFlight(false)
@@ -157,7 +157,12 @@ class EphemeralReplayController
             return result
         }
 
-        private fun reportFallback(reason: OsrmFailureReason) {
-            routingErrorReporter.report("${osrmFailureMessage(reason)} — using straight line for part of the route")
+        private fun reportFallback(
+            context: Context,
+            reason: OsrmFailureReason,
+        ) {
+            routingErrorReporter.report(
+                context.getString(R.string.ephemeral_replay_fallback_message, osrmFailureMessage(context, reason)),
+            )
         }
     }

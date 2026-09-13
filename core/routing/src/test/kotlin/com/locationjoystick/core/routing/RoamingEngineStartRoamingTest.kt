@@ -3,6 +3,7 @@ package com.locationjoystick.core.routing
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.RoamingConfig
 import com.locationjoystick.core.model.distanceTo
+import io.mockk.mockk
 import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -19,7 +20,13 @@ class RoamingEngineStartRoamingTest {
 
     @Before
     fun setUp() {
-        engine = RoamingEngine(OsrmClient(), RouteInterpolator(), RoutingErrorReporter(), kotlinx.coroutines.Dispatchers.Unconfined)
+        engine =
+            RoamingEngine(
+                OsrmClient(),
+                RouteInterpolator(),
+                RoutingErrorReporter(mockk<android.content.Context>(relaxed = true)),
+                kotlinx.coroutines.Dispatchers.Unconfined,
+            )
     }
 
     @After

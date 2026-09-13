@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,6 +54,7 @@ import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.RecentSearch
 import com.locationjoystick.core.model.RouteType
 import com.locationjoystick.core.overlay.OverlayService
+import com.locationjoystick.feature.routes.impl.R
 import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
@@ -400,12 +402,12 @@ private fun SaveRouteDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Save Route") },
+        title = { Text(stringResource(R.string.route_creator_save_route)) },
         text = {
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Route name") },
+                label = { Text(stringResource(R.string.route_creator_route_name)) },
                 modifier = Modifier,
                 singleLine = true,
             )
@@ -418,12 +420,12 @@ private fun SaveRouteDialog(
                     }
                 },
             ) {
-                Text("Save")
+                Text(stringResource(R.string.route_creator_save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.route_creator_cancel))
             }
         },
     )
@@ -440,12 +442,12 @@ private fun TeleportWaitDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Wait duration") },
+        title = { Text(stringResource(R.string.route_creator_wait_duration)) },
         text = {
             OutlinedTextField(
                 value = text,
                 onValueChange = { text = it },
-                label = { Text("Seconds to wait here") },
+                label = { Text(stringResource(R.string.route_creator_seconds_to_wait_here)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             )
@@ -455,12 +457,12 @@ private fun TeleportWaitDialog(
                 onClick = { seconds?.let(onConfirm) },
                 enabled = isValid,
             ) {
-                Text("Confirm")
+                Text(stringResource(R.string.route_creator_confirm))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.route_creator_cancel_2))
             }
         },
     )

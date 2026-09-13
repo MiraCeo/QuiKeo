@@ -17,11 +17,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.common.util.toLocaleDoubleOrNull
 import com.locationjoystick.core.designsystem.component.LjButton
 import com.locationjoystick.core.designsystem.component.LjCheckboxRow
+import com.locationjoystick.feature.settings.impl.R
 import kotlin.math.roundToInt
 
 private fun formatJitterDouble(d: Double): String {
@@ -103,15 +105,15 @@ internal fun GpsJitterSection(
     isMph: Boolean,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("Location Randomness", style = MaterialTheme.typography.headlineSmall)
+    Text(stringResource(R.string.settings_gps_section_location_randomness), style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        "Adds small random shifts to your fake location, making it look more natural. Set 0 to disable.",
+        stringResource(R.string.settings_gps_section_adds_small_random_shifts_to_your),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
     Spacer(modifier = Modifier.height(8.dp))
-    Text("Position jitter", style = MaterialTheme.typography.labelLarge)
+    Text(stringResource(R.string.settings_gps_section_position_jitter), style = MaterialTheme.typography.labelLarge)
     Spacer(modifier = Modifier.height(4.dp))
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         JitterInput(
@@ -135,7 +137,7 @@ internal fun GpsJitterSection(
         modifier = Modifier.fillMaxWidth(),
     )
     Spacer(modifier = Modifier.height(8.dp))
-    Text("Speed variation", style = MaterialTheme.typography.labelLarge)
+    Text(stringResource(R.string.settings_gps_section_speed_variation), style = MaterialTheme.typography.labelLarge)
     Spacer(modifier = Modifier.height(4.dp))
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         JitterInput(
@@ -166,11 +168,10 @@ internal fun GpsRealismSection(
     isMph: Boolean,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("GPS Realism", style = MaterialTheme.typography.headlineSmall)
+    Text(stringResource(R.string.settings_gps_section_gps_realism), style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        "Controls how the fake GPS signal behaves. These options add metadata and variation that real GPS " +
-            "chips produce — some apps and games inspect these signals to detect fake locations.",
+        stringResource(R.string.settings_gps_section_controls_how_the_fake_gps_signal),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -214,10 +215,10 @@ internal fun GpsRealismSection(
         onClick = { onAction(SettingsAction.ResetAltitudeOverride) },
         enabled = uiState.hasAltitudeOverride,
     ) {
-        Text("Reset elevation override")
+        Text(stringResource(R.string.settings_gps_section_reset_elevation_override))
     }
     Text(
-        "Clears a manually-set altitude (floating widget) and lets automatic elevation lookup resume.",
+        stringResource(R.string.settings_gps_section_clears_a_manually_set_altitude_floating),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )

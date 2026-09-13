@@ -3,6 +3,7 @@ package com.locationjoystick.core.routing
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.RoamingConfig
 import com.locationjoystick.core.model.distanceTo
+import io.mockk.mockk
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
@@ -10,7 +11,13 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
 class RoamingEngineTest {
-    private val engine = RoamingEngine(OsrmClient(), RouteInterpolator(), RoutingErrorReporter(), kotlinx.coroutines.Dispatchers.Unconfined)
+    private val engine =
+        RoamingEngine(
+            OsrmClient(),
+            RouteInterpolator(),
+            RoutingErrorReporter(mockk<android.content.Context>(relaxed = true)),
+            kotlinx.coroutines.Dispatchers.Unconfined,
+        )
 
     @Test
     fun `randomPointInRadius stays within radius`() {
@@ -88,7 +95,13 @@ class RoamingEngineTest {
         val distanceMeters = 50.0
         val speedMs = 2.0
 
-        val e = RoamingEngine(OsrmClient(), RouteInterpolator(), RoutingErrorReporter(), kotlinx.coroutines.Dispatchers.Unconfined)
+        val e =
+            RoamingEngine(
+                OsrmClient(),
+                RouteInterpolator(),
+                RoutingErrorReporter(mockk<android.content.Context>(relaxed = true)),
+                kotlinx.coroutines.Dispatchers.Unconfined,
+            )
         val config =
             RoamingConfig(
                 centerPosition = center,
@@ -115,7 +128,13 @@ class RoamingEngineTest {
         val distanceMeters = 50.0
         val speedMs = 2.0
 
-        val e = RoamingEngine(OsrmClient(), RouteInterpolator(), RoutingErrorReporter(), kotlinx.coroutines.Dispatchers.Unconfined)
+        val e =
+            RoamingEngine(
+                OsrmClient(),
+                RouteInterpolator(),
+                RoutingErrorReporter(mockk<android.content.Context>(relaxed = true)),
+                kotlinx.coroutines.Dispatchers.Unconfined,
+            )
         val config =
             RoamingConfig(
                 centerPosition = center,

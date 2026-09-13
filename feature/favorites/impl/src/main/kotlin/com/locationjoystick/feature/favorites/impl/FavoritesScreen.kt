@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -59,6 +60,7 @@ import com.locationjoystick.core.designsystem.component.LjTextButton
 import com.locationjoystick.core.designsystem.component.WideContentClamp
 import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.model.LatLng
+import com.locationjoystick.feature.favorites.impl.R
 
 @Composable
 fun FavoritesRoute(
@@ -157,7 +159,7 @@ internal fun FavoritesScreen(
         actions = {
             LjOverflowMenu { dismiss ->
                 DropdownMenuItem(
-                    text = { Text("Sort") },
+                    text = { Text(stringResource(R.string.favorites_screen_sort)) },
                     onClick = {
                         dismiss()
                         onToggleSort()
@@ -168,7 +170,7 @@ internal fun FavoritesScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { showAddOptionsSheet = true }) {
-                Icon(LjIcons.Add, contentDescription = "Add favorite")
+                Icon(LjIcons.Add, contentDescription = stringResource(R.string.favorites_screen_add_favorite_cd))
             }
         },
     ) { scaffoldPadding ->
@@ -182,7 +184,7 @@ internal fun FavoritesScreen(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    label = { Text("Search favorites") },
+                    label = { Text(stringResource(R.string.favorites_screen_search_favorites)) },
                     leadingIcon = { Icon(LjIcons.Search, contentDescription = null) },
                     singleLine = true,
                     modifier =
@@ -210,7 +212,7 @@ internal fun FavoritesScreen(
                             modifier = Modifier.align(Alignment.Center),
                             action = {
                                 LjButton(onClick = { showAddOptionsSheet = true }) {
-                                    Text("Add a favorite")
+                                    Text(stringResource(R.string.favorites_screen_add_a_favorite))
                                 }
                             },
                         )
@@ -290,7 +292,7 @@ internal fun FavoritesScreen(
             containerColor = MaterialTheme.colorScheme.surface,
         ) {
             Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-                Text("Add a favorite", style = MaterialTheme.typography.headlineSmall)
+                Text(stringResource(R.string.favorites_screen_add_a_favorite_2), style = MaterialTheme.typography.headlineSmall)
                 Spacer(Modifier.height(12.dp))
                 LjActionSheetRow(
                     icon = LjIcons.Map,
@@ -372,14 +374,14 @@ private fun FavoriteCard(
         trailing = {
             Box {
                 IconButton(onClick = { menuExpanded = true }) {
-                    Icon(LjIcons.MoreVert, contentDescription = "More options")
+                    Icon(LjIcons.MoreVert, contentDescription = stringResource(R.string.favorites_screen_more_options_cd))
                 }
                 DropdownMenu(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Edit") },
+                        text = { Text(stringResource(R.string.favorites_screen_edit)) },
                         onClick = {
                             onEdit(favorite)
                             menuExpanded = false
@@ -387,7 +389,7 @@ private fun FavoriteCard(
                         leadingIcon = { Icon(LjIcons.Edit, null) },
                     )
                     DropdownMenuItem(
-                        text = { Text("Share") },
+                        text = { Text(stringResource(R.string.favorites_screen_share)) },
                         onClick = {
                             onShare(favorite)
                             menuExpanded = false
@@ -396,7 +398,7 @@ private fun FavoriteCard(
                     )
                     LjOverflowMenuSectionLabel("Danger")
                     DropdownMenuItem(
-                        text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
+                        text = { Text(stringResource(R.string.favorites_screen_delete), color = MaterialTheme.colorScheme.error) },
                         onClick = {
                             onDelete(favorite)
                             menuExpanded = false
@@ -442,7 +444,7 @@ private fun AddFavoriteSheet(
         contentModifier = Modifier.fillMaxWidth().padding(16.dp).imePadding(),
     ) {
         Text(
-            "Add Favorite Location",
+            stringResource(R.string.favorites_screen_add_favorite_location),
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onSurface,
         )
@@ -450,7 +452,7 @@ private fun AddFavoriteSheet(
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
-            label = { Text("Name") },
+            label = { Text(stringResource(R.string.common_name)) },
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -467,7 +469,7 @@ private fun AddFavoriteSheet(
             OutlinedTextField(
                 value = lat,
                 onValueChange = { lat = it },
-                label = { Text("Latitude") },
+                label = { Text(stringResource(R.string.favorites_screen_latitude)) },
                 modifier = Modifier.weight(1f),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -475,7 +477,7 @@ private fun AddFavoriteSheet(
             OutlinedTextField(
                 value = lon,
                 onValueChange = { lon = it },
-                label = { Text("Longitude") },
+                label = { Text(stringResource(R.string.favorites_screen_longitude)) },
                 modifier = Modifier.weight(1f),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -490,13 +492,13 @@ private fun AddFavoriteSheet(
             horizontalArrangement = Arrangement.End,
         ) {
             LjTextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.common_cancel))
             }
             LjTextButton(
                 onClick = { onAdd(name, latVal!!, lonVal!!) },
                 enabled = isValid,
             ) {
-                Text("Save")
+                Text(stringResource(R.string.common_save))
             }
         }
     }
@@ -518,12 +520,12 @@ private fun EditFavoriteDialog(
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(Modifier.fillMaxWidth().padding(16.dp)) {
-            Text("Edit Favorite", style = MaterialTheme.typography.headlineSmall)
+            Text(stringResource(R.string.favorites_screen_edit_favorite), style = MaterialTheme.typography.headlineSmall)
             Spacer(Modifier.height(12.dp))
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Name") },
+                label = { Text(stringResource(R.string.common_name)) },
                 modifier =
                     Modifier
                         .fillMaxWidth()
@@ -532,7 +534,7 @@ private fun EditFavoriteDialog(
             OutlinedTextField(
                 value = lat,
                 onValueChange = { lat = it },
-                label = { Text("Latitude") },
+                label = { Text(stringResource(R.string.favorites_screen_latitude_2)) },
                 modifier =
                     Modifier
                         .fillMaxWidth()
@@ -541,19 +543,19 @@ private fun EditFavoriteDialog(
             OutlinedTextField(
                 value = lon,
                 onValueChange = { lon = it },
-                label = { Text("Longitude") },
+                label = { Text(stringResource(R.string.favorites_screen_longitude_2)) },
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                 LjTextButton(onClick = onDismiss) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.common_cancel))
                 }
                 LjTextButton(
                     onClick = { onSave(name, latVal!!, lonVal!!) },
                     enabled = isValid,
                 ) {
-                    Text("Save")
+                    Text(stringResource(R.string.common_save))
                 }
             }
         }

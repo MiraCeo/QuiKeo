@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
@@ -73,6 +74,7 @@ import com.locationjoystick.core.model.MockMode
 import com.locationjoystick.core.model.RecentSearch
 import com.locationjoystick.core.model.RoamingDefaults
 import com.locationjoystick.core.model.SpeedUnit
+import com.locationjoystick.feature.widget.impl.R
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -341,7 +343,7 @@ internal fun MapFloatingView(
                     .padding(8.dp)
                     .background(LjBg, CircleShape),
         ) {
-            Icon(LjIcons.Close, contentDescription = "Close", tint = LjText)
+            Icon(LjIcons.Close, contentDescription = stringResource(R.string.map_floating_close_cd), tint = LjText)
         }
 
         // FAB column — bottom-right, mirrors main map layout
@@ -643,7 +645,7 @@ private fun BoxScope.TapActionPanel(
                 .padding(16.dp),
     ) {
         if (isRouteReplay && !isEphemeralReplay) {
-            Text("Route in progress", style = MaterialTheme.typography.titleMedium, color = LjText)
+            Text(stringResource(R.string.map_floating_route_in_progress), style = MaterialTheme.typography.titleMedium, color = LjText)
             Spacer(Modifier.height(16.dp))
             if (!hideTeleportFeatures) {
                 LjButton(
@@ -652,7 +654,7 @@ private fun BoxScope.TapActionPanel(
                         onDismiss()
                     },
                     modifier = Modifier.fillMaxWidth(),
-                ) { Text("Stop route and teleport") }
+                ) { Text(stringResource(R.string.map_floating_stop_route_and_teleport)) }
                 Spacer(Modifier.height(8.dp))
             }
             LjOutlinedButton(
@@ -661,7 +663,7 @@ private fun BoxScope.TapActionPanel(
                     onDismiss()
                 },
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text("Stop route and walk here") }
+            ) { Text(stringResource(R.string.map_floating_stop_route_and_walk_here)) }
             Spacer(Modifier.height(8.dp))
             LjOutlinedButton(
                 onClick = {
@@ -669,9 +671,9 @@ private fun BoxScope.TapActionPanel(
                     onDismiss()
                 },
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text("Finish route and walk here") }
+            ) { Text(stringResource(R.string.map_floating_finish_route_and_walk_here)) }
         } else {
-            Text("Move to this location?", style = MaterialTheme.typography.titleMedium, color = LjText)
+            Text(stringResource(R.string.map_floating_move_to_this_location), style = MaterialTheme.typography.titleMedium, color = LjText)
             val cooldownState by remember(tap) {
                 cooldownForPosition?.invoke(tap) ?: flowOf(CooldownState.Ready)
             }.collectAsStateWithLifecycle(initialValue = CooldownState.Ready)
@@ -687,7 +689,7 @@ private fun BoxScope.TapActionPanel(
                         onDismiss()
                     },
                     modifier = Modifier.fillMaxWidth(),
-                ) { Text("Teleport here") }
+                ) { Text(stringResource(R.string.map_floating_teleport_here)) }
                 Spacer(Modifier.height(8.dp))
             }
             LjOutlinedButton(
@@ -696,7 +698,7 @@ private fun BoxScope.TapActionPanel(
                     onDismiss()
                 },
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text("Walk here") }
+            ) { Text(stringResource(R.string.map_floating_walk_here)) }
             Spacer(Modifier.height(8.dp))
             LjOutlinedButton(
                 onClick = {
@@ -704,7 +706,7 @@ private fun BoxScope.TapActionPanel(
                     onDismiss()
                 },
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text("Walk here via roads") }
+            ) { Text(stringResource(R.string.map_floating_walk_here_via_roads)) }
             if (isWalkActive) {
                 Spacer(Modifier.height(8.dp))
                 LjOutlinedButton(
@@ -713,7 +715,7 @@ private fun BoxScope.TapActionPanel(
                         onDismiss()
                     },
                     modifier = Modifier.fillMaxWidth(),
-                ) { Text("Add next point") }
+                ) { Text(stringResource(R.string.map_floating_add_next_point)) }
                 Spacer(Modifier.height(8.dp))
                 LjOutlinedButton(
                     onClick = {
@@ -721,13 +723,13 @@ private fun BoxScope.TapActionPanel(
                         onDismiss()
                     },
                     modifier = Modifier.fillMaxWidth(),
-                ) { Text("Add next point via roads") }
+                ) { Text(stringResource(R.string.map_floating_add_next_point_via_roads)) }
             }
         }
         Spacer(Modifier.height(4.dp))
         LjTextButton(
             onClick = { onDismiss() },
             modifier = Modifier.fillMaxWidth(),
-        ) { Text("Do nothing") }
+        ) { Text(stringResource(R.string.map_floating_do_nothing)) }
     }
 }

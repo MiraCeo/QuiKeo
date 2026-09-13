@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
@@ -43,6 +44,7 @@ import com.locationjoystick.core.designsystem.LjError
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.LjSpacing
 import com.locationjoystick.core.designsystem.LjSuccess
+import com.locationjoystick.core.designsystem.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,7 +80,7 @@ fun LjTopBar(
                     IconButton(onClick = onNavigationClick) {
                         Icon(
                             imageVector = navigationIcon,
-                            contentDescription = "Open navigation menu",
+                            contentDescription = stringResource(R.string.top_bar_open_navigation_menu_cd),
                             tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
@@ -166,7 +168,7 @@ fun LjOverflowMenu(content: @Composable ColumnScope.(dismiss: () -> Unit) -> Uni
     var expanded by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { expanded = true }) {
-            Icon(LjIcons.MoreVert, contentDescription = "More actions")
+            Icon(LjIcons.MoreVert, contentDescription = stringResource(R.string.top_bar_more_actions_cd))
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             content { expanded = false }

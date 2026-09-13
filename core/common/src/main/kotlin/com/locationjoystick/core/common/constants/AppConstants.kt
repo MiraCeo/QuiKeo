@@ -203,22 +203,10 @@ object AppConstants {
         const val ID_PERMISSION_ERROR = 1002
         const val CHANNEL_ID_ACTIVE = "location_spoof_channel"
         const val CHANNEL_ID_PERMISSION_ERROR = "location_perm_error_channel"
-        const val CHANNEL_NAME_ACTIVE = "Location Spoofing"
-        const val CHANNEL_DESC_ACTIVE = "Active while mock location is running"
         const val CHANNEL_ID_ACTIVE_MINIMIZED = "location_spoof_channel_minimized"
-        const val CHANNEL_NAME_ACTIVE_MINIMIZED = "Location Spoofing (Minimized)"
-        const val CHANNEL_DESC_ACTIVE_MINIMIZED = "Active while mock location is running — hidden from the status bar"
-        const val CHANNEL_NAME_PERMISSION_ERROR = "Permission Errors"
-        const val CHANNEL_DESC_PERMISSION_ERROR = "Shown when required permissions are missing"
-        const val TITLE_PERMISSION_ERROR = "Permissions missing"
-        const val TEXT_PERMISSION_ERROR = "Open the app and complete setup to start spoofing."
-        const val TITLE_ACTIVE = "Mock location active"
-        const val TEXT_ACTIVE = "locationjoystick is spoofing your GPS position"
-        const val ACTION_STOP = "Stop"
-        const val ACTION_OPEN_MAP = "Map"
-        const val ACTION_OPEN_FAVORITES = "Favorites"
-        const val ACTION_PAUSE = "Pause"
-        const val ACTION_RESUME = "Resume"
+
+        // User-visible channel/notification text lives in :core:location's strings.xml
+        // (MockLocationNotification.kt), not here — only technical IDs stay in AppConstants.
     }
 
     object ServiceConstants {

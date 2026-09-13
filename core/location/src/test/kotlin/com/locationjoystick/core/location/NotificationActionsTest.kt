@@ -9,9 +9,9 @@ class NotificationActionsTest {
     fun `not replay active - shows Stop Map Favorites`() {
         val actions = selectNotificationActions(replayActive = false, replayPaused = false)
         assertEquals(3, actions.size)
-        assertEquals(AppConstants.NotificationConstants.ACTION_STOP, actions[0].label)
-        assertEquals(AppConstants.NotificationConstants.ACTION_OPEN_MAP, actions[1].label)
-        assertEquals(AppConstants.NotificationConstants.ACTION_OPEN_FAVORITES, actions[2].label)
+        assertEquals(R.string.notification_action_stop, actions[0].labelRes)
+        assertEquals(R.string.notification_action_map, actions[1].labelRes)
+        assertEquals(R.string.notification_action_favorites, actions[2].labelRes)
     }
 
     @Test
@@ -19,27 +19,27 @@ class NotificationActionsTest {
         // replayPaused=true is meaningless when replayActive=false, but must not crash
         val actions = selectNotificationActions(replayActive = false, replayPaused = true)
         assertEquals(3, actions.size)
-        assertEquals(AppConstants.NotificationConstants.ACTION_STOP, actions[0].label)
-        assertEquals(AppConstants.NotificationConstants.ACTION_OPEN_MAP, actions[1].label)
-        assertEquals(AppConstants.NotificationConstants.ACTION_OPEN_FAVORITES, actions[2].label)
+        assertEquals(R.string.notification_action_stop, actions[0].labelRes)
+        assertEquals(R.string.notification_action_map, actions[1].labelRes)
+        assertEquals(R.string.notification_action_favorites, actions[2].labelRes)
     }
 
     @Test
     fun `replay active not paused - shows Stop Pause Map`() {
         val actions = selectNotificationActions(replayActive = true, replayPaused = false)
         assertEquals(3, actions.size)
-        assertEquals(AppConstants.NotificationConstants.ACTION_STOP, actions[0].label)
-        assertEquals(AppConstants.NotificationConstants.ACTION_PAUSE, actions[1].label)
-        assertEquals(AppConstants.NotificationConstants.ACTION_OPEN_MAP, actions[2].label)
+        assertEquals(R.string.notification_action_stop, actions[0].labelRes)
+        assertEquals(R.string.notification_action_pause, actions[1].labelRes)
+        assertEquals(R.string.notification_action_map, actions[2].labelRes)
     }
 
     @Test
     fun `replay active and paused - shows Stop Resume Map`() {
         val actions = selectNotificationActions(replayActive = true, replayPaused = true)
         assertEquals(3, actions.size)
-        assertEquals(AppConstants.NotificationConstants.ACTION_STOP, actions[0].label)
-        assertEquals(AppConstants.NotificationConstants.ACTION_RESUME, actions[1].label)
-        assertEquals(AppConstants.NotificationConstants.ACTION_OPEN_MAP, actions[2].label)
+        assertEquals(R.string.notification_action_stop, actions[0].labelRes)
+        assertEquals(R.string.notification_action_resume, actions[1].labelRes)
+        assertEquals(R.string.notification_action_map, actions[2].labelRes)
     }
 
     @Test

@@ -23,12 +23,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.locationjoystick.app.IDLE_ROUTE
+import com.locationjoystick.app.R
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.feature.favorites.api.FAVORITES_ROUTE
 import com.locationjoystick.feature.favorites.api.MAP_PICKER_ROUTE
@@ -54,13 +56,13 @@ fun LjDrawerContent(
             horizontalArrangement = Arrangement.End,
         ) {
             IconButton(onClick = { scope.launch { drawerState.close() } }) {
-                Icon(LjIcons.Close, contentDescription = "Close menu")
+                Icon(LjIcons.Close, contentDescription = stringResource(R.string.drawer_close_menu_cd))
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
         NavigationDrawerItem(
-            icon = { Icon(LjIcons.Home, "Home") },
-            label = { Text("Home") },
+            icon = { Icon(LjIcons.Home, stringResource(R.string.drawer_home_cd)) },
+            label = { Text(stringResource(R.string.drawer_home)) },
             selected = currentRoute == IDLE_ROUTE,
             onClick = {
                 navController.navigate(IDLE_ROUTE) {
@@ -71,8 +73,8 @@ fun LjDrawerContent(
             },
         )
         NavigationDrawerItem(
-            icon = { Icon(LjIcons.LocationOn, "Map") },
-            label = { Text("Map") },
+            icon = { Icon(LjIcons.LocationOn, stringResource(R.string.drawer_map_cd)) },
+            label = { Text(stringResource(R.string.drawer_map)) },
             selected = currentRoute == MAP_ROUTE,
             onClick = {
                 navController.navigate(MAP_ROUTE) {
@@ -84,8 +86,8 @@ fun LjDrawerContent(
             },
         )
         NavigationDrawerItem(
-            icon = { Icon(LjIcons.Route, "Routes") },
-            label = { Text("Routes") },
+            icon = { Icon(LjIcons.Route, stringResource(R.string.drawer_routes_cd)) },
+            label = { Text(stringResource(R.string.drawer_routes)) },
             selected = currentRoute != null && (currentRoute == ROUTES_ROUTE || currentRoute.startsWith("route_")),
             onClick = {
                 navController.navigate(ROUTES_ROUTE) {
@@ -97,8 +99,8 @@ fun LjDrawerContent(
             },
         )
         NavigationDrawerItem(
-            icon = { Icon(LjIcons.Favorite, "Favorites") },
-            label = { Text("Favorites") },
+            icon = { Icon(LjIcons.Favorite, stringResource(R.string.drawer_favorites_cd)) },
+            label = { Text(stringResource(R.string.drawer_favorites)) },
             selected = currentRoute == FAVORITES_ROUTE || currentRoute == MAP_PICKER_ROUTE,
             onClick = {
                 navController.navigate(FAVORITES_ROUTE) {
@@ -110,8 +112,8 @@ fun LjDrawerContent(
             },
         )
         NavigationDrawerItem(
-            icon = { Icon(LjIcons.Share, "Group Sync") },
-            label = { Text("Group Sync") },
+            icon = { Icon(LjIcons.Share, stringResource(R.string.drawer_group_sync_cd)) },
+            label = { Text(stringResource(R.string.drawer_group_sync)) },
             selected = currentRoute == GROUP_ROUTE,
             onClick = {
                 navController.navigate(GROUP_ROUTE) {
@@ -123,8 +125,8 @@ fun LjDrawerContent(
             },
         )
         NavigationDrawerItem(
-            icon = { Icon(LjIcons.Settings, "Settings") },
-            label = { Text("Settings") },
+            icon = { Icon(LjIcons.Settings, stringResource(R.string.drawer_settings_cd)) },
+            label = { Text(stringResource(R.string.drawer_settings)) },
             selected = currentRoute == SETTINGS_ROUTE,
             onClick = {
                 navController.navigate(SETTINGS_ROUTE) {
@@ -136,10 +138,10 @@ fun LjDrawerContent(
             },
         )
         NavigationDrawerItem(
-            icon = { Icon(LjIcons.Explore, "Website") },
+            icon = { Icon(LjIcons.Explore, stringResource(R.string.drawer_website_cd)) },
             label = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Website")
+                    Text(stringResource(R.string.drawer_website))
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(
                         imageVector = LjIcons.OpenInNew,
@@ -155,10 +157,10 @@ fun LjDrawerContent(
             },
         )
         NavigationDrawerItem(
-            icon = { Icon(LjIcons.Forum, "Discord") },
+            icon = { Icon(LjIcons.Forum, stringResource(R.string.drawer_discord_cd)) },
             label = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Discord")
+                    Text(stringResource(R.string.drawer_discord))
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(
                         imageVector = LjIcons.OpenInNew,

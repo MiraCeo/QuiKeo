@@ -209,11 +209,13 @@ class RoutesViewModel
                             addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         }
                     withContext(Dispatchers.Main) {
-                        context.startActivity(android.content.Intent.createChooser(intent, "Share GPX"))
+                        context.startActivity(
+                            android.content.Intent.createChooser(intent, context.getString(R.string.route_creator_share_gpx)),
+                        )
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Export GPX failed", e)
-                    _errorMessage.value = "Export failed: ${e.message}"
+                    _errorMessage.value = context.getString(R.string.route_creator_export_failed, e.message.orEmpty())
                 }
             }
         }
@@ -243,16 +245,21 @@ class RoutesViewModel
                     withContext(Dispatchers.Main) {
                         val message =
                             if (routes.size == 1) {
-                                "Route imported: ${routes.first().name}"
+                                context.getString(R.string.route_creator_route_imported, routes.first().name)
                             } else {
-                                "${routes.size} routes imported"
+                                context.getString(R.string.route_creator_routes_imported, routes.size)
                             }
                         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "GPX import failed", e)
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "Import failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast
+                            .makeText(
+                                context,
+                                context.getString(R.string.route_creator_import_failed, e.message.orEmpty()),
+                                Toast.LENGTH_SHORT,
+                            ).show()
                     }
                 }
             }

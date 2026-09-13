@@ -5,6 +5,7 @@ import com.locationjoystick.core.model.RoamingConfig
 import com.locationjoystick.core.model.distanceTo
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -22,7 +23,16 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalCoroutinesApi::class)
 class RoamingWaypointPlannerTest {
     private val mockOsrmClient = mockk<OsrmClient>(relaxed = true)
-    private val routingErrorReporter = RoutingErrorReporter()
+    private val fakeContext: android.content.Context =
+        mockk<android.content.Context>(relaxed = true).also { ctx ->
+            every {
+                ctx.getString(R.string.routing_road_following_partial_fallback, any(), any())
+            } answers {
+                val args = it.invocation.args[1] as Array<*>
+                "Road-following partially unavailable — ${args[0]} of ${args[1]} legs used straight-line paths"
+            }
+        }
+    private val routingErrorReporter = RoutingErrorReporter(fakeContext)
     private val engine = RoamingEngine(mockOsrmClient, RouteInterpolator(), routingErrorReporter, kotlinx.coroutines.Dispatchers.Unconfined)
     private val center = LatLng(48.8566, 2.3522)
 

@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -76,6 +77,7 @@ import com.locationjoystick.core.model.AppFeature
 import com.locationjoystick.core.model.FavoriteLocation
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.startWaypoint
+import com.locationjoystick.feature.widget.impl.R
 
 /** Shared circular icon button for the widget panel: press scale + icon crossfade on state change. */
 @Composable
@@ -402,12 +404,12 @@ private fun AltitudeOverrideInput(
             onValueChange = { value = it },
             modifier = Modifier.width(100.dp),
             singleLine = true,
-            label = { Text("Altitude (m)", color = LjText) },
+            label = { Text(stringResource(R.string.widget_panel_altitude_m), color = LjText) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { value.toDoubleOrNull()?.let(onConfirm) }),
         )
         IconButton(onClick = { value.toDoubleOrNull()?.let(onConfirm) }) {
-            Icon(LjIcons.Check, contentDescription = "Confirm altitude", tint = LjSuccess)
+            Icon(LjIcons.Check, contentDescription = stringResource(R.string.widget_panel_confirm_altitude_cd), tint = LjSuccess)
         }
     }
 }
@@ -449,7 +451,7 @@ private fun FloatingPickerShell(
                 ) {
                     if (hasBack) {
                         IconButton(onClick = onBack) {
-                            Icon(LjIcons.ArrowBack, contentDescription = "Back", tint = LjText)
+                            Icon(LjIcons.ArrowBack, contentDescription = stringResource(R.string.widget_panel_back_cd), tint = LjText)
                         }
                     }
                     Text(
@@ -460,7 +462,7 @@ private fun FloatingPickerShell(
                     )
                     if (!hasBack) {
                         IconButton(onClick = onDismiss) {
-                            Icon(LjIcons.Close, contentDescription = "Close", tint = LjText)
+                            Icon(LjIcons.Close, contentDescription = stringResource(R.string.widget_panel_close_cd), tint = LjText)
                         }
                     }
                 }
@@ -538,7 +540,7 @@ internal fun FavoritesFloatingView(
                     OutlinedTextField(
                         value = newFavName,
                         onValueChange = { newFavName = it },
-                        label = { Text("Name", color = LjText) },
+                        label = { Text(stringResource(R.string.widget_panel_name), color = LjText) },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                         keyboardActions =
@@ -562,7 +564,7 @@ internal fun FavoritesFloatingView(
                             showAddForm = false
                             newFavName = ""
                         }) {
-                            Text("Cancel", color = LjText)
+                            Text(stringResource(R.string.widget_panel_cancel), color = LjText)
                         }
                         Spacer(Modifier.width(8.dp))
                         LjButton(
@@ -574,7 +576,7 @@ internal fun FavoritesFloatingView(
                                 }
                             },
                         ) {
-                            Text("Save")
+                            Text(stringResource(R.string.widget_panel_save))
                         }
                     }
                 } else {
@@ -584,7 +586,7 @@ internal fun FavoritesFloatingView(
                     ) {
                         Icon(LjIcons.Add, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text("Add from current location")
+                        Text(stringResource(R.string.widget_panel_add_from_current_location))
                     }
                 }
             }

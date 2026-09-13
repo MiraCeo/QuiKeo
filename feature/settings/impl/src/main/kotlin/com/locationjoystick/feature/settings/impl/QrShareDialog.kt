@@ -24,11 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import com.locationjoystick.core.designsystem.component.LjButton
 import com.locationjoystick.core.designsystem.component.LjTextButton
+import com.locationjoystick.feature.settings.impl.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -53,7 +55,7 @@ fun QrShareDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Export via QR code") },
+        title = { Text(stringResource(R.string.qr_share_dialog_export_via_qr_code)) },
         text = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -62,7 +64,7 @@ fun QrShareDialog(
             ) {
                 if (!ready) {
                     Text(
-                        "Starting local export server…",
+                        stringResource(R.string.qr_share_dialog_starting_local_export_server),
                         style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center,
                     )
@@ -76,7 +78,7 @@ fun QrShareDialog(
                 }
 
                 Text(
-                    "Scan this on the other device — both must be on the same Wi-Fi network",
+                    stringResource(R.string.qr_share_dialog_scan_this_on_the_other_device),
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center,
                 )
@@ -84,7 +86,7 @@ fun QrShareDialog(
                 if (bitmap != null) {
                     Image(
                         bitmap = bitmap.asImageBitmap(),
-                        contentDescription = "Export QR code",
+                        contentDescription = stringResource(R.string.qr_share_dialog_export_qr_code_cd),
                         modifier =
                             Modifier
                                 .size(QR_IMAGE_SIZE)
@@ -92,7 +94,7 @@ fun QrShareDialog(
                                 .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp)),
                     )
                 } else {
-                    Text("Failed to encode QR")
+                    Text(stringResource(R.string.qr_share_dialog_failed_to_encode_qr))
                 }
 
                 Text(
@@ -106,12 +108,12 @@ fun QrShareDialog(
                 enabled = ready && bitmap != null,
                 onClick = { if (bitmap != null) scope.launch { shareQrBitmap(context, bitmap) } },
             ) {
-                Text("Share")
+                Text(stringResource(R.string.qr_share_dialog_share))
             }
         },
         dismissButton = {
             LjTextButton(onClick = onDismiss) {
-                Text("Done")
+                Text(stringResource(R.string.qr_share_dialog_done))
             }
         },
     )

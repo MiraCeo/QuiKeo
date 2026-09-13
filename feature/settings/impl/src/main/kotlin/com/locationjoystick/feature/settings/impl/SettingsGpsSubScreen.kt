@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.common.constants.AppConstants
@@ -34,6 +35,7 @@ import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.designsystem.component.LjSegmentedControl
 import com.locationjoystick.core.model.SpeedProfile
 import com.locationjoystick.core.model.SpeedUnit
+import com.locationjoystick.feature.settings.impl.R
 
 @Composable
 internal fun SettingsGpsSubScreen(
@@ -78,10 +80,10 @@ internal fun SettingsGpsSubScreen(
                         Spacer(modifier = Modifier.height(24.dp))
                         GpsRealismSection(uiState, isMph, onAction)
                         Spacer(modifier = Modifier.height(24.dp))
-                        Text("Location Memory", style = MaterialTheme.typography.headlineSmall)
+                        Text(stringResource(R.string.settings_gps_location_memory), style = MaterialTheme.typography.headlineSmall)
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            "Controls whether the app remembers where you left off when reopened.",
+                            stringResource(R.string.settings_gps_controls_whether_the_app_remembers_where),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -104,10 +106,10 @@ private fun SpeedProfilesSection(
     uiState: SettingsUiState,
     onAction: (SettingsAction) -> Unit,
 ) {
-    Text("Speed Profiles", style = MaterialTheme.typography.headlineSmall)
+    Text(stringResource(R.string.settings_gps_speed_profiles), style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(4.dp))
     Text(
-        "Movement speed used by the joystick, route replay, and roaming. Select a unit, then set each preset.",
+        stringResource(R.string.settings_gps_movement_speed_used_by_the_joystick),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -117,7 +119,7 @@ private fun SpeedProfilesSection(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text("Unit", modifier = Modifier.weight(0.3f))
+        Text(stringResource(R.string.settings_gps_unit), modifier = Modifier.weight(0.3f))
         LjSegmentedControl(
             options = listOf(SpeedUnit.KMH to "km/h", SpeedUnit.MPH to "mph"),
             selected = uiState.speedUnit,
@@ -196,7 +198,7 @@ private fun SpeedProfileInput(
 @Composable
 private fun AntiCheatWarning() {
     Text(
-        text = "Speed exceeds 8 m/s — may trigger anti-cheat in some games",
+        text = stringResource(R.string.settings_gps_speed_exceeds_8_m_s_may),
         color = MaterialTheme.colorScheme.error,
         style = MaterialTheme.typography.labelSmall,
         modifier = Modifier.padding(start = 4.dp, top = 2.dp),

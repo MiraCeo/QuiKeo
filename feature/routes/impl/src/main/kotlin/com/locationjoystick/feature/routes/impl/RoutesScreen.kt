@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,6 +52,7 @@ import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.model.RouteType
 import com.locationjoystick.core.model.distanceTo
 import com.locationjoystick.core.model.startWaypoint
+import com.locationjoystick.feature.routes.impl.R
 
 @Composable
 fun RoutesRoute(
@@ -160,7 +162,7 @@ internal fun RoutesScreen(
         actions = {
             LjOverflowMenu { dismiss ->
                 DropdownMenuItem(
-                    text = { Text("Sort") },
+                    text = { Text(stringResource(R.string.routes_screen_sort)) },
                     onClick = {
                         dismiss()
                         onToggleSort()
@@ -171,7 +173,7 @@ internal fun RoutesScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { showAddOptionsSheet = true }) {
-                Icon(LjIcons.Add, contentDescription = "Add route")
+                Icon(LjIcons.Add, contentDescription = stringResource(R.string.routes_screen_add_route_cd))
             }
         },
     ) { paddingValues ->
@@ -193,7 +195,7 @@ internal fun RoutesScreen(
                         modifier = Modifier.align(Alignment.Center),
                         action = {
                             LjButton(onClick = { showAddOptionsSheet = true }) {
-                                Text("Draw a route")
+                                Text(stringResource(R.string.routes_screen_draw_a_route))
                             }
                         },
                     )
@@ -249,7 +251,7 @@ internal fun RoutesScreen(
             containerColor = MaterialTheme.colorScheme.surface,
         ) {
             Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-                Text("Add a route", style = MaterialTheme.typography.headlineSmall)
+                Text(stringResource(R.string.routes_screen_add_a_route), style = MaterialTheme.typography.headlineSmall)
                 Spacer(Modifier.height(12.dp))
                 LjActionSheetRow(
                     icon = LjIcons.Map,
@@ -358,19 +360,19 @@ private fun RouteCard(
             }
             if (isPlaying || isPaused) {
                 IconButton(onClick = onStopReplay) {
-                    Icon(LjIcons.Stop, contentDescription = "Stop")
+                    Icon(LjIcons.Stop, contentDescription = stringResource(R.string.routes_screen_stop_cd))
                 }
             }
             Box {
                 IconButton(onClick = { menuExpanded = true }) {
-                    Icon(LjIcons.MoreVert, contentDescription = "Menu")
+                    Icon(LjIcons.MoreVert, contentDescription = stringResource(R.string.routes_screen_menu_cd))
                 }
                 DropdownMenu(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Edit") },
+                        text = { Text(stringResource(R.string.routes_screen_edit)) },
                         onClick = {
                             menuExpanded = false
                             onNavigateToEdit(route.id)
@@ -378,7 +380,7 @@ private fun RouteCard(
                         leadingIcon = { Icon(LjIcons.Edit, contentDescription = null) },
                     )
                     DropdownMenuItem(
-                        text = { Text("Export") },
+                        text = { Text(stringResource(R.string.routes_screen_export)) },
                         onClick = {
                             menuExpanded = false
                             onExport(route)
@@ -387,7 +389,7 @@ private fun RouteCard(
                     )
                     LjOverflowMenuSectionLabel("Danger")
                     DropdownMenuItem(
-                        text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
+                        text = { Text(stringResource(R.string.routes_screen_delete), color = MaterialTheme.colorScheme.error) },
                         onClick = {
                             menuExpanded = false
                             onDeleteRoute(route)
@@ -418,7 +420,7 @@ private fun RouteCard(
             containerColor = MaterialTheme.colorScheme.surface,
         ) {
             Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-                Text("Start route", style = MaterialTheme.typography.headlineSmall)
+                Text(stringResource(R.string.routes_screen_start_route), style = MaterialTheme.typography.headlineSmall)
                 Spacer(Modifier.height(12.dp))
                 RouteStartSheetContent(
                     key = route.id,

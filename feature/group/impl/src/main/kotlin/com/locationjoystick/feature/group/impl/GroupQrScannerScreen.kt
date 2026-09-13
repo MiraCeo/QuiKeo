@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -44,6 +45,7 @@ import com.google.zxing.NotFoundException
 import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import com.locationjoystick.core.designsystem.LjIcons
+import com.locationjoystick.feature.group.impl.R
 import java.util.concurrent.Executors
 
 private const val TAG = "GroupQrScannerScreen"
@@ -138,14 +140,14 @@ fun GroupQrScannerScreen(
                         .padding(horizontal = 16.dp, vertical = 8.dp),
             ) {
                 Text(
-                    text = "Point at the leader's group QR code",
+                    text = stringResource(R.string.group_qr_scanner_point_at_the_leader_s_group),
                     color = Color.White,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
         } else {
             Text(
-                text = "Camera permission required to scan QR code.",
+                text = stringResource(R.string.group_qr_scanner_camera_permission_required_to_scan_qr),
                 modifier = Modifier.align(Alignment.Center).padding(24.dp),
             )
         }
@@ -154,7 +156,7 @@ fun GroupQrScannerScreen(
             onClick = onNavigateBack,
             modifier = Modifier.align(Alignment.TopStart).padding(8.dp),
         ) {
-            Icon(LjIcons.ArrowBack, contentDescription = "Back", tint = Color.White)
+            Icon(LjIcons.ArrowBack, contentDescription = stringResource(R.string.group_qr_scanner_back_cd), tint = Color.White)
         }
     }
 }

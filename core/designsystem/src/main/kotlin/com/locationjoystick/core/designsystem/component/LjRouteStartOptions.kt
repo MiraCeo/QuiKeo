@@ -14,8 +14,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.designsystem.LjSpacing
+import com.locationjoystick.core.designsystem.R
 
 @Composable
 fun LjRouteStartOptions(
@@ -67,19 +69,19 @@ fun LjRouteStartOptions(
         if (!hideTeleport) {
             Spacer(Modifier.height(20.dp))
             OutlinedButton(onClick = onTeleport, modifier = Modifier.fillMaxWidth()) {
-                Text("Teleport", color = textColor)
+                Text(stringResource(R.string.route_start_options_teleport), color = textColor)
             }
         }
         Spacer(Modifier.height(20.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(LjSpacing.sm)) {
             OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f)) {
-                Text("Cancel", color = textColor)
+                Text(stringResource(R.string.route_start_options_cancel), color = textColor)
             }
             Button(onClick = onStart, enabled = !isStarting, modifier = Modifier.weight(1f)) {
                 if (isStarting) {
                     CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                 } else {
-                    Text("Start", color = textColor)
+                    Text(stringResource(R.string.common_start), color = textColor)
                 }
             }
         }

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="map_sheet_back_cd">"Back"</string>
+    <string name="map_sheet_route_in_progress">"Route in progress"</string>
+    <string name="map_sheet_stop_route_and_teleport">"Stop route and teleport"</string>
+    <string name="map_sheet_stop_route_and_walk_here">"Stop route and walk here"</string>
+    <string name="map_sheet_finish_route_and_walk_here">"Finish route and walk here"</string>
+    <string name="map_sheet_move_to_this_location">"Move to this location?"</string>
+    <string name="map_sheet_teleport_here">"Teleport here"</string>
+    <string name="map_sheet_walk_here">"Walk here"</string>
+    <string name="map_sheet_walk_via_roads">"Walk via roads"</string>
+    <string name="map_sheet_add_next_point">"Add next point"</string>
+    <string name="map_sheet_add_next_point_via_roads">"Add next point via roads"</string>
+    <string name="map_sheet_share_this_location">"Share this location"</string>
+    <string name="map_sheet_close">"Close"</string>
+    <string name="map_sheet_save_current_location">"Save current location"</string>
+    <string name="map_sheet_name">"Name"</string>
+    <string name="map_sheet_save">"Save"</string>
+    <string name="map_sheet_cancel">"Cancel"</string>
+</resources>

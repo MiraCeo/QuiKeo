@@ -174,12 +174,12 @@ class GroupSyncViewModel
             }
             viewModelScope.launch {
                 groupRepository.groupLostEvent.collect {
-                    _errorMessage.value = "Disconnected from group — leader is no longer reachable"
+                    _errorMessage.value = context.getString(R.string.group_sync_disconnected_from_group)
                 }
             }
             viewModelScope.launch {
                 groupRepository.teleportUnavailableEvent.collect {
-                    _errorMessage.value = "Leader position not yet known — try again in a moment"
+                    _errorMessage.value = context.getString(R.string.group_sync_leader_position_not_yet_known)
                 }
             }
         }
@@ -195,7 +195,8 @@ class GroupSyncViewModel
         fun joinByCode(code: String) {
             val normalized = code.uppercase().trim()
             if (normalized.length != AppConstants.SyncConstants.GROUP_CODE_LENGTH) {
-                _errorMessage.value = "Code must be ${AppConstants.SyncConstants.GROUP_CODE_LENGTH} characters"
+                _errorMessage.value =
+                    context.getString(R.string.group_sync_code_must_be_characters, AppConstants.SyncConstants.GROUP_CODE_LENGTH)
                 return
             }
             viewModelScope.launch {
@@ -206,7 +207,7 @@ class GroupSyncViewModel
                     val (host, port) = result
                     handlePendingInvite(GroupInvite(host = host, port = port, groupId = normalized))
                 } else {
-                    _errorMessage.value = "No group found for code $normalized"
+                    _errorMessage.value = context.getString(R.string.group_sync_no_group_found_for_code, normalized)
                 }
             }
         }
@@ -214,7 +215,7 @@ class GroupSyncViewModel
         fun joinViaScannedUrl(url: String) {
             val invite = parseGroupUrl(url)
             if (invite == null) {
-                _errorMessage.value = "Invalid group QR code"
+                _errorMessage.value = context.getString(R.string.group_sync_invalid_group_qr_code)
                 return
             }
             viewModelScope.launch { handlePendingInvite(invite) }
@@ -246,7 +247,7 @@ class GroupSyncViewModel
                     val resolved = groupNsdManager.discoverByCode(id)
                     _isDiscovering.value = false
                     if (resolved == null) {
-                        _errorMessage.value = "No group found for code $id"
+                        _errorMessage.value = context.getString(R.string.group_sync_no_group_found_for_code, id)
                         groupRepository.setFollowerModeEnabled(false)
                         return@launch
                     }

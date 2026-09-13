@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="favorites_screen_sort">"Sort"</string>
+    <string name="favorites_screen_add_favorite_cd">"Add favorite"</string>
+    <string name="favorites_screen_search_favorites">"Search favorites"</string>
+    <string name="favorites_screen_add_a_favorite">"Add a favorite"</string>
+    <string name="favorites_screen_add_a_favorite_2">"Add a favorite"</string>
+    <string name="favorites_screen_more_options_cd">"More options"</string>
+    <string name="favorites_screen_edit">"Edit"</string>
+    <string name="favorites_screen_share">"Share"</string>
+    <string name="favorites_screen_delete">"Delete"</string>
+    <string name="favorites_screen_add_favorite_location">"Add Favorite Location"</string>
+    <string name="common_name">"Name"</string>
+    <string name="favorites_screen_latitude">"Latitude"</string>
+    <string name="favorites_screen_longitude">"Longitude"</string>
+    <string name="common_cancel">"Cancel"</string>
+    <string name="common_save">"Save"</string>
+    <string name="favorites_screen_edit_favorite">"Edit Favorite"</string>
+    <string name="favorites_screen_latitude_2">"Latitude"</string>
+    <string name="favorites_screen_longitude_2">"Longitude"</string>
+    <string name="map_picker_save_location">"Save Location"</string>
+</resources>

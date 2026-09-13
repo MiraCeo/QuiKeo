@@ -96,7 +96,7 @@ class WidgetPanelPresenterTest {
                 startRouteReplayUseCase = mockk<StartRouteReplayUseCase>(relaxed = true),
                 ephemeralReplayController = ephemeralReplayController,
                 osrmClient = mockk<OsrmClient>(relaxed = true),
-                routingErrorReporter = RoutingErrorReporter(),
+                routingErrorReporter = RoutingErrorReporter(mockk<android.content.Context>(relaxed = true)),
                 appScope = scope,
             )
 

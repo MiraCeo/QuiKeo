@@ -13,8 +13,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.designsystem.LjSpacing
+import com.locationjoystick.core.designsystem.R
 import com.locationjoystick.core.model.FavoriteLocation
 
 /**
@@ -60,7 +62,7 @@ fun FavoriteTargetDetail(
                         .fillMaxWidth()
                         .padding(top = LjSpacing.md),
             ) {
-                Text("Set location", color = textColor)
+                Text(stringResource(R.string.favorite_target_detail_set_location), color = textColor)
             }
         }
         OutlinedButton(
@@ -70,7 +72,7 @@ fun FavoriteTargetDetail(
                     .fillMaxWidth()
                     .padding(top = LjSpacing.sm),
         ) {
-            Text("Walk to location", color = textColor)
+            Text(stringResource(R.string.favorite_target_detail_walk_to_location), color = textColor)
         }
         OutlinedButton(
             onClick = onGoToLocationViaRoads,
@@ -83,7 +85,7 @@ fun FavoriteTargetDetail(
             if (isRoadRouteFetchInFlight) {
                 CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
             } else {
-                Text("Walk via roads", color = textColor)
+                Text(stringResource(R.string.favorite_target_detail_walk_via_roads), color = textColor)
             }
         }
         if (showDismissButton) {
@@ -91,7 +93,7 @@ fun FavoriteTargetDetail(
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth().padding(top = LjSpacing.sm),
             ) {
-                Text("Do nothing", color = textColor)
+                Text(stringResource(R.string.favorite_target_detail_do_nothing), color = textColor)
             }
         }
     }

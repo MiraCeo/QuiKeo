@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_set_up_locationjoystick">"Set up locationjoystick"</string>
+    <string name="onboarding_complete_the_steps_below_to_start">"Complete the steps below to start simulating your GPS location."</string>
+    <string name="onboarding_no_account_or_login_needed_everything">"No account or login needed — everything stays on your device."</string>
+    <string name="onboarding_trouble_setting_up">"Trouble setting up?"</string>
+    <string name="onboarding_getting_started">"Getting Started"</string>
+    <string name="onboarding_separator_dot">"·"</string>
+    <string name="onboarding_troubleshooting">"Troubleshooting"</string>
+    <string name="onboarding_debug_build_permissions_optional">"Debug build — permissions optional"</string>
+    <string name="onboarding_skip_this_check">"Skip this check?"</string>
+    <string name="onboarding_most_devices_need_locationjoystick_set_a">"Most devices need locationjoystick set as the mock location app for spoofing to work. Only skip this if you've confirmed mock location works another way — for example, a modified setup that Android doesn't report through this check."</string>
+    <string name="onboarding_version">"v%1$s"</string>
+    <string name="onboarding_skip_anyway">"Skip anyway"</string>
+    <string name="onboarding_cancel">"Cancel"</string>
+</resources>

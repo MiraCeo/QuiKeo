@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
@@ -30,6 +31,7 @@ import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.LjTheme
 import com.locationjoystick.core.model.LatLng
+import com.locationjoystick.feature.widget.impl.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -174,7 +176,7 @@ private fun TapToWalkOverlayContent(
         )
         // Hint label
         Text(
-            text = "Tap anywhere to walk there",
+            text = stringResource(R.string.tap_to_walk_overlay_tap_anywhere_to_walk_there),
             style = MaterialTheme.typography.bodyMedium,
             color = Color.White,
             textAlign = TextAlign.Center,
@@ -200,7 +202,7 @@ private fun TapToWalkOverlayContent(
         ) {
             Icon(
                 imageVector = LjIcons.Close,
-                contentDescription = "Cancel tap-to-walk",
+                contentDescription = stringResource(R.string.tap_to_walk_overlay_cancel_tap_to_walk_cd),
                 tint = Color.White,
             )
         }

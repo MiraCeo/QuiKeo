@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -66,6 +67,7 @@ import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.designsystem.component.WideContentClamp
 import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.feature.onboarding.api.ONBOARDING_ROUTE
+import com.locationjoystick.feature.onboarding.impl.R
 
 fun NavGraphBuilder.onboardingScreen(onSetupComplete: () -> Unit) {
     composable(route = ONBOARDING_ROUTE) {
@@ -149,7 +151,7 @@ internal fun OnboardingScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Set up locationjoystick",
+                text = stringResource(R.string.onboarding_set_up_locationjoystick),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,
@@ -158,7 +160,7 @@ internal fun OnboardingScreen(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "v${AppConstants.AppInfo.VERSION_NAME}",
+                text = stringResource(R.string.onboarding_version, AppConstants.AppInfo.VERSION_NAME),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -167,7 +169,7 @@ internal fun OnboardingScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Complete the steps below to start simulating your GPS location.",
+                text = stringResource(R.string.onboarding_complete_the_steps_below_to_start),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -176,7 +178,7 @@ internal fun OnboardingScreen(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "No account or login needed — everything stays on your device.",
+                text = stringResource(R.string.onboarding_no_account_or_login_needed_everything),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -189,7 +191,7 @@ internal fun OnboardingScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "Trouble setting up?",
+                    text = stringResource(R.string.onboarding_trouble_setting_up),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -201,12 +203,12 @@ internal fun OnboardingScreen(
                     },
                 ) {
                     Text(
-                        text = "Getting Started",
+                        text = stringResource(R.string.onboarding_getting_started),
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
                 Text(
-                    text = "·",
+                    text = stringResource(R.string.onboarding_separator_dot),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -218,7 +220,7 @@ internal fun OnboardingScreen(
                     },
                 ) {
                     Text(
-                        text = "Troubleshooting",
+                        text = stringResource(R.string.onboarding_troubleshooting),
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
@@ -312,7 +314,7 @@ internal fun OnboardingScreen(
             if (uiState.isDebugBuild && !uiState.canProceed) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Debug build — permissions optional",
+                    text = stringResource(R.string.onboarding_debug_build_permissions_optional),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -341,22 +343,20 @@ private fun SkipMockLocationConfirmDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Skip this check?") },
+        title = { Text(stringResource(R.string.onboarding_skip_this_check)) },
         text = {
             Text(
-                "Most devices need locationjoystick set as the mock location app for spoofing to " +
-                    "work. Only skip this if you've confirmed mock location works another way — " +
-                    "for example, a modified setup that Android doesn't report through this check.",
+                stringResource(R.string.onboarding_most_devices_need_locationjoystick_set_a),
             )
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Skip anyway")
+                Text(stringResource(R.string.onboarding_skip_anyway))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.onboarding_cancel))
             }
         },
     )

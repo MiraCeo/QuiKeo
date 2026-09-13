@@ -30,10 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.designsystem.LjSpacing
+import com.locationjoystick.core.designsystem.R
 
 /** One card in a [DestinationHub] list — icon, title, description, and its own tap target. */
 data class DestinationCardSpec(
@@ -154,14 +156,14 @@ private fun DestinationHubHeaderText() {
     AppIcon()
     Spacer(modifier = Modifier.height(LjSpacing.lg))
     Text(
-        text = "locationjoystick",
+        text = stringResource(R.string.destination_card_locationjoystick),
         style = MaterialTheme.typography.headlineSmall,
         color = MaterialTheme.colorScheme.onBackground,
         textAlign = TextAlign.Center,
     )
     Spacer(modifier = Modifier.height(LjSpacing.xs))
     Text(
-        text = "v${AppConstants.AppInfo.VERSION_NAME}",
+        text = stringResource(R.string.destination_card_version, AppConstants.AppInfo.VERSION_NAME),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,

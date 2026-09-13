@@ -235,6 +235,7 @@ class MockLocationService : Service() {
             )
         replayOrchestrator =
             ReplayOrchestrator(
+                context = this,
                 locationRepository = locationRepository,
                 routeRepository = routeRepository,
                 roamingRepository = roamingRepository,

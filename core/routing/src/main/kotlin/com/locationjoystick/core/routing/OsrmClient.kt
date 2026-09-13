@@ -1,5 +1,6 @@
 package com.locationjoystick.core.routing
 
+import android.content.Context
 import android.util.Log
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.common.util.AppJson
@@ -157,14 +158,17 @@ fun classifyOsrmFailure(e: Throwable): OsrmFailureReason =
     }
 
 /** Short, user-facing description of [reason] (no trailing punctuation — callers append their own context). */
-fun osrmFailureMessage(reason: OsrmFailureReason): String =
+fun osrmFailureMessage(
+    context: Context,
+    reason: OsrmFailureReason,
+): String =
     when (reason) {
-        is OsrmFailureReason.Timeout -> "Routing server timed out"
-        is OsrmFailureReason.ServerError -> "Routing server unavailable"
-        is OsrmFailureReason.RateLimited -> "Routing server is rate-limiting requests"
-        is OsrmFailureReason.NoRouteFound -> "No road route found"
-        is OsrmFailureReason.NetworkUnavailable -> "No network connection"
-        is OsrmFailureReason.Unknown -> "Road routing unavailable"
+        is OsrmFailureReason.Timeout -> context.getString(R.string.osrm_failure_timeout)
+        is OsrmFailureReason.ServerError -> context.getString(R.string.osrm_failure_server_error)
+        is OsrmFailureReason.RateLimited -> context.getString(R.string.osrm_failure_rate_limited)
+        is OsrmFailureReason.NoRouteFound -> context.getString(R.string.osrm_failure_no_route_found)
+        is OsrmFailureReason.NetworkUnavailable -> context.getString(R.string.osrm_failure_network_unavailable)
+        is OsrmFailureReason.Unknown -> context.getString(R.string.osrm_failure_unknown)
     }
 
 /** Parses a numeric (seconds-form) `Retry-After` header into milliseconds; null if absent or an HTTP-date. */

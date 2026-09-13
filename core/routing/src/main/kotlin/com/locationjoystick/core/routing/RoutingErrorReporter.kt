@@ -1,5 +1,7 @@
 package com.locationjoystick.core.routing
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -15,7 +17,9 @@ import javax.inject.Singleton
 @Singleton
 class RoutingErrorReporter
     @Inject
-    constructor() {
+    constructor(
+        @ApplicationContext private val context: Context,
+    ) {
         private val _errors = MutableSharedFlow<String>(extraBufferCapacity = 1)
         val errors: SharedFlow<String> = _errors.asSharedFlow()
 
@@ -35,7 +39,7 @@ class RoutingErrorReporter
         ) {
             if (fallbackCount > 0) {
                 report(
-                    "Road-following partially unavailable — $fallbackCount of $totalLegs legs used straight-line paths",
+                    context.getString(R.string.routing_road_following_partial_fallback, fallbackCount, totalLegs),
                 )
             }
         }

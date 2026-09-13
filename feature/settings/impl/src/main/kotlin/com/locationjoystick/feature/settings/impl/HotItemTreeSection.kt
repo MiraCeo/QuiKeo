@@ -19,9 +19,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.designsystem.component.LjCheckboxRow
+import com.locationjoystick.feature.settings.impl.R
 
 /**
  * Generic collapsible country → city → item tree for selecting subsets of hot items.
@@ -45,8 +47,8 @@ internal fun HotItemTreeSection(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(headerLabel, style = MaterialTheme.typography.labelLarge, modifier = Modifier.weight(1f))
-        TextButton(onClick = { onSelectionChange(emptySet()) }) { Text("Uncheck all") }
-        TextButton(onClick = { onSelectionChange(tree.allIds) }) { Text("Check all") }
+        TextButton(onClick = { onSelectionChange(emptySet()) }) { Text(stringResource(R.string.hot_item_tree_uncheck_all)) }
+        TextButton(onClick = { onSelectionChange(tree.allIds) }) { Text(stringResource(R.string.hot_item_tree_check_all)) }
     }
 
     tree.byCountry.forEach { (country, citiesMap) ->

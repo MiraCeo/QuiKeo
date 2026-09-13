@@ -1,5 +1,6 @@
 package com.locationjoystick.core.location
 
+import android.content.Context
 import com.locationjoystick.core.common.util.calculateBearing
 import com.locationjoystick.core.data.LocationRepository
 import com.locationjoystick.core.data.RoamingRepository
@@ -34,6 +35,7 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class ReplayOrchestratorTest {
     private val dispatcher = UnconfinedTestDispatcher()
+    private val context: Context = mockk(relaxed = true)
     private val locationRepository = LocationRepository()
     private val routeRepository: RouteRepository = mockk(relaxed = true)
     private val roamingRepository: RoamingRepository = mockk(relaxed = true)
@@ -56,6 +58,7 @@ class ReplayOrchestratorTest {
         startUpdateLoopCalled = false
         orchestrator =
             ReplayOrchestrator(
+                context = context,
                 locationRepository = locationRepository,
                 routeRepository = routeRepository,
                 roamingRepository = roamingRepository,
@@ -340,6 +343,7 @@ class ReplayOrchestratorTest {
             }
             val throwingOrchestrator =
                 ReplayOrchestrator(
+                    context = context,
                     locationRepository = locationRepository,
                     routeRepository = routeRepository,
                     roamingRepository = roamingRepository,
@@ -691,6 +695,7 @@ class ReplayOrchestratorTest {
             var capturedCallback: ((LatLng) -> Unit)? = null
             val orch =
                 ReplayOrchestrator(
+                    context = context,
                     locationRepository = locationRepository,
                     routeRepository = routeRepository,
                     roamingRepository = roamingRepository,

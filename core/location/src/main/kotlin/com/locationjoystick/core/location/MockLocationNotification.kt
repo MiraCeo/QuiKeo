@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import com.locationjoystick.core.common.constants.AppConstants
 
@@ -22,7 +23,7 @@ internal enum class NotificationAction {
 }
 
 internal data class ActionSpec(
-    val label: String,
+    @StringRes val labelRes: Int,
     val action: NotificationAction,
 )
 
@@ -33,25 +34,25 @@ internal fun selectNotificationActions(
     when {
         !replayActive -> {
             listOf(
-                ActionSpec(AppConstants.NotificationConstants.ACTION_STOP, NotificationAction.STOP),
-                ActionSpec(AppConstants.NotificationConstants.ACTION_OPEN_MAP, NotificationAction.NAV_MAP),
-                ActionSpec(AppConstants.NotificationConstants.ACTION_OPEN_FAVORITES, NotificationAction.NAV_FAVORITES),
+                ActionSpec(R.string.notification_action_stop, NotificationAction.STOP),
+                ActionSpec(R.string.notification_action_map, NotificationAction.NAV_MAP),
+                ActionSpec(R.string.notification_action_favorites, NotificationAction.NAV_FAVORITES),
             )
         }
 
         replayPaused -> {
             listOf(
-                ActionSpec(AppConstants.NotificationConstants.ACTION_STOP, NotificationAction.STOP),
-                ActionSpec(AppConstants.NotificationConstants.ACTION_RESUME, NotificationAction.RESUME),
-                ActionSpec(AppConstants.NotificationConstants.ACTION_OPEN_MAP, NotificationAction.NAV_MAP),
+                ActionSpec(R.string.notification_action_stop, NotificationAction.STOP),
+                ActionSpec(R.string.notification_action_resume, NotificationAction.RESUME),
+                ActionSpec(R.string.notification_action_map, NotificationAction.NAV_MAP),
             )
         }
 
         else -> {
             listOf(
-                ActionSpec(AppConstants.NotificationConstants.ACTION_STOP, NotificationAction.STOP),
-                ActionSpec(AppConstants.NotificationConstants.ACTION_PAUSE, NotificationAction.PAUSE),
-                ActionSpec(AppConstants.NotificationConstants.ACTION_OPEN_MAP, NotificationAction.NAV_MAP),
+                ActionSpec(R.string.notification_action_stop, NotificationAction.STOP),
+                ActionSpec(R.string.notification_action_pause, NotificationAction.PAUSE),
+                ActionSpec(R.string.notification_action_map, NotificationAction.NAV_MAP),
             )
         }
     }
@@ -77,28 +78,28 @@ internal fun createMockLocationNotificationChannels(context: Context) {
     val channel =
         NotificationChannel(
             CHANNEL_ID,
-            AppConstants.NotificationConstants.CHANNEL_NAME_ACTIVE,
+            context.getString(R.string.notification_channel_name_active),
             NotificationManager.IMPORTANCE_LOW,
         ).apply {
-            description = AppConstants.NotificationConstants.CHANNEL_DESC_ACTIVE
+            description = context.getString(R.string.notification_channel_desc_active)
             setShowBadge(false)
         }
     val minimizedChannel =
         NotificationChannel(
             CHANNEL_ID_MINIMIZED,
-            AppConstants.NotificationConstants.CHANNEL_NAME_ACTIVE_MINIMIZED,
+            context.getString(R.string.notification_channel_name_active_minimized),
             NotificationManager.IMPORTANCE_MIN,
         ).apply {
-            description = AppConstants.NotificationConstants.CHANNEL_DESC_ACTIVE_MINIMIZED
+            description = context.getString(R.string.notification_channel_desc_active_minimized)
             setShowBadge(false)
         }
     val errorChannel =
         NotificationChannel(
             CHANNEL_ID_PERM_ERROR,
-            AppConstants.NotificationConstants.CHANNEL_NAME_PERMISSION_ERROR,
+            context.getString(R.string.notification_channel_name_permission_error),
             NotificationManager.IMPORTANCE_HIGH,
         ).apply {
-            description = AppConstants.NotificationConstants.CHANNEL_DESC_PERMISSION_ERROR
+            description = context.getString(R.string.notification_channel_desc_permission_error)
         }
     val notificationManager = context.getSystemService(NotificationManager::class.java)
     notificationManager.createNotificationChannel(channel)
@@ -163,8 +164,8 @@ internal fun buildMockLocationNotification(
     val builder =
         NotificationCompat
             .Builder(context, notificationChannelId(hideNotification))
-            .setContentTitle(AppConstants.NotificationConstants.TITLE_ACTIVE)
-            .setContentText(AppConstants.NotificationConstants.TEXT_ACTIVE)
+            .setContentTitle(context.getString(R.string.notification_title_active))
+            .setContentText(context.getString(R.string.notification_text_active))
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .setContentIntent(openAppIntent)
             .setOngoing(true)
@@ -180,7 +181,7 @@ internal fun buildMockLocationNotification(
                 NotificationAction.NAV_FAVORITES -> favoritesPendingIntent
             }
         if (pendingIntent != null) {
-            builder.addAction(0, action.label, pendingIntent)
+            builder.addAction(0, context.getString(action.labelRes), pendingIntent)
         }
     }
 
@@ -200,8 +201,8 @@ internal fun postMockLocationPermissionErrorNotification(context: Context) {
     val notification =
         NotificationCompat
             .Builder(context, CHANNEL_ID_PERM_ERROR)
-            .setContentTitle(AppConstants.NotificationConstants.TITLE_PERMISSION_ERROR)
-            .setContentText(AppConstants.NotificationConstants.TEXT_PERMISSION_ERROR)
+            .setContentTitle(context.getString(R.string.notification_title_permission_error))
+            .setContentText(context.getString(R.string.notification_text_permission_error))
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
             .setContentIntent(openAppIntent)
             .setAutoCancel(true)

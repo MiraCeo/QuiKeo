@@ -2,6 +2,7 @@ package com.locationjoystick.lint.checks
 
 import com.android.tools.lint.client.api.UElementHandler
 import com.android.tools.lint.detector.api.Category
+import com.android.tools.lint.detector.api.ConstantEvaluator
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Implementation
 import com.android.tools.lint.detector.api.Issue
@@ -10,7 +11,6 @@ import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UElement
-import org.jetbrains.uast.ULiteralExpression
 import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.getParentOfType
 import org.jetbrains.uast.skipParenthesizedExprDown
@@ -18,11 +18,13 @@ import org.jetbrains.uast.skipParenthesizedExprDown
 /**
  * Flags a literal `String` passed to the text-bearing parameter of a small,
  * fixed set of Compose/Material calls. Deliberately narrow: it only flags a
- * plain string literal with no `$` interpolation (`ULiteralExpression`
- * whose `.value` is a `String`) — a string template with an interpolated
- * argument is not flagged, because the extraction sweep turns those into
- * `stringResource(R.string.x, arg)` calls, which are themselves calls, not
- * literals, and so are already clean.
+ * compile-time-constant string — `ConstantEvaluator` resolves a plain Kotlin
+ * string literal (which UAST wraps as `KotlinStringTemplateUPolyadicExpression`
+ * even with zero `$` interpolation, not a bare `ULiteralExpression`) but
+ * returns null for a template with an interpolated (non-constant) part, so a
+ * string like `"Hello $name"` is not flagged — the extraction sweep turns
+ * those into `stringResource(R.string.x, arg)` calls, which are themselves
+ * calls, not literals, and so are already clean.
  */
 class HardcodedComposeStringDetector :
     Detector(),
@@ -41,15 +43,15 @@ class HardcodedComposeStringDetector :
                 val argumentExpression =
                     mapping.entries.firstOrNull { it.value.name == target.paramName }?.key ?: return
 
-                val literal = argumentExpression.skipParenthesizedExprDown() as? ULiteralExpression ?: return
-                if (literal.value !is String) return
+                val expression = argumentExpression.skipParenthesizedExprDown()
+                ConstantEvaluator.evaluate(context, expression) as? String ?: return
 
                 if (isInsidePreview(node)) return
 
                 context.report(
                     ISSUE,
                     node,
-                    context.getLocation(literal),
+                    context.getLocation(expression),
                     "Hardcoded string passed to ${node.methodName}() — use stringResource() instead",
                 )
             }

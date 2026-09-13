@@ -17,9 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.LjSpacing
+import com.locationjoystick.core.designsystem.R
 import com.locationjoystick.core.model.Route
 
 /**
@@ -45,7 +47,7 @@ fun RoutesPickerList(
         }
         if (routes.isEmpty()) {
             Text(
-                "No routes saved",
+                stringResource(R.string.routes_picker_no_routes_saved),
                 style = MaterialTheme.typography.bodyMedium,
                 color = textColor,
                 modifier = Modifier.padding(top = LjSpacing.md),
@@ -75,7 +77,7 @@ fun RoutesPickerList(
                             )
                         }
                         Button(onClick = { onSelect(route) }) {
-                            Icon(LjIcons.PlayArrow, contentDescription = "Start route")
+                            Icon(LjIcons.PlayArrow, contentDescription = stringResource(R.string.routes_picker_start_route_cd))
                         }
                     }
                 }

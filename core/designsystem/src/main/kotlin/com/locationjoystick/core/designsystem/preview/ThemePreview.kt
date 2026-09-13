@@ -12,10 +12,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.LjTheme
+import com.locationjoystick.core.designsystem.R
 import com.locationjoystick.core.designsystem.component.EmptyState
 import com.locationjoystick.core.designsystem.component.LjButton
 import com.locationjoystick.core.designsystem.component.LjCard
@@ -34,12 +36,12 @@ private fun ThemePreview() {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Text(
-                    text = "Lj",
+                    text = stringResource(R.string.theme_preview_lj),
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
                 Text(
-                    text = "Design System Preview",
+                    text = stringResource(R.string.theme_preview_design_system_preview),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -47,12 +49,12 @@ private fun ThemePreview() {
                 LjCard(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "Mock Location Active",
+                            text = stringResource(R.string.theme_preview_mock_location_active),
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.secondary,
                         )
                         Text(
-                            text = "48.8566° N, 2.3522° E",
+                            text = stringResource(R.string.theme_preview_48_8566_n_2_3522_e),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
@@ -66,13 +68,13 @@ private fun ThemePreview() {
                         onClick = {},
                         modifier = Modifier.weight(1f),
                     ) {
-                        Text("Start")
+                        Text(stringResource(R.string.common_start))
                     }
                     LjOutlinedButton(
                         onClick = {},
                         modifier = Modifier.weight(1f),
                     ) {
-                        Text("Stop")
+                        Text(stringResource(R.string.theme_preview_stop))
                     }
                 }
                 EmptyState(

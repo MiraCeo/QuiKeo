@@ -15,12 +15,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.locationjoystick.app.R
 import com.locationjoystick.app.navigation.LjDrawerContent
 import com.locationjoystick.app.navigation.LjNavHost
 import com.locationjoystick.core.model.RouteType
@@ -47,10 +49,11 @@ fun LjApp(
     val scope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val couldNotOpenLinkMessage = stringResource(R.string.app_couldn_t_open_that_link)
 
     LaunchedEffect(Unit) {
         deepLinkFailedFlow.collect {
-            snackbarHostState.showSnackbar("Couldn't open that link")
+            snackbarHostState.showSnackbar(couldNotOpenLinkMessage)
         }
     }
 

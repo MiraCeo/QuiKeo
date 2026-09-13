@@ -14,6 +14,7 @@
 - No business logic in Composables.
 - `@Preview` every non-trivial Composable.
 - `remember { }` expensive computations, `rememberSaveable { }` state surviving process death.
+- No hardcoded user-facing strings — use `stringResource()` for Composables and string resources everywhere else. Enforced by lint.
 
 ## Coroutines
 

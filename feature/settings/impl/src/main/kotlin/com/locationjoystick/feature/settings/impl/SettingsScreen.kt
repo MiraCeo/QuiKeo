@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,6 +50,7 @@ import com.locationjoystick.core.designsystem.component.LjOverflowMenuSectionLab
 import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.model.RoamingDefaults
+import com.locationjoystick.feature.settings.impl.R
 
 private enum class SettingsSection { GPS, MENUS, FAVORITES_ROUTES, ROAMING }
 
@@ -638,14 +640,14 @@ private fun SettingsHubScreen(
             LjOverflowMenu { dismiss ->
                 LjOverflowMenuSectionLabel("Export", showDivider = false)
                 DropdownMenuItem(
-                    text = { Text("Export via QR code") },
+                    text = { Text(stringResource(R.string.settings_export_via_qr_code)) },
                     onClick = {
                         dismiss()
                         onAction(SettingsAction.QrShare)
                     },
                 )
                 DropdownMenuItem(
-                    text = { Text("Export settings") },
+                    text = { Text(stringResource(R.string.settings_export_settings)) },
                     onClick = {
                         dismiss()
                         onAction(SettingsAction.Export)
@@ -653,35 +655,35 @@ private fun SettingsHubScreen(
                 )
                 LjOverflowMenuSectionLabel("Import")
                 DropdownMenuItem(
-                    text = { Text("Import from QR code") },
+                    text = { Text(stringResource(R.string.settings_import_from_qr_code)) },
                     onClick = {
                         dismiss()
                         onAction(SettingsAction.QrScan)
                     },
                 )
                 DropdownMenuItem(
-                    text = { Text("Import via code") },
+                    text = { Text(stringResource(R.string.settings_import_via_code)) },
                     onClick = {
                         dismiss()
                         onAction(SettingsAction.QrEnterCode)
                     },
                 )
                 DropdownMenuItem(
-                    text = { Text("Import from file") },
+                    text = { Text(stringResource(R.string.settings_import_from_file)) },
                     onClick = {
                         dismiss()
                         onAction(SettingsAction.Import)
                     },
                 )
                 DropdownMenuItem(
-                    text = { Text("Import from GPS Joystick") },
+                    text = { Text(stringResource(R.string.settings_import_from_gps_joystick)) },
                     onClick = {
                         dismiss()
                         onAction(SettingsAction.ImportGpsJoystick)
                     },
                 )
                 DropdownMenuItem(
-                    text = { Text("Import from YAMLA") },
+                    text = { Text(stringResource(R.string.settings_import_from_yamla)) },
                     onClick = {
                         dismiss()
                         onAction(SettingsAction.ImportYamla)
@@ -689,7 +691,7 @@ private fun SettingsHubScreen(
                 )
                 LjOverflowMenuSectionLabel("Danger")
                 DropdownMenuItem(
-                    text = { Text("Reset all data", color = MaterialTheme.colorScheme.error) },
+                    text = { Text(stringResource(R.string.settings_reset_all_data), color = MaterialTheme.colorScheme.error) },
                     leadingIcon = { Icon(LjIcons.Delete, null, tint = MaterialTheme.colorScheme.error) },
                     onClick = {
                         dismiss()
@@ -754,14 +756,14 @@ internal fun SettingsSaveDiscardFab(
             ExtendedFloatingActionButton(
                 onClick = { onAction(SettingsAction.DiscardChanges) },
                 icon = { Icon(LjIcons.Close, contentDescription = null) },
-                text = { Text("Discard") },
+                text = { Text(stringResource(R.string.settings_discard)) },
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             ExtendedFloatingActionButton(
                 onClick = { onAction(SettingsAction.SaveChanges) },
                 icon = { Icon(LjIcons.Check, contentDescription = null) },
-                text = { Text("Save") },
+                text = { Text(stringResource(R.string.settings_save)) },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
             )
@@ -778,15 +780,17 @@ private fun UnsavedChangesConfirmDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Save changes?") },
+        title = { Text(stringResource(R.string.settings_save_changes)) },
         text = { Text(message) },
         confirmButton = {
-            TextButton(onClick = onSave) { Text("Save") }
+            TextButton(onClick = onSave) { Text(stringResource(R.string.settings_save_2)) }
         },
         dismissButton = {
             Row {
-                TextButton(onClick = onDismiss) { Text("Cancel") }
-                TextButton(onClick = onDiscard) { Text("Discard", color = MaterialTheme.colorScheme.error) }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel)) }
+                TextButton(
+                    onClick = onDiscard,
+                ) { Text(stringResource(R.string.settings_discard_2), color = MaterialTheme.colorScheme.error) }
             }
         },
     )
@@ -800,13 +804,13 @@ private fun ImportConfirmDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Import data") },
-        text = { Text("How would you like to handle existing data?") },
+        title = { Text(stringResource(R.string.settings_import_data)) },
+        text = { Text(stringResource(R.string.settings_how_would_you_like_to_handle)) },
         confirmButton = {
             Row {
-                TextButton(onClick = onDismiss) { Text("Cancel") }
-                TextButton(onClick = onAdd) { Text("Add") }
-                TextButton(onClick = onReplace) { Text("Replace", color = MaterialTheme.colorScheme.error) }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel)) }
+                TextButton(onClick = onAdd) { Text(stringResource(R.string.settings_add)) }
+                TextButton(onClick = onReplace) { Text(stringResource(R.string.settings_replace), color = MaterialTheme.colorScheme.error) }
             }
         },
         dismissButton = {},
@@ -820,15 +824,15 @@ private fun ResetAllDataConfirmDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Reset all data?") },
-        text = { Text("All favorites, routes, and settings will be permanently deleted. This cannot be undone.") },
+        title = { Text(stringResource(R.string.settings_reset_all_data_2)) },
+        text = { Text(stringResource(R.string.settings_all_favorites_routes_and_settings_will)) },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Reset", color = MaterialTheme.colorScheme.error)
+                Text(stringResource(R.string.settings_reset), color = MaterialTheme.colorScheme.error)
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel)) }
         },
     )
 }
@@ -842,18 +846,18 @@ private fun EnterExportCodeDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Enter export code") },
+        title = { Text(stringResource(R.string.settings_enter_export_code)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Ask the sender for their 6-character code shown in the QR share dialog.",
+                    text = stringResource(R.string.settings_ask_the_sender_for_their_6),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 OutlinedTextField(
                     value = code,
                     onValueChange = { code = it.uppercase().take(6) },
-                    label = { Text("Code") },
+                    label = { Text(stringResource(R.string.settings_code)) },
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = FontFamily.Monospace),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -863,10 +867,10 @@ private fun EnterExportCodeDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onConfirm(code) }, enabled = code.length == 6) { Text("Import") }
+            TextButton(onClick = { onConfirm(code) }, enabled = code.length == 6) { Text(stringResource(R.string.settings_import)) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel)) }
         },
     )
 }
