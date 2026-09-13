@@ -21,6 +21,7 @@ import com.locationjoystick.core.model.RoamingDefaults
 import com.locationjoystick.core.model.sortedByAge
 import com.locationjoystick.core.model.toConfig
 import com.locationjoystick.core.routing.OsrmClient
+import com.locationjoystick.core.routing.OsrmFailureReason
 import com.locationjoystick.core.routing.RoutingErrorReporter
 import com.locationjoystick.core.routing.classifyOsrmFailure
 import com.locationjoystick.core.routing.osrmFailureMessage
@@ -387,9 +388,7 @@ class MapController
                     if (waypoints.isNullOrEmpty()) {
                         val reason = routeResult.exceptionOrNull()?.let(::classifyOsrmFailure)
                         Log.w(TAG, "OSRM road-following failed ($reason); falling back to straight walk")
-                        val prefix =
-                            reason?.let { osrmFailureMessage(context, it) }
-                                ?: context.getString(com.locationjoystick.core.routing.R.string.osrm_failure_unknown)
+                        val prefix = osrmFailureMessage(context, reason ?: OsrmFailureReason.Unknown)
                         routingErrorReporter.report(context.getString(R.string.walk_via_roads_fallback_message, prefix))
                         walkTo(position)
                         return@launch
