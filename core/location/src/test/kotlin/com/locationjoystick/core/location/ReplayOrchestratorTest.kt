@@ -750,7 +750,6 @@ class ReplayOrchestratorTest {
                     isLooping = false,
                     onPositionUpdate = any(),
                     onComplete = any(),
-                    boundaryIndices = any(),
                 )
             }
             verify(exactly = 0) { routeReplayEngine.start(any(), any(), any(), any(), any(), any()) }
@@ -771,7 +770,6 @@ class ReplayOrchestratorTest {
                     isLooping = any(),
                     onPositionUpdate = any(),
                     onComplete = any(),
-                    boundaryIndices = any(),
                 )
             }
         }
@@ -857,7 +855,7 @@ class ReplayOrchestratorTest {
             coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
             val onCompleteSlot = slot<() -> Unit>()
             every {
-                teleportRouteEngine.start(any(), any(), any(), any(), capture(onCompleteSlot), any())
+                teleportRouteEngine.start(any(), any(), any(), any(), capture(onCompleteSlot))
             } returns Unit
             orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
             onCompleteSlot.captured.invoke()

@@ -56,8 +56,6 @@ class TeleportRouteEngine
          * @param waypoints Positions in order.
          * @param waitSecondsPerWaypoint Same length as [waypoints]; seconds to wait at each
          *   before jumping onward.
-         * @param boundaryIndices Real named-stop indices within [waypoints]; defaults to every
-         *   index. Teleport routes are never road-expanded, so callers normally pass null.
          */
         fun start(
             waypoints: List<LatLng>,
@@ -65,12 +63,11 @@ class TeleportRouteEngine
             isLooping: Boolean = false,
             onPositionUpdate: (LatLng) -> Unit,
             onComplete: () -> Unit,
-            boundaryIndices: List<Int>? = null,
         ) {
             savedWaypointsRef.set(waypoints)
             savedWaitSecondsRef.set(waitSecondsPerWaypoint)
             this.isLooping = isLooping
-            this.boundaryIndices = boundaryIndices ?: waypoints.indices.toList()
+            this.boundaryIndices = waypoints.indices.toList()
             resumeIndex = 0
             resumeRemainingWaitMs = waitMsFor(0)
             launchReplay(onPositionUpdate, onComplete)
