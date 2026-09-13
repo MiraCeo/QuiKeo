@@ -93,6 +93,39 @@ class RoamingEngineStartRoamingTest {
         assertTrue("should stay within roaming radius ($distFromCenter m)", distFromCenter < 200.0)
     }
 
+    @Test
+    fun `startRoaming first position update moves away from center instead of wasting the first tick`() {
+        // distanceMeters=50 plans a 2-waypoint route (center, endpoint) — the exact shape that
+        // hit the bug: starting waypointIndex at 0 targeted route[0] (the start position itself,
+        // distance 0), so the first tick reported no movement at all. Starting at index 1 (the
+        // first waypoint actually ahead) fixes this.
+        val center = LatLng(0.0, 0.0)
+        val firstPosition = AtomicReference<LatLng?>(null)
+        val latch = CountDownLatch(1)
+        val config =
+            RoamingConfig(
+                centerPosition = center,
+                radiusMeters = 100.0,
+                distanceMeters = 50.0,
+                useRoadSnapping = false,
+                speedProfileId = "walk",
+                returnToInitialLocation = false,
+            )
+        engine.startRoaming(config, 1.4) { pos ->
+            if (firstPosition.compareAndSet(null, pos)) {
+                latch.countDown()
+            }
+        }
+
+        latch.await(10, TimeUnit.SECONDS)
+
+        val movedDistance = center.distanceTo(firstPosition.get()!!)
+        assertTrue(
+            "first tick should move roughly a full tick's budget (~1.4m), not stay at center ($movedDistance m)",
+            movedDistance > 0.5,
+        )
+    }
+
     // startRoaming — returnToInitialLocation
 
     @Test

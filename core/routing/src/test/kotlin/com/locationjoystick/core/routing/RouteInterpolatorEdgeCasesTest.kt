@@ -1,7 +1,9 @@
 package com.locationjoystick.core.routing
 
 import com.locationjoystick.core.common.constants.AppConstants
+import com.locationjoystick.core.common.util.calculateBearing
 import com.locationjoystick.core.model.LatLng
+import com.locationjoystick.core.model.distanceTo
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -94,11 +96,12 @@ class RouteInterpolatorEdgeCasesTest {
         val next = LatLng(0.002, 0.0)
         val waypoints = listOf(start, target, next)
 
-        // Speed 200 m/s * 1s = 200m > 111m → should snap
+        // Speed 200 m/s * 1s = 200m > 111m → overshoots target, index advances to it,
+        // and the leftover budget carries on toward `next` rather than being dropped.
         val result = interpolator.interpolateAlongRoute(waypoints, start, 1, 200.0, 1000)
         assertFalse(result.reachedEnd)
         assertEquals(2, result.nextWaypointIndex)
-        assertEquals(target.latitude, result.position.latitude, 0.00001)
+        assertTrue("leftover budget should carry position past target", result.position.latitude > target.latitude)
     }
 
     // interpolateAlongRoute — zero speed stays in place
@@ -247,7 +250,8 @@ class RouteInterpolatorEdgeCasesTest {
         val wp2 = LatLng(0.002, 0.0) // another ~111m north
         val waypoints = listOf(wp0, wp1, wp2)
 
-        // Speed high enough to overshoot wp1 in one tick: 200m/s for 1s = 200m > ~111m
+        // Speed high enough to overshoot wp1 but not reach wp2 in one tick: 200m/s for 1s = 200m,
+        // and wp0->wp1 + wp1->wp2 is ~222m total.
         val result =
             interpolator.interpolateAlongRoute(
                 waypoints = waypoints,
@@ -257,11 +261,46 @@ class RouteInterpolatorEdgeCasesTest {
                 deltaTimeMs = 1000L,
             )
 
-        // Should advance index to 2 (targeting wp2) and position snaps to wp1 (no further waypoint for carry)
+        // Should advance index to 2 (targeting wp2) and the full 200m budget is consumed:
+        // 111m to reach wp1, then the ~89m leftover carried past it toward wp2.
         assertEquals(2, result.nextWaypointIndex)
         assertFalse(result.reachedEnd)
-        // No carry-forward possible (nextIndex=2 is the last waypoint), position is at wp1
-        assertEquals(wp1.latitude, result.position.latitude, 1e-9)
+        val distanceToWp1 = wp0.distanceTo(wp1)
+        val leftover = 200.0 - distanceToWp1
+        val bearingToWp2 = calculateBearing(wp1.latitude, wp1.longitude, wp2.latitude, wp2.longitude)
+        val expected = interpolator.advancePosition(wp1, bearingToWp2, leftover)
+        assertEquals(expected.latitude, result.position.latitude, 1e-9)
+        assertTrue("leftover should carry position past wp1", result.position.latitude > wp1.latitude)
+    }
+
+    @Test
+    fun `interpolateAlongRoute budget spanning three waypoints consumes full distance in one call`() {
+        // Four waypoints ~111m apart each; budget covers the first two segments fully
+        // plus part of the third, all within a single interpolateAlongRoute call.
+        val wp0 = LatLng(0.0, 0.0)
+        val wp1 = LatLng(0.001, 0.0)
+        val wp2 = LatLng(0.002, 0.0)
+        val wp3 = LatLng(0.003, 0.0)
+        val waypoints = listOf(wp0, wp1, wp2, wp3)
+
+        // 300m/s for 1s = 300m budget; wp0->wp1->wp2 is ~222m, leaving ~78m carried into wp2->wp3.
+        val result =
+            interpolator.interpolateAlongRoute(
+                waypoints = waypoints,
+                currentPosition = wp0,
+                currentWaypointIndex = 1,
+                speedMs = 300.0,
+                deltaTimeMs = 1000L,
+            )
+
+        // Full budget crossed two full segments — index lands past wp1 and wp2, targeting wp3.
+        assertEquals(3, result.nextWaypointIndex)
+        assertFalse(result.reachedEnd)
+        val leftover = 300.0 - wp0.distanceTo(wp1) - wp1.distanceTo(wp2)
+        val bearingToWp3 = calculateBearing(wp2.latitude, wp2.longitude, wp3.latitude, wp3.longitude)
+        val expected = interpolator.advancePosition(wp2, bearingToWp3, leftover)
+        assertEquals(expected.latitude, result.position.latitude, 1e-9)
+        assertTrue("leftover should carry position past wp2", result.position.latitude > wp2.latitude)
     }
 
     @Test

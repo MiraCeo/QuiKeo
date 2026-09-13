@@ -23,7 +23,11 @@ Routes can also be imported from GPX files via the Routes screen overflow menu �
   via `calculateBearing` (`core/common/util/GeoUtils.kt`), published through
   `LocationRepository.currentBearing` and picked up by `MockLocationService` — covers
   route replay, ephemeral replay, the walk-to-start-of-route phase, and waypoint jumps.
-- Advance: `speed * deltaTime`.
+- Advance: `speed * deltaTime`. `RouteInterpolator.interpolateAlongRoute()` consumes this whole
+  per-tick budget across as many consecutive waypoints as it spans in one call (dense geometry,
+  e.g. many closely spaced saved waypoints, can put several within a single tick's travel
+  distance) rather than carrying leftover distance forward only one segment and dropping any
+  remainder beyond it (issue #75).
 - Snap at `AppConstants.LocationConstants.WALK_ARRIVAL_THRESHOLD_METERS`.
 - Loop: smooth interpolation last→first waypoint.
 - Pausing keeps pushing the frozen position to the mock location provider

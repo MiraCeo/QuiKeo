@@ -204,7 +204,10 @@ class RoamingEngine
             onTick: () -> Unit = {},
         ): LatLng {
             var currentPosition = startPosition
-            var waypointIndex = 0
+            // startPosition is route[0] (the caller's only call site passes route.first()) —
+            // target waypoint 1 (the first one ahead), matching RouteReplayEngine's
+            // resumeWaypointIndex convention. Targeting index 0 snaps instantly and wastes a tick.
+            var waypointIndex = 1
             while (currentCoroutineContext().isActive) {
                 while (isPaused && currentCoroutineContext().isActive) {
                     delay(AppConstants.LocationConstants.UPDATE_INTERVAL_MS)

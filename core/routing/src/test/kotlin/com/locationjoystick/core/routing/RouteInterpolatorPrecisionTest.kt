@@ -149,15 +149,16 @@ class RouteInterpolatorPrecisionTest {
     }
 
     @Test
-    fun `carry-forward distance is bounded by next segment length`() {
-        // Extreme overshoot: speed high enough that leftover > entire next segment
+    fun `carry-forward keeps consuming budget across a short intermediate segment`() {
+        // Extreme overshoot: speed high enough that leftover after wp1 exceeds the
+        // short wp1->wp2 segment too — the fix keeps consuming budget into wp2->wp3
+        // instead of dropping the remainder at wp2 (the old, capped behavior).
         val wp0 = LatLng(0.0, 0.0)
         val wp1 = LatLng(0.001, 0.0) // ~111m
-        val wp2 = LatLng(0.0011, 0.0) // only ~11m from wp1 — leftover will exceed this
+        val wp2 = LatLng(0.0011, 0.0) // only ~11m from wp1
         val wp3 = LatLng(0.01, 0.0)
         val waypoints = listOf(wp0, wp1, wp2, wp3)
 
-        // 1000 m/s overshoot: leftover >> 11m next-segment length; carry is capped at segment length
         val result =
             interpolator.interpolateAlongRoute(
                 waypoints = waypoints,
@@ -168,17 +169,23 @@ class RouteInterpolatorPrecisionTest {
             )
 
         assertFalse(result.reachedEnd)
-        assertEquals(2, result.nextWaypointIndex)
-        // Position capped at wp2 (carry = minOf(leftover, distToNextTarget))
+        // Full 1000m budget crosses wp1 (~111m) and wp2 (~11m more), landing in the wp2->wp3 leg.
+        assertEquals("Index should advance past wp2 to wp3", 3, result.nextWaypointIndex)
         assertTrue(
-            "Carry must not exceed wp2 latitude",
-            result.position.latitude <= wp2.latitude + 1e-9,
+            "Leftover budget should carry position past wp2, not cap there",
+            result.position.latitude > wp2.latitude,
+        )
+        assertTrue(
+            "Should not overshoot wp3 since the full budget is less than the whole route",
+            result.position.latitude < wp3.latitude,
         )
     }
 
     @Test
-    fun `no carry-forward when next waypoint is the last one`() {
-        // 3 waypoints: nextIndex=2 is the last → nextIndex+1 >= size → no carry
+    fun `carry-forward happens even when the next waypoint is the last one`() {
+        // 3 waypoints: reaching wp1 still has budget left over, and wp2 is the last
+        // waypoint — the fix carries the leftover into wp1->wp2 instead of dropping it
+        // (the old bug required a waypoint *after* the next one to carry at all).
         val wp0 = LatLng(0.0, 0.0)
         val wp1 = LatLng(0.001, 0.0) // ~111m
         val wp2 = LatLng(0.002, 0.0)
@@ -195,7 +202,8 @@ class RouteInterpolatorPrecisionTest {
 
         assertFalse(result.reachedEnd)
         assertEquals(2, result.nextWaypointIndex)
-        // Position snaps exactly to wp1 — no carry into wp1→wp2
-        assertEquals(wp1.latitude, result.position.latitude, 1e-9)
+        // Position carries past wp1 toward wp2 instead of snapping exactly to wp1.
+        assertTrue(result.position.latitude > wp1.latitude)
+        assertTrue(result.position.latitude < wp2.latitude)
     }
 }

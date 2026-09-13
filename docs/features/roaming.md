@@ -21,6 +21,14 @@ The entire route is pre-planned before walking begins. The map shows the complet
 
 **Preview = planning**: `generateRoamingPreview` runs the full planning algorithm. `startRoaming` walks the pre-planned route directly. If no preview exists at start time, planning runs inline.
 
+**Walking the plan**: `RoamingEngine.walkRouteSegment()` starts targeting waypoint index 1 (the
+first point ahead), not index 0 (the start position itself, which is `route.first()`) — mirroring
+`RouteReplayEngine`'s `resumeWaypointIndex` convention. Targeting index 0 would put the walk's very
+first tick at distance 0 from its own target, snapping instantly and wasting that tick's movement
+budget (issue #75). Movement itself is shared with Route Replay via `RouteInterpolator` (see
+@docs/features/routes.md, "Replay") — dense road-following geometry benefits from the same
+full-tick-budget-consumption fix.
+
 ## Configuration Fields (`RoamingConfig`)
 
 | Field | Description |

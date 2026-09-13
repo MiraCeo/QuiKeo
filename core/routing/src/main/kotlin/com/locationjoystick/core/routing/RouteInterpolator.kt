@@ -61,42 +61,36 @@ class RouteInterpolator
                 return InterpolationResult(currentPosition, currentWaypointIndex, reachedEnd = true)
             }
 
-            val target = waypoints[currentWaypointIndex]
-            val distanceToTarget = currentPosition.distanceTo(target)
-            val distanceToAdvance = speedMs * (deltaTimeMs / 1000.0)
+            var position = currentPosition
+            var waypointIndex = currentWaypointIndex
+            var remaining = speedMs * (deltaTimeMs / 1000.0)
 
-            return if (distanceToTarget <= AppConstants.RouteConstants.WAYPOINT_SNAP_THRESHOLD_METERS ||
-                distanceToAdvance >= distanceToTarget
-            ) {
-                val nextIndex = currentWaypointIndex + 1
-                if (nextIndex >= waypoints.size) {
-                    InterpolationResult(target, currentWaypointIndex, reachedEnd = true)
-                } else {
-                    // Carry leftover distance forward into the next segment rather than
-                    // pausing at the waypoint for a full tick (prevents stuttering at
-                    // high speed / bike profile).
-                    val leftover = (distanceToAdvance - distanceToTarget).coerceAtLeast(0.0)
-                    if (leftover > 0.0 && nextIndex + 1 < waypoints.size) {
-                        val nextTarget = waypoints[nextIndex]
-                        val bearingToNext =
-                            calculateBearing(
-                                target.latitude,
-                                target.longitude,
-                                nextTarget.latitude,
-                                nextTarget.longitude,
-                            )
-                        val distToNextTarget = target.distanceTo(nextTarget)
-                        val carry = minOf(leftover, distToNextTarget)
-                        val carried = advancePosition(target, bearingToNext, carry)
-                        InterpolationResult(carried, nextIndex, reachedEnd = false)
-                    } else {
-                        InterpolationResult(target, nextIndex, reachedEnd = false)
-                    }
+            // Consume the full tick budget across as many consecutive waypoints as
+            // needed (dense geometry, e.g. OSRM road-following, can put several
+            // waypoints within one tick's travel distance) rather than carrying
+            // leftover distance forward only one segment and dropping the rest.
+            while (true) {
+                val target = waypoints[waypointIndex]
+                val distanceToTarget = position.distanceTo(target)
+
+                if (distanceToTarget > AppConstants.RouteConstants.WAYPOINT_SNAP_THRESHOLD_METERS &&
+                    remaining < distanceToTarget
+                ) {
+                    val bearing = calculateBearing(position.latitude, position.longitude, target.latitude, target.longitude)
+                    val newPosition = advancePosition(position, bearing, remaining)
+                    return InterpolationResult(newPosition, waypointIndex, reachedEnd = false)
                 }
-            } else {
-                val bearing = calculateBearing(currentPosition.latitude, currentPosition.longitude, target.latitude, target.longitude)
-                val newPosition = advancePosition(currentPosition, bearing, distanceToAdvance)
-                InterpolationResult(newPosition, currentWaypointIndex, reachedEnd = false)
+
+                remaining = (remaining - distanceToTarget).coerceAtLeast(0.0)
+                position = target
+                val nextIndex = waypointIndex + 1
+                if (nextIndex >= waypoints.size) {
+                    return InterpolationResult(position, waypointIndex, reachedEnd = true)
+                }
+                waypointIndex = nextIndex
+                if (remaining <= 0.0) {
+                    return InterpolationResult(position, waypointIndex, reachedEnd = false)
+                }
             }
         }
     }

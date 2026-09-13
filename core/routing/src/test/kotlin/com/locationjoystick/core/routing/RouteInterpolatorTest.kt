@@ -126,7 +126,9 @@ class RouteInterpolatorTest {
         val result = interpolator.interpolateAlongRoute(waypoints, start, 1, 1.4, 1000)
         assertFalse(result.reachedEnd)
         assertEquals(2, result.nextWaypointIndex)
-        assertEquals(nearTarget.latitude, result.position.latitude, 0.000001)
+        // Leftover budget (1.4m - 0.89m) carries past nearTarget toward nextTarget
+        // instead of being dropped there.
+        assertTrue(result.position.latitude > nearTarget.latitude)
     }
 
     @Test
