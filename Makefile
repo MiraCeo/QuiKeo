@@ -14,7 +14,8 @@ clean:
 	find . -name "build" -type d -not -path "*/.git/*" | xargs rm -rf
 	find . -name ".gradle" -type d -not -path "*/.git/*" | xargs rm -rf
 
-.PHONY: build
+.PHONY: stop clean build bundle format lint install-on-phone reinstall-on-phone start-on-phone tail-log-on-phone \
+	test coverage coverage-open screenshot screenshot-playstore wiki-changelog wiki-serve smoke-test smoke-test-one
 build:
 	./gradlew assembleRelease
 
