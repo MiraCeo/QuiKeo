@@ -52,6 +52,15 @@ Complete every item in order. Items marked `[x]` are already done.
 
 - [x] **Short description** (≤80 chars): `Mock your GPS location on Android — no root, no ads.`
 - [ ] **Full description** (≤4000 chars): write from the feature table in `README.md`, expand into Store prose
+- [ ] **Accessibility disclosure in the full description**: paste the paragraph below verbatim into the full description, in every listing language. Play rejects the release without it ("Politique relative à l'API Accessibility : Description manquante dans la fiche Play"), because `CompassAccessibilityService` declares `isAccessibilityTool="false"`.
+  ```text
+  ACCESSIBILITY SERVICE USE
+  This app includes an optional Accessibility Service, used only by the "Compass orientation" part of the Tap to Walk feature. It is off by default. You turn it on yourself in Android Settings > Accessibility.
+  What it does: when you use the Tap to Walk screen overlay, the service takes one screenshot of your screen. The app finds the compass icon of the game or map app on that screenshot and reads its direction. It then converts your tap into the correct real-world walking direction.
+  Why it needs the Accessibility API: Android lets an app capture the screen of another app in the background only through an Accessibility Service.
+  Data: the screenshot is analyzed on your device, in memory, and deleted immediately. The app does not save it, does not send it anywhere, and does not read text, passwords, or other content from your screen. The service does not perform any action on your behalf.
+  This service is not an accessibility tool for users with disabilities. You can turn it off at any time in Android Settings > Accessibility. All other features work without it.
+  ```
 - [x] **Screenshots**: 17 canonical shots in `docs/wiki/screenshots/` (1080×2340, `*_playstore` variants pre-cropped for the listing) — upload at least 2
 - [ ] **App icon** (512×512 px): `docs/wiki/icon.png` is currently 192×192 — resize/export at 512×512 before upload
 - [ ] **Feature graphic** (1024×500 px): does not exist yet — design and upload (shown at top of listing)
@@ -113,6 +122,7 @@ Play Console → App content:
 
 - [ ] Ads: **No ads** — app contains no advertising SDKs or ad placements
 - [ ] Sensitive permissions: declare `ACCESS_FINE_LOCATION` and `SYSTEM_ALERT_WINDOW` usage
+- [ ] Accessibility API: declare `CompassAccessibilityService` (App content → Accessibility API). Use the same purpose as the full-description paragraph in step 5. Attach a short screen recording that shows the in-app disclosure, enabling the service, and the Tap to Walk compass in use.
 - [ ] News app: No
 - [ ] COVID-19 contact tracing: No
 
