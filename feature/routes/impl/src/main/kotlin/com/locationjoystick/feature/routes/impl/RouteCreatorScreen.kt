@@ -316,12 +316,8 @@ internal fun RouteCreatorScreen(
             if (showSearch) {
                 NominatimSearchBar(
                     onLocationSelected = { lat, lon, _ ->
-                        val position = LatLng(lat, lon)
-                        if (routeType == RouteType.TELEPORT) {
-                            pendingWaitPrompt = position
-                        } else {
-                            onAddWaypoint(position, 0)
-                        }
+                        // Search only recenters the map — the user places waypoints themselves via map tap,
+                        // matching the long-press/tap-to-add flow (issue: auto-added a waypoint on search).
                         showSearch = false
                         val map = mapRef.value ?: return@NominatimSearchBar
                         map.animateCamera(
