@@ -50,6 +50,7 @@ kover = "0.9.9"
 
 # Lint / format
 ktlint-gradle = "14.2.0"
+lint-tools = "32.4.0"
 
 # Testing
 junit = "4.13.2"
@@ -136,6 +137,11 @@ mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "moc
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 orgjson = { group = "org.json", name = "json", version.ref = "orgjson" }
+
+# Lint checks (custom rules module)
+lintcheck-api = { group = "com.android.tools.lint", name = "lint-api", version.ref = "lint-tools" }
+lintcheck-core = { group = "com.android.tools.lint", name = "lint", version.ref = "lint-tools" }
+lintcheck-tests = { group = "com.android.tools.lint", name = "lint-tests", version.ref = "lint-tools" }
 
 # Build logic dependencies (for convention plugins)
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }

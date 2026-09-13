@@ -2,6 +2,7 @@ import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.dependencies
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.File
 
@@ -88,12 +89,20 @@ class LjApplicationConventionPlugin : Plugin<Project> {
                         excludes += "/META-INF/{AL2.0,LGPL2.1}"
                     }
                 }
+
+                lint {
+                    error += "HardcodedComposeString"
+                }
             }
 
             extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension> {
                 compilerOptions {
                     jvmTarget.set(JvmTarget.JVM_17)
                 }
+            }
+
+            dependencies {
+                add("lintChecks", project(":lint:checks"))
             }
         }
     }

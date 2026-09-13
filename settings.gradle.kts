@@ -20,6 +20,8 @@ rootProject.name = "locationjoystick"
 
 include(":app")
 
+include(":lint:checks")
+
 include(":core:common")
 include(":core:data")
 include(":core:map")

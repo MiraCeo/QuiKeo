@@ -2,6 +2,7 @@ import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.dependencies
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 class LjLibraryConventionPlugin : Plugin<Project> {
@@ -23,12 +24,20 @@ class LjLibraryConventionPlugin : Plugin<Project> {
                     sourceCompatibility = org.gradle.api.JavaVersion.VERSION_17
                     targetCompatibility = org.gradle.api.JavaVersion.VERSION_17
                 }
+
+                lint {
+                    error += "HardcodedComposeString"
+                }
             }
 
             extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension> {
                 compilerOptions {
                     jvmTarget.set(JvmTarget.JVM_17)
                 }
+            }
+
+            dependencies {
+                add("lintChecks", project(":lint:checks"))
             }
         }
     }
