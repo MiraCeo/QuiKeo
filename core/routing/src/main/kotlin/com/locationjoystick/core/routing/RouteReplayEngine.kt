@@ -5,7 +5,6 @@ import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.model.LatLng
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -122,10 +121,7 @@ class RouteReplayEngine
          * State is saved internally for resume.
          */
         override fun pause() {
-            // Cancel but do NOT null activeJob here — launchReplay() calls activeJob?.cancel()
-            // before launching the new coroutine, which is safe on an already-cancelled job.
-            // Nulling immediately would allow a concurrent resume() to skip the cancel guard.
-            jobController.activeJob?.cancel()
+            jobController.cancel()
             Log.i(TAG, "Replay paused at index $resumeWaypointIndex")
         }
 
@@ -179,8 +175,8 @@ class RouteReplayEngine
             val waypoints = savedWaypointsRef.get()
             if (waypoints.isEmpty()) return null
             val clamped = target.coerceIn(0, waypoints.size - 1)
-            val wasRunning = jobController.activeJob?.isActive == true
-            jobController.activeJob?.cancel()
+            val wasRunning = jobController.isRunning
+            jobController.cancel()
             resumePosition = waypoints[clamped]
             resumeWaypointIndex = clamped + 1
             if (wasRunning) {
@@ -230,57 +226,54 @@ class RouteReplayEngine
             onComplete: () -> Unit,
         ) {
             val snapshot = savedWaypointsRef.get()
-            val previousJob = jobController.activeJob
-            previousJob?.cancel()
             if (snapshot.size < 2) {
+                jobController.cancel()
                 onComplete()
                 return
             }
             var position = resumePosition ?: snapshot.first()
             var index = resumeWaypointIndex
 
-            jobController.activeJob =
-                jobController.scope.launch {
-                    previousJob?.join()
-                    while (isActive) {
-                        val waypoints = savedWaypointsRef.get()
-                        val result =
-                            routeInterpolator.interpolateAlongRoute(
-                                waypoints = waypoints,
-                                currentPosition = position,
-                                currentWaypointIndex = index.coerceAtMost(waypoints.size - 1),
-                                speedMs = savedSpeedMs,
-                                deltaTimeMs = AppConstants.LocationConstants.UPDATE_INTERVAL_MS,
-                            )
-                        position = result.position
-                        index = result.nextWaypointIndex
-                        resumePosition = position
-                        resumeWaypointIndex = index
-                        try {
-                            onPositionUpdate(position)
-                        } catch (e: Exception) {
-                            Log.e(TAG, "onPositionUpdate failed", e)
-                        }
-                        if (result.reachedEnd) {
-                            if (isLooping) {
-                                position = savedWaypointsRef.get().first()
-                                index = 1
-                                resumePosition = position
-                                resumeWaypointIndex = index
-                            } else {
-                                if (isActive) {
-                                    try {
-                                        onComplete()
-                                    } catch (e: Exception) {
-                                        Log.e(TAG, "onComplete failed", e)
-                                    }
-                                }
-                                break
-                            }
-                        }
-                        delay(AppConstants.LocationConstants.UPDATE_INTERVAL_MS)
+            jobController.launch {
+                while (isActive) {
+                    val waypoints = savedWaypointsRef.get()
+                    val result =
+                        routeInterpolator.interpolateAlongRoute(
+                            waypoints = waypoints,
+                            currentPosition = position,
+                            currentWaypointIndex = index.coerceAtMost(waypoints.size - 1),
+                            speedMs = savedSpeedMs,
+                            deltaTimeMs = AppConstants.LocationConstants.UPDATE_INTERVAL_MS,
+                        )
+                    position = result.position
+                    index = result.nextWaypointIndex
+                    resumePosition = position
+                    resumeWaypointIndex = index
+                    try {
+                        onPositionUpdate(position)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "onPositionUpdate failed", e)
                     }
+                    if (result.reachedEnd) {
+                        if (isLooping) {
+                            position = savedWaypointsRef.get().first()
+                            index = 1
+                            resumePosition = position
+                            resumeWaypointIndex = index
+                        } else {
+                            if (isActive) {
+                                try {
+                                    onComplete()
+                                } catch (e: Exception) {
+                                    Log.e(TAG, "onComplete failed", e)
+                                }
+                            }
+                            break
+                        }
+                    }
+                    delay(AppConstants.LocationConstants.UPDATE_INTERVAL_MS)
                 }
+            }
         }
     }
 

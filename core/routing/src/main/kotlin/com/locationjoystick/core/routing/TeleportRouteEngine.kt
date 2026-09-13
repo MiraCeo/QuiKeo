@@ -5,7 +5,6 @@ import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.model.LatLng
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -66,7 +65,7 @@ class TeleportRouteEngine
         }
 
         override fun pause() {
-            jobController.activeJob?.cancel()
+            jobController.cancel()
             Log.i(TAG, "Teleport replay paused at index $resumeIndex")
         }
 
@@ -88,8 +87,8 @@ class TeleportRouteEngine
             val waypoints = savedWaypointsRef.get()
             if (waypoints.isEmpty()) return null
             val clamped = target.coerceIn(0, waypoints.size - 1)
-            val wasRunning = jobController.activeJob?.isActive == true
-            jobController.activeJob?.cancel()
+            val wasRunning = jobController.isRunning
+            jobController.cancel()
             resumeIndex = clamped
             resumeRemainingWaitMs = waitMsFor(clamped)
             if (wasRunning) launchReplay(onPositionUpdate, onComplete)
@@ -126,59 +125,56 @@ class TeleportRouteEngine
             onPositionUpdate: (LatLng) -> Unit,
             onComplete: () -> Unit,
         ) {
-            val previousJob = jobController.activeJob
-            previousJob?.cancel()
             val snapshot = savedWaypointsRef.get()
             if (snapshot.size < 2) {
+                jobController.cancel()
                 onComplete()
                 return
             }
             var index = resumeIndex
             var remainingWaitMs = resumeRemainingWaitMs
 
-            jobController.activeJob =
-                jobController.scope.launch {
-                    previousJob?.join()
-                    onPositionUpdate(snapshot[index])
-                    while (isActive) {
-                        delay(AppConstants.LocationConstants.UPDATE_INTERVAL_MS)
-                        remainingWaitMs -= AppConstants.LocationConstants.UPDATE_INTERVAL_MS
-                        resumeRemainingWaitMs = remainingWaitMs
-                        if (remainingWaitMs > 0) {
-                            // Still waiting: re-push the frozen position so the fix never goes stale.
-                            try {
-                                onPositionUpdate(snapshot[index])
-                            } catch (e: Exception) {
-                                Log.e(TAG, "onPositionUpdate failed", e)
-                            }
-                            continue
-                        }
-                        val atEnd = index >= snapshot.size - 1
-                        if (atEnd) {
-                            if (isLooping) {
-                                index = 0
-                            } else {
-                                if (isActive) {
-                                    try {
-                                        onComplete()
-                                    } catch (e: Exception) {
-                                        Log.e(TAG, "onComplete failed", e)
-                                    }
-                                }
-                                break
-                            }
-                        } else {
-                            index += 1
-                        }
-                        remainingWaitMs = waitMsFor(index)
-                        resumeIndex = index
-                        resumeRemainingWaitMs = remainingWaitMs
+            jobController.launch {
+                onPositionUpdate(snapshot[index])
+                while (isActive) {
+                    delay(AppConstants.LocationConstants.UPDATE_INTERVAL_MS)
+                    remainingWaitMs -= AppConstants.LocationConstants.UPDATE_INTERVAL_MS
+                    resumeRemainingWaitMs = remainingWaitMs
+                    if (remainingWaitMs > 0) {
+                        // Still waiting: re-push the frozen position so the fix never goes stale.
                         try {
                             onPositionUpdate(snapshot[index])
                         } catch (e: Exception) {
                             Log.e(TAG, "onPositionUpdate failed", e)
                         }
+                        continue
+                    }
+                    val atEnd = index >= snapshot.size - 1
+                    if (atEnd) {
+                        if (isLooping) {
+                            index = 0
+                        } else {
+                            if (isActive) {
+                                try {
+                                    onComplete()
+                                } catch (e: Exception) {
+                                    Log.e(TAG, "onComplete failed", e)
+                                }
+                            }
+                            break
+                        }
+                    } else {
+                        index += 1
+                    }
+                    remainingWaitMs = waitMsFor(index)
+                    resumeIndex = index
+                    resumeRemainingWaitMs = remainingWaitMs
+                    try {
+                        onPositionUpdate(snapshot[index])
+                    } catch (e: Exception) {
+                        Log.e(TAG, "onPositionUpdate failed", e)
                     }
                 }
+            }
         }
     }
