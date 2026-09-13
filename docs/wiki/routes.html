@@ -48,7 +48,7 @@
       <img class="phone-shot" src="screenshots/16_routes_add_button.png" alt="Routes screen with add button visible">
       <ul class="section-bullets">
         <li>The button opens a menu with every way to add a route.</li>
-        <li>Choose "Draw on map" to place stops by hand, "Draw on map (follow roads)" to snap them to real streets, or "Import GPX file" to bring in an existing route.</li>
+        <li>Choose "Draw on map" to place stops by hand, "Draw on map (follow roads)" to snap them to real streets, "Draw on map (teleport)" to jump between stops instead of walking, or "Import GPX file" to bring in an existing route.</li>
       </ul>
     </div>
 
@@ -64,6 +64,10 @@
         <tr>
           <td><strong>Guided (road-following)</strong></td>
           <td>Each stretch between stops is sent to an online road routing service at <a href="https://router.project-osrm.org" target="_blank" rel="noopener">router.project-osrm.org</a>, which sends back a path that follows real roads. The Walk and Run speeds use walking directions; the Bike speed uses cycling directions. If the service can't be reached, that stretch <a href="map.html#road-routing-fallback">falls back to a straight line</a>. The road path is saved after it's fetched once, so later replays don't need to look it up again.</td>
+        </tr>
+        <tr>
+          <td><strong>Teleport</strong></td>
+          <td>You jump straight to each stop instead of walking there. When you place a stop while drawing this kind of route, you're asked how many seconds to stay there before jumping to the next one (at least 1 second). During playback, you stay at each stop for the time you set, then jump straight to the next one — no movement in between. Follow roads has no effect on this route type, since nothing walks between the stops.</td>
         </tr>
       </tbody>
     </table>
@@ -88,7 +92,7 @@
         </tr>
         <tr>
           <td><strong>Follow roads</strong></td>
-          <td>When checked, both the walk to the route's first stop and the movement between each stop follow real roads instead of a straight line.</td>
+          <td>When checked, both the walk to the route's first stop and the movement between each stop follow real roads instead of a straight line. Not shown for teleport routes, since nothing walks between stops.</td>
         </tr>
         <tr>
           <td><strong>Teleport</strong></td>
@@ -100,7 +104,7 @@
         </tr>
         <tr>
           <td><strong>Previous / Next stop</strong></td>
-          <td>Jump straight to the stop before or after the one you're on, without waiting for the app to walk there. Available from the widget and the routes screen while a route is running.</td>
+          <td>Jump straight to the stop before or after the one you're on, without waiting for the app to walk there. Available from the widget and the routes screen while a route is running. On a teleport route, jumping to a stop always restarts its full wait time, even if you'd already been waiting there before.</td>
         </tr>
       </tbody>
     </table>
@@ -114,7 +118,8 @@
       <ul class="section-bullets">
         <li>Search for a location by name using the search button, backed by <a href="https://nominatim.openstreetmap.org" target="_blank" rel="noopener">nominatim.openstreetmap.org</a>.</li>
         <li>Undo the last stop you placed with the undo button.</li>
-        <li>Choose between a straight line and road-following before saving.</li>
+        <li>Choose between a straight line, road-following, or teleport before saving.</li>
+        <li>On a teleport route, placing a stop asks how many seconds to stay there before jumping onward.</li>
         <li>Record mode: tap record to capture your phone's real movement as a new route as you walk.</li>
       </ul>
     </div>

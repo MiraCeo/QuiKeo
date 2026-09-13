@@ -5,6 +5,7 @@ import com.locationjoystick.core.routing.RoamingEngine
 import com.locationjoystick.core.routing.RouteInterpolator
 import com.locationjoystick.core.routing.RouteReplayEngine
 import com.locationjoystick.core.routing.RoutingErrorReporter
+import com.locationjoystick.core.routing.TeleportRouteEngine
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,4 +34,8 @@ object RoutingModule {
     @Provides
     @Singleton
     fun provideRouteReplayEngine(routeInterpolator: RouteInterpolator): RouteReplayEngine = RouteReplayEngine(routeInterpolator)
+
+    @Provides
+    @Singleton
+    fun provideTeleportRouteEngine(): TeleportRouteEngine = TeleportRouteEngine()
 }

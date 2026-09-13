@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -49,6 +51,7 @@ import com.locationjoystick.core.map.maplibre.addCreatorLayers
 import com.locationjoystick.core.model.FavoriteLocation
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.RecentSearch
+import com.locationjoystick.core.model.RouteType
 import com.locationjoystick.core.overlay.OverlayService
 import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraPosition
@@ -74,6 +77,7 @@ fun RouteCreatorRoute(
 
     RouteCreatorScreen(
         state = state,
+        routeType = viewModel.routeType,
         initialPosition = viewModel.currentPosition,
         favorites = favorites,
         currentPosition = livePosition,
@@ -98,8 +102,9 @@ fun RouteCreatorRoute(
 private fun RouteCreatorScreenPreview() {
     RouteCreatorScreen(
         state = CreatorState(),
+        routeType = RouteType.STRAIGHT,
         initialPosition = null,
-        onAddWaypoint = {},
+        onAddWaypoint = { _, _ -> },
         onUndo = {},
         onSaveRoute = {},
         onBack = {},
@@ -110,11 +115,12 @@ private fun RouteCreatorScreenPreview() {
 @Composable
 internal fun RouteCreatorScreen(
     state: CreatorState,
+    routeType: RouteType = RouteType.STRAIGHT,
     initialPosition: LatLng? = null,
     favorites: List<FavoriteLocation> = emptyList(),
     currentPosition: LatLng? = null,
     recentSearches: List<RecentSearch> = emptyList(),
-    onAddWaypoint: (LatLng) -> Unit,
+    onAddWaypoint: (LatLng, Int) -> Unit,
     onUndo: () -> Unit,
     onSaveRoute: (String) -> Unit,
     onSearchCommitted: ((String, Double, Double) -> Unit)? = null,
@@ -139,6 +145,7 @@ internal fun RouteCreatorScreen(
     var showSaveDialog by remember { mutableStateOf(false) }
     var showSearch by remember { mutableStateOf(false) }
     var showFavoritesSheet by remember { mutableStateOf(false) }
+    var pendingWaitPrompt by remember { mutableStateOf<LatLng?>(null) }
 
     LaunchedEffect(showSaveDialog) {
         context.sendBroadcast(
@@ -280,7 +287,12 @@ internal fun RouteCreatorScreen(
                             }
 
                             map.addOnMapClickListener { latLng ->
-                                onAddWaypoint(LatLng(latLng.latitude, latLng.longitude))
+                                val position = LatLng(latLng.latitude, latLng.longitude)
+                                if (routeType == RouteType.TELEPORT) {
+                                    pendingWaitPrompt = position
+                                } else {
+                                    onAddWaypoint(position, 0)
+                                }
                                 true
                             }
                         }
@@ -304,7 +316,12 @@ internal fun RouteCreatorScreen(
             if (showSearch) {
                 NominatimSearchBar(
                     onLocationSelected = { lat, lon, _ ->
-                        onAddWaypoint(LatLng(lat, lon))
+                        val position = LatLng(lat, lon)
+                        if (routeType == RouteType.TELEPORT) {
+                            pendingWaitPrompt = position
+                        } else {
+                            onAddWaypoint(position, 0)
+                        }
                         showSearch = false
                         val map = mapRef.value ?: return@NominatimSearchBar
                         map.animateCamera(
@@ -348,6 +365,16 @@ internal fun RouteCreatorScreen(
                 )
             },
             onDismiss = { showFavoritesSheet = false },
+        )
+    }
+
+    pendingWaitPrompt?.let { position ->
+        TeleportWaitDialog(
+            onDismiss = { pendingWaitPrompt = null },
+            onConfirm = { seconds ->
+                onAddWaypoint(position, seconds)
+                pendingWaitPrompt = null
+            },
         )
     }
 }
@@ -396,6 +423,43 @@ private fun SaveRouteDialog(
                 },
             ) {
                 Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        },
+    )
+}
+
+@Composable
+private fun TeleportWaitDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (Int) -> Unit,
+) {
+    var text by remember { mutableStateOf(AppConstants.RouteConstants.DEFAULT_TELEPORT_WAIT_SECONDS.toString()) }
+    val seconds = text.toIntOrNull()
+    val isValid = seconds != null && seconds >= AppConstants.RouteConstants.MIN_TELEPORT_WAIT_SECONDS
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Wait duration") },
+        text = {
+            OutlinedTextField(
+                value = text,
+                onValueChange = { text = it },
+                label = { Text("Seconds to wait here") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { seconds?.let(onConfirm) },
+                enabled = isValid,
+            ) {
+                Text("Confirm")
             }
         },
         dismissButton = {

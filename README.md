@@ -24,7 +24,7 @@ Here's everything included:
 | **Last Position** | Restores last spoofed location on app restart. No manual re-entry needed. |
 | **Joystick** | Floating overlay stays on top of any app. Drag to move in any direction at chosen speed. Draggable anywhere on screen. |
 | **Speed Profiles** | Slow Walk / Walk / Run / Bike / Drive presets, all user-editable. Anti-cheat warning when speed exceeds threshold. Accessible from floating widget. |
-| **Routes** | Create waypoints on map → polyline. Two types: **straight** (direct segments) and **guided** (OSRM road-following). Save, edit, replay, loop, or record in real time. Import from GPX files. |
+| **Routes** | Create waypoints on map → polyline. Three types: **straight** (direct segments), **guided** (OSRM road-following), and **teleport** (instant jumps between points, waiting a set time at each). Save, edit, replay, loop, or record in real time. Import from GPX files. |
 | **Roaming** | Set center, radius, duration. Auto-walks randomly within radius. Optional road-following via OSRM. Optional return-to-start after loop completes. Configured via bottom sheet on Map screen. |
 | **Favorites** | Save named map positions. Instantly teleport or walk to any. Add via inline dialog or MapPicker with Nominatim search. Optional curated list of 48 popular locations (Settings → Favorites → Show hot locations). |
 | **Floating Widget** | Configurable quick-access panel floats over other apps. Collapsible FAB → expanded panel with user-selected controls. |

@@ -1,6 +1,6 @@
 package com.locationjoystick.core.model
 
-enum class RouteType { STRAIGHT, GUIDED }
+enum class RouteType { STRAIGHT, GUIDED, TELEPORT }
 
 data class Route(
     val id: String,

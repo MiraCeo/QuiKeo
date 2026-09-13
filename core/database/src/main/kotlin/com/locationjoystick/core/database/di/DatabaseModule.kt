@@ -27,8 +27,12 @@ object DatabaseModule {
                 context,
                 LjDatabase::class.java,
                 AppConstants.DatabaseConstants.DATABASE_NAME,
-            ).addMigrations(LjDatabase.MIGRATION_1_2, LjDatabase.MIGRATION_2_3, LjDatabase.MIGRATION_3_4)
-            .build()
+            ).addMigrations(
+                LjDatabase.MIGRATION_1_2,
+                LjDatabase.MIGRATION_2_3,
+                LjDatabase.MIGRATION_3_4,
+                LjDatabase.MIGRATION_4_5,
+            ).build()
 
     @Provides
     fun provideRouteDao(database: LjDatabase): RouteDao = database.routeDao()

@@ -323,6 +323,8 @@ object AppConstants {
 
     object RouteConstants {
         const val WAYPOINT_SNAP_THRESHOLD_METERS = 1.0
+        const val MIN_TELEPORT_WAIT_SECONDS = 1
+        const val DEFAULT_TELEPORT_WAIT_SECONDS = 5
     }
 
     object DatabaseConstants {

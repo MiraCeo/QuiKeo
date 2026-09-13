@@ -31,6 +31,7 @@ fun LjRouteStartOptions(
     onCancel: () -> Unit,
     onStart: () -> Unit,
     hideTeleport: Boolean = false,
+    isTeleportRoute: Boolean = false,
     textColor: Color = Color.Unspecified,
     isStarting: Boolean = false,
 ) {
@@ -55,12 +56,14 @@ fun LjRouteStartOptions(
             onCheckedChange = onReturnToLocationChange,
             textColor = textColor,
         )
-        LjCheckboxRow(
-            title = "Follow roads",
-            checked = followRoads,
-            onCheckedChange = onFollowRoadsChange,
-            textColor = textColor,
-        )
+        if (!isTeleportRoute) {
+            LjCheckboxRow(
+                title = "Follow roads",
+                checked = followRoads,
+                onCheckedChange = onFollowRoadsChange,
+                textColor = textColor,
+            )
+        }
         if (!hideTeleport) {
             Spacer(Modifier.height(20.dp))
             OutlinedButton(onClick = onTeleport, modifier = Modifier.fillMaxWidth()) {

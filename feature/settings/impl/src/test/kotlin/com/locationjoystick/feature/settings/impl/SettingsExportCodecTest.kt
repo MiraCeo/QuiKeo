@@ -42,7 +42,8 @@ private fun waypoint(
     lat: Double = 1.0,
     lon: Double = 2.0,
     orderIndex: Int = 0,
-): Waypoint = Waypoint(id = id, position = LatLng(latitude = lat, longitude = lon), orderIndex = orderIndex)
+    waitSeconds: Int = 0,
+): Waypoint = Waypoint(id = id, position = LatLng(latitude = lat, longitude = lon), orderIndex = orderIndex, waitSeconds = waitSeconds)
 
 private fun favorite(
     id: String = "fav1",
@@ -254,5 +255,41 @@ class SettingsExportCodecTest {
     fun `parse throws on unsupported schemaVersion`() {
         val json = """{"schemaVersion":99,"exportedAt":0,"settings":{},"speedProfiles":[],"routes":[],"favoriteLocations":[]}"""
         SettingsExportCodec.parseExportData(json)
+    }
+
+    @Test
+    fun `round-trip preserves TELEPORT routeType and per-waypoint waitSeconds`() {
+        val data =
+            minimalExportData().copy(
+                routes =
+                    listOf(
+                        route(
+                            routeType = RouteType.TELEPORT,
+                            waypoints =
+                                listOf(
+                                    waypoint(id = "wp1", waitSeconds = 3),
+                                    waypoint(id = "wp2", waitSeconds = 7),
+                                ),
+                        ),
+                    ),
+            )
+        val json = SettingsExportCodec.serializeExportData(data)
+
+        val parsed = SettingsExportCodec.parseExportData(json)
+
+        assertEquals(RouteType.TELEPORT, parsed.routes[0].routeType)
+        assertEquals(3, parsed.routes[0].waypoints[0].waitSeconds)
+        assertEquals(7, parsed.routes[0].waypoints[1].waitSeconds)
+    }
+
+    @Test
+    fun `parse defaults missing waypoint waitSeconds to 0`() {
+        @Suppress("ktlint:standard:max-line-length") // JSON string literal cannot be split without changing its value
+        val json =
+            """{"schemaVersion":1,"exportedAt":0,"settings":{"speedUnit":"KMH","enabledWidgetFeatures":[]},"speedProfiles":[],"routes":[{"id":"r1","name":"test","isLooping":false,"createdAt":0,"waypoints":[{"id":"wp1","lat":1.0,"lon":2.0,"orderIndex":0}]}],"favoriteLocations":[],"jitterIdleRadius":0.0,"jitterMovingRadius":1.0,"jitterIntervalSeconds":3}"""
+
+        val parsed = SettingsExportCodec.parseExportData(json)
+
+        assertEquals(0, parsed.routes[0].waypoints[0].waitSeconds)
     }
 }

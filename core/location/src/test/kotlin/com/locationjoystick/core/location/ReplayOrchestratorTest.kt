@@ -8,9 +8,13 @@ import com.locationjoystick.core.data.WalkToEngine
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.MockLocationState
 import com.locationjoystick.core.model.MockMode
+import com.locationjoystick.core.model.Route
+import com.locationjoystick.core.model.RouteType
+import com.locationjoystick.core.model.Waypoint
 import com.locationjoystick.core.routing.OsrmClient
 import com.locationjoystick.core.routing.RouteReplayEngine
 import com.locationjoystick.core.routing.RoutingErrorReporter
+import com.locationjoystick.core.routing.TeleportRouteEngine
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -18,6 +22,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -33,6 +38,7 @@ class ReplayOrchestratorTest {
     private val routeRepository: RouteRepository = mockk(relaxed = true)
     private val roamingRepository: RoamingRepository = mockk(relaxed = true)
     private val routeReplayEngine: RouteReplayEngine = mockk(relaxed = true)
+    private val teleportRouteEngine: TeleportRouteEngine = mockk(relaxed = true)
     private val walkToEngine: WalkToEngine = mockk(relaxed = true)
     private val osrmClient: OsrmClient = mockk(relaxed = true)
     private val routingErrorReporter: RoutingErrorReporter = mockk(relaxed = true)
@@ -54,6 +60,7 @@ class ReplayOrchestratorTest {
                 routeRepository = routeRepository,
                 roamingRepository = roamingRepository,
                 routeReplayEngine = routeReplayEngine,
+                teleportRouteEngine = teleportRouteEngine,
                 walkToEngine = walkToEngine,
                 osrmClient = osrmClient,
                 routingErrorReporter = routingErrorReporter,
@@ -337,6 +344,7 @@ class ReplayOrchestratorTest {
                     routeRepository = routeRepository,
                     roamingRepository = roamingRepository,
                     routeReplayEngine = routeReplayEngine,
+                    teleportRouteEngine = teleportRouteEngine,
                     walkToEngine = walkToEngine,
                     osrmClient = osrmClient,
                     routingErrorReporter = routingErrorReporter,
@@ -687,6 +695,7 @@ class ReplayOrchestratorTest {
                     routeRepository = routeRepository,
                     roamingRepository = roamingRepository,
                     routeReplayEngine = routeReplayEngine,
+                    teleportRouteEngine = teleportRouteEngine,
                     walkToEngine = walkToEngine,
                     osrmClient = osrmClient,
                     routingErrorReporter = routingErrorReporter,
@@ -717,5 +726,161 @@ class ReplayOrchestratorTest {
 
             assertEquals(LatLng(5.0, 5.0), locationRepository.currentPosition.value)
             assertEquals(0, pushCount)
+        }
+
+    private fun teleportRoute(
+        waypoints: List<Waypoint> =
+            listOf(
+                Waypoint("w1", LatLng(1.0, 1.0), 0, waitSeconds = 3),
+                Waypoint("w2", LatLng(2.0, 2.0), 1, waitSeconds = 7),
+            ),
+    ) = Route(id = "teleport-1", name = "T", waypoints = waypoints, routeType = RouteType.TELEPORT)
+
+    @Test
+    fun handleStart_teleportRoute_callsTeleportEngineNotReplayEngine() =
+        runTest {
+            coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
+
+            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+
+            verify {
+                teleportRouteEngine.start(
+                    waypoints = listOf(LatLng(1.0, 1.0), LatLng(2.0, 2.0)),
+                    waitSecondsPerWaypoint = listOf(3, 7),
+                    isLooping = false,
+                    onPositionUpdate = any(),
+                    onComplete = any(),
+                    boundaryIndices = any(),
+                )
+            }
+            verify(exactly = 0) { routeReplayEngine.start(any(), any(), any(), any(), any(), any()) }
+            coVerify(exactly = 0) { walkToEngine.walkToOnce(any(), any(), any(), any()) }
+        }
+
+    @Test
+    fun handleStart_teleportRouteBackward_reversesWaypointsAndWaitSecondsTogether() =
+        runTest {
+            coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
+
+            orchestrator.handleStart("teleport-1", isBackward = true, speedMs = 1.4)
+
+            verify {
+                teleportRouteEngine.start(
+                    waypoints = listOf(LatLng(2.0, 2.0), LatLng(1.0, 1.0)),
+                    waitSecondsPerWaypoint = listOf(7, 3),
+                    isLooping = any(),
+                    onPositionUpdate = any(),
+                    onComplete = any(),
+                    boundaryIndices = any(),
+                )
+            }
+        }
+
+    @Test
+    fun handlePause_whileTeleportReplayActive_pausesTeleportEngineNotReplayEngine() =
+        runTest {
+            coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
+            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+
+            orchestrator.handlePause()
+
+            verify { teleportRouteEngine.pause() }
+            verify(exactly = 0) { routeReplayEngine.pause() }
+        }
+
+    @Test
+    fun handleResume_whileTeleportReplayActive_resumesTeleportEngineNotReplayEngine() =
+        runTest {
+            coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
+            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+
+            orchestrator.handleResume(1.4)
+
+            verify { teleportRouteEngine.resume(any(), any()) }
+            verify(exactly = 0) { routeReplayEngine.resume(any(), any()) }
+        }
+
+    @Test
+    fun handleStop_whileTeleportReplayActive_stopsTeleportEngineNotReplayEngine() =
+        runTest {
+            coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
+            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+
+            orchestrator.handleStop()
+
+            // routeReplayEngine.stop() is also called once as unconditional cleanup inside
+            // handleStart itself (before the route type is known) — only teleportRouteEngine
+            // is the *dispatch target* of handleStop() while a teleport replay is active.
+            coVerify(exactly = 2) { teleportRouteEngine.stop() }
+            coVerify(exactly = 1) { routeReplayEngine.stop() }
+        }
+
+    @Test
+    fun handleCancel_whileTeleportReplayActive_stopsTeleportEngineNotReplayEngine() =
+        runTest {
+            coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
+            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+
+            orchestrator.handleCancel()
+
+            coVerify(exactly = 2) { teleportRouteEngine.stop() }
+            coVerify(exactly = 1) { routeReplayEngine.stop() }
+        }
+
+    @Test
+    fun handleJumpToNextWaypoint_whileTeleportReplayActive_callsTeleportEngine() =
+        runTest {
+            coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
+            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+
+            orchestrator.handleJumpToNextWaypoint()
+
+            verify { teleportRouteEngine.jumpToNextWaypoint(any(), any()) }
+            verify(exactly = 0) { routeReplayEngine.jumpToNextWaypoint(any(), any()) }
+        }
+
+    @Test
+    fun handleJumpToPreviousWaypoint_whileTeleportReplayActive_callsTeleportEngine() =
+        runTest {
+            coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
+            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+
+            orchestrator.handleJumpToPreviousWaypoint()
+
+            verify { teleportRouteEngine.jumpToPreviousWaypoint(any(), any()) }
+            verify(exactly = 0) { routeReplayEngine.jumpToPreviousWaypoint(any(), any()) }
+        }
+
+    @Test
+    fun afterTeleportReplayCompletes_nextReplayDispatchesToRouteReplayEngineNotStaleTeleportRef() =
+        runTest {
+            coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
+            val onCompleteSlot = slot<() -> Unit>()
+            every {
+                teleportRouteEngine.start(any(), any(), any(), any(), capture(onCompleteSlot), any())
+            } returns Unit
+            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+            onCompleteSlot.captured.invoke()
+
+            val straightRoute = Route(id = "straight-1", name = "S", waypoints = teleportRoute().waypoints)
+            coEvery { routeRepository.getRouteWithWaypoints("straight-1") } returns flowOf(straightRoute)
+            orchestrator.handleStart("straight-1", isBackward = false, speedMs = 1.4)
+
+            orchestrator.handlePause()
+
+            verify { routeReplayEngine.pause() }
+        }
+
+    @Test
+    fun updateSpeed_whileTeleportReplayActive_skipsEngineCallButReportsZero() =
+        runTest {
+            coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
+            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+            speedChanges.clear()
+
+            orchestrator.updateSpeed(5.0)
+
+            verify(exactly = 0) { routeReplayEngine.updateSpeed(any()) }
+            assertEquals(0f, speedChanges.last())
         }
 }

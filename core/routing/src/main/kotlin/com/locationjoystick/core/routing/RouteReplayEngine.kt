@@ -49,7 +49,8 @@ class RouteReplayEngine
     @Inject
     constructor(
         private val routeInterpolator: RouteInterpolator,
-    ) : AutoCloseable {
+    ) : AutoCloseable,
+        RouteReplayer {
         private val exceptionHandler =
             CoroutineExceptionHandler { _, throwable ->
                 Log.e(TAG, "Replay coroutine crashed", throwable)
@@ -129,7 +130,7 @@ class RouteReplayEngine
          * @param onPositionUpdate Callback invoked each tick with new position
          * @param onComplete Callback invoked when replay finishes
          */
-        fun resume(
+        override fun resume(
             onPositionUpdate: (LatLng) -> Unit,
             onComplete: () -> Unit,
         ) {
@@ -141,7 +142,7 @@ class RouteReplayEngine
          * Pauses the current replay. Call [resume] to continue from current position.
          * State is saved internally for resume.
          */
-        fun pause() {
+        override fun pause() {
             // Cancel but do NOT null activeJob here — launchReplay() calls activeJob?.cancel()
             // before launching the new coroutine, which is safe on an already-cancelled job.
             // Nulling immediately would allow a concurrent resume() to skip the cancel guard.
@@ -153,7 +154,7 @@ class RouteReplayEngine
          * Stops the replay and clears all state.
          * Use this to fully reset after pause or to cancel a running replay.
          */
-        suspend fun stop() {
+        override suspend fun stop() {
             jobMutex.withLock {
                 activeJob?.cancelAndJoin()
                 activeJob = null
@@ -213,31 +214,21 @@ class RouteReplayEngine
             return waypoints[clamped]
         }
 
-        /**
-         * Nearest boundary index at or after [idx], clamped to the last boundary. Falls back to
-         * [idx] itself when no replay is active (empty [boundaryIndices]) — [jumpToWaypoint]
-         * discards it anyway via its own empty-waypoints guard.
-         */
-        private fun nextBoundaryAtOrAfter(idx: Int): Int = boundaryIndices.firstOrNull { it >= idx } ?: boundaryIndices.lastOrNull() ?: idx
-
-        /** Nearest boundary index strictly before [idx], clamped to the first boundary (or [idx], see above). */
-        private fun previousBoundaryBefore(idx: Int): Int = boundaryIndices.lastOrNull { it < idx } ?: boundaryIndices.firstOrNull() ?: idx
-
         /** Jumps to the waypoint currently being walked toward (index unchanged if already at the last one). */
-        fun jumpToNextWaypoint(
+        override fun jumpToNextWaypoint(
             onPositionUpdate: (LatLng) -> Unit,
             onComplete: () -> Unit,
-        ): LatLng? = jumpToWaypoint(nextBoundaryAtOrAfter(resumeWaypointIndex), onPositionUpdate, onComplete)
+        ): LatLng? = jumpToWaypoint(nextBoundaryAtOrAfter(boundaryIndices, resumeWaypointIndex), onPositionUpdate, onComplete)
 
         /** Jumps to the waypoint before the one last departed from (index unchanged if already at the first one). */
-        fun jumpToPreviousWaypoint(
+        override fun jumpToPreviousWaypoint(
             onPositionUpdate: (LatLng) -> Unit,
             onComplete: () -> Unit,
         ): LatLng? {
             // resumeWaypointIndex targets the waypoint ahead; step back once to the one just
             // departed, then once more to the one before that.
-            val lastDeparted = previousBoundaryBefore(resumeWaypointIndex)
-            return jumpToWaypoint(previousBoundaryBefore(lastDeparted), onPositionUpdate, onComplete)
+            val lastDeparted = previousBoundaryBefore(boundaryIndices, resumeWaypointIndex)
+            return jumpToWaypoint(previousBoundaryBefore(boundaryIndices, lastDeparted), onPositionUpdate, onComplete)
         }
 
         /**

@@ -268,6 +268,14 @@ internal fun RoutesScreen(
                     },
                 )
                 LjActionSheetRow(
+                    icon = LjIcons.Map,
+                    title = "Draw on map (teleport)",
+                    onClick = {
+                        showAddOptionsSheet = false
+                        onNavigateToCreate(RouteType.TELEPORT)
+                    },
+                )
+                LjActionSheetRow(
                     icon = LjIcons.FileDownload,
                     title = "Import GPX file",
                     onClick = {
@@ -423,6 +431,7 @@ private fun RouteCard(
                     },
                     onCancel = { showStartDialog = false },
                     hideTeleport = hideTeleportFeatures,
+                    isTeleportRoute = route.routeType == RouteType.TELEPORT,
                     isRoadRouteFetchInFlight = isRoadRouteFetchInFlight,
                 )
             }

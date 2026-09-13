@@ -17,7 +17,7 @@ import com.locationjoystick.core.database.entities.WaypointEntity
         WaypointEntity::class,
         FavoriteEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = true,
 )
 abstract class LjDatabase : RoomDatabase() {
@@ -46,6 +46,13 @@ abstract class LjDatabase : RoomDatabase() {
             object : Migration(3, 4) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL("ALTER TABLE routes ADD COLUMN speedProfileId TEXT")
+                }
+            }
+
+        val MIGRATION_4_5 =
+            object : Migration(4, 5) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL("ALTER TABLE waypoints ADD COLUMN waitSeconds INTEGER NOT NULL DEFAULT 0")
                 }
             }
     }

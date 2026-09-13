@@ -123,6 +123,7 @@ internal object SettingsExportCodec {
                 wpObj.put("lat", wp.position.latitude)
                 wpObj.put("lon", wp.position.longitude)
                 wpObj.put("orderIndex", wp.orderIndex)
+                wpObj.put("waitSeconds", wp.waitSeconds)
                 wpArray.put(wpObj)
             }
             obj.put("waypoints", wpArray)
@@ -303,6 +304,7 @@ internal object SettingsExportCodec {
                                         longitude = wpObj.getDouble("lon"),
                                     ),
                                 orderIndex = wpObj.getInt("orderIndex"),
+                                waitSeconds = wpObj.optInt("waitSeconds", 0),
                             ),
                         )
                     }

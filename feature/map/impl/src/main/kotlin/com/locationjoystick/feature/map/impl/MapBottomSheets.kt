@@ -38,6 +38,7 @@ import com.locationjoystick.core.designsystem.component.LjOutlinedButton
 import com.locationjoystick.core.designsystem.component.LjTextButton
 import com.locationjoystick.core.designsystem.component.RouteStartSheetContent
 import com.locationjoystick.core.designsystem.component.RoutesPickerList
+import com.locationjoystick.core.model.RouteType
 import com.locationjoystick.core.model.startWaypoint
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,6 +84,7 @@ internal fun RoutesPickerSheet(
                         onAction(MapAction.CloseRoutesSheet)
                     },
                     hideTeleport = uiState.hideTeleportFeatures,
+                    isTeleportRoute = route?.routeType == RouteType.TELEPORT,
                     isRoadRouteFetchInFlight = uiState.isRoadRouteFetchInFlight,
                 )
             }

@@ -5,10 +5,10 @@ All in `:core:model`. Pure Kotlin — no Android, no Room. Room entities in `:co
 | Model | Fields |
 |-------|--------|
 | `LatLng` | `latitude: Double`, `longitude: Double` |
-| `Waypoint` | `id: String`, `position: LatLng`, `orderIndex: Int` |
+| `Waypoint` | `id: String`, `position: LatLng`, `orderIndex: Int`, `waitSeconds: Int` |
 | `Route` | `id: String`, `name: String`, `waypoints: List<Waypoint>`, `isLooping: Boolean`, `routeType: RouteType`, `speedProfileId: String?`, `createdAt: Long`, `updatedAt: Long` |
 | `FavoriteLocation` | `id: String`, `name: String`, `position: LatLng`, `createdAt: Long`, `category: String?` |
-| `RouteType` | enum: `STRAIGHT`, `GUIDED` |
+| `RouteType` | enum: `STRAIGHT`, `GUIDED`, `TELEPORT` |
 | `SpeedProfile` | `id: String`, `name: String`, `speedMetersPerSecond: Double` |
 | `RoamingConfig` | `centerPosition: LatLng`, `radiusMeters: Double`, `durationSeconds: Long`, `useRoadSnapping: Boolean` |
 | `RoamingDefaults` | `radiusMeters: Double`, `distanceMeters: Double`, `speedProfileId: String`, `followRoads: Boolean`, `returnToInitialLocation: Boolean` |

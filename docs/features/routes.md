@@ -8,6 +8,7 @@ Key files: `:feature:routes:impl/RoutesScreen.kt`, `:feature:routes:impl/RouteCr
 
 - **STRAIGHT** (`RouteType.STRAIGHT`): straight segments, no network.
 - **GUIDED** (`RouteType.GUIDED`): OSRM road-following. On fail → `osrmError = true` in `CreatorState`. No silent fallback.
+- **TELEPORT** (`RouteType.TELEPORT`): instant jumps between waypoints, waiting at each — see "Teleport Routes" below.
 
 ## Storage
 
@@ -102,6 +103,34 @@ map's polyline (main screen and floating widget map, via `MapController`'s exist
 generic `routeTrace` plumbing) shows the resolved road-following path during replay,
 not the route's saved straight-line waypoints — reverting to the saved shape once the
 session ends or restarts without Follow roads.
+
+## Teleport Routes
+
+A `RouteType.TELEPORT` route replays by instantly jumping between waypoints instead of
+interpolating movement — driven by `TeleportRouteEngine` (`:core:routing`), not
+`RouteReplayEngine`. Each `Waypoint.waitSeconds` (min
+`AppConstants.RouteConstants.MIN_TELEPORT_WAIT_SECONDS`, default
+`AppConstants.RouteConstants.DEFAULT_TELEPORT_WAIT_SECONDS`) is how long the spoofed
+position stays frozen at that stop before jumping to the next one. Like paused route
+replay, the frozen position is still pushed to the mock provider every tick so the fix
+never goes stale.
+
+- **Placement**: in the route creator, placing a point on a `TELEPORT` route (map tap,
+  search result, or favorite) shows a modal asking for the wait duration in seconds
+  before the point is added. There is no later "edit wait duration" screen for a saved
+  route — only the creator's placement-time modal sets it (out of scope for now, may be
+  added later).
+- **No road-following**: "Follow roads" is hidden entirely on the start sheet for a
+  teleport route — it has no meaning when nothing walks between points.
+- **Loop / Reverse / Return to location**: unaffected — these only decide which
+  waypoints replay in what order, not whether movement between them is instant.
+- **Next / Previous waypoint jumps**: using the route-jump buttons
+  (@docs/features/widget.md, "Route Controls Across Surfaces") while a teleport replay
+  is waiting at a point resets that point's wait timer — landing on a waypoint, from
+  either direction, always restarts its full configured wait.
+- **Speed profile**: a teleport route's `speedProfileId` is never read during replay —
+  nothing moves at a "speed" — so the widget's Speed Cycle button reports 0 m/s while a
+  teleport replay is active.
 
 ## Recording
 

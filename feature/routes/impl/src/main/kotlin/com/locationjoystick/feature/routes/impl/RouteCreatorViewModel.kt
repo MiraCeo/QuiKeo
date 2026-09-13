@@ -38,6 +38,8 @@ data class CreatorState(
     val totalDistanceMeters: Double = 0.0,
     val isLoadingSegment: Boolean = false,
     val osrmError: Boolean = false,
+    /** Index-aligned with [waypoints]; only ever populated for [RouteType.TELEPORT]. */
+    val waitSecondsList: List<Int> = emptyList(),
 )
 
 @HiltViewModel
@@ -51,7 +53,7 @@ class RouteCreatorViewModel
         private val settingsRepository: SettingsRepository,
         savedStateHandle: SavedStateHandle,
     ) : ViewModel() {
-        private val routeType =
+        val routeType: RouteType =
             RouteType.valueOf(
                 savedStateHandle.get<String>("routeType") ?: RouteType.STRAIGHT.name,
             )
@@ -82,9 +84,13 @@ class RouteCreatorViewModel
             viewModelScope.launch { settingsRepository.addRecentSearch(displayName, lat, lon) }
         }
 
-        fun addWaypoint(latLng: LatLng) {
+        fun addWaypoint(
+            latLng: LatLng,
+            waitSeconds: Int = 0,
+        ) {
             val currentWaypoints = _state.value.waypoints
             val newWaypoints = currentWaypoints + latLng
+            val newWaitSecondsList = _state.value.waitSecondsList + waitSeconds
 
             if (newWaypoints.size < 2) {
                 _state.value =
@@ -92,13 +98,14 @@ class RouteCreatorViewModel
                         waypoints = newWaypoints,
                         segments = emptyList(),
                         totalDistanceMeters = 0.0,
+                        waitSecondsList = newWaitSecondsList,
                     )
                 return
             }
 
             val lastWaypoint = currentWaypoints.last()
 
-            if (routeType == RouteType.STRAIGHT) {
+            if (routeType == RouteType.STRAIGHT || routeType == RouteType.TELEPORT) {
                 val segment = listOf(lastWaypoint, latLng)
                 val currentSegments = _state.value.segments + listOf(segment)
                 val distance =
@@ -110,6 +117,7 @@ class RouteCreatorViewModel
                         waypoints = newWaypoints,
                         segments = currentSegments,
                         totalDistanceMeters = distance,
+                        waitSecondsList = newWaitSecondsList,
                     )
                 return
             }
@@ -137,6 +145,7 @@ class RouteCreatorViewModel
                             totalDistanceMeters = distance,
                             isLoadingSegment = false,
                             osrmError = false,
+                            waitSecondsList = newWaitSecondsList,
                         )
                 } catch (e: Exception) {
                     Log.e(TAG, "Error fetching OSRM route", e)
@@ -167,6 +176,7 @@ class RouteCreatorViewModel
                     waypoints = newWaypoints,
                     segments = newSegments,
                     totalDistanceMeters = distance,
+                    waitSecondsList = current.waitSecondsList.dropLast(1),
                 )
         }
 
@@ -189,6 +199,7 @@ class RouteCreatorViewModel
                         id = UUID.randomUUID().toString(),
                         position = latLng,
                         orderIndex = idx,
+                        waitSeconds = current.waitSecondsList.getOrElse(idx) { 0 },
                     )
                 }
 

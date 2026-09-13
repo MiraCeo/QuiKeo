@@ -617,6 +617,7 @@ internal fun RoutesFloatingView(
         if (selectedRouteId != null) {
             val routeId = selectedRouteId!!
             val route = routes.find { it.id == routeId }
+            val isTeleportRoute = route?.routeType == com.locationjoystick.core.model.RouteType.TELEPORT
             var loop by remember(routeId) { mutableStateOf(false) }
             var reverse by remember(routeId) { mutableStateOf(false) }
             var returnToLocation by remember(routeId) { mutableStateOf(false) }
@@ -639,11 +640,12 @@ internal fun RoutesFloatingView(
                     onDismiss()
                 },
                 onStart = {
-                    onStartRoute(routeId, loop, reverse, returnToLocation && !loop, followRoads)
+                    onStartRoute(routeId, loop, reverse, returnToLocation && !loop, followRoads && !isTeleportRoute)
                     selectedRouteId = null
                     onDismiss()
                 },
                 hideTeleport = hideTeleport,
+                isTeleportRoute = isTeleportRoute,
                 textColor = LjText,
             )
         } else {

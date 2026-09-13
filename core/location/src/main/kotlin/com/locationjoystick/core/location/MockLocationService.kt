@@ -37,6 +37,7 @@ import com.locationjoystick.core.model.SyncPositionUpdate
 import com.locationjoystick.core.routing.OsrmClient
 import com.locationjoystick.core.routing.RouteReplayEngine
 import com.locationjoystick.core.routing.RoutingErrorReporter
+import com.locationjoystick.core.routing.TeleportRouteEngine
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -112,6 +113,8 @@ class MockLocationService : Service() {
     @Inject lateinit var settingsRepository: SettingsRepository
 
     @Inject lateinit var routeReplayEngine: RouteReplayEngine
+
+    @Inject lateinit var teleportRouteEngine: TeleportRouteEngine
 
     @Inject lateinit var walkToEngine: WalkToEngine
 
@@ -236,6 +239,7 @@ class MockLocationService : Service() {
                 routeRepository = routeRepository,
                 roamingRepository = roamingRepository,
                 routeReplayEngine = routeReplayEngine,
+                teleportRouteEngine = teleportRouteEngine,
                 walkToEngine = walkToEngine,
                 osrmClient = osrmClient,
                 routingErrorReporter = routingErrorReporter,
@@ -628,6 +632,7 @@ class MockLocationService : Service() {
         locationRepository.stopSpoofing()
         locationRepository.setActiveRouteId(null)
         routeReplayEngine.cancelActiveReplay()
+        teleportRouteEngine.cancelActiveReplay()
         roamingRepository.resetOnServiceDestroy()
         // RoamingEngine.close() (which cancels engineScope) is not called here because RoamingEngine
         // is not injected in this service. resetOnServiceDestroy() cancels the active job via stop();

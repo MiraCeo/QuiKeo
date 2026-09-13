@@ -25,6 +25,7 @@ fun RouteStartSheetContent(
     onStart: (loop: Boolean, reverse: Boolean, returnToLocation: Boolean, followRoads: Boolean) -> Unit,
     onCancel: () -> Unit,
     hideTeleport: Boolean = false,
+    isTeleportRoute: Boolean = false,
     isRoadRouteFetchInFlight: Boolean = false,
 ) {
     var loop by remember(key) { mutableStateOf(false) }
@@ -51,10 +52,12 @@ fun RouteStartSheetContent(
         onTeleport = { onTeleport(reverse) },
         onCancel = onCancel,
         onStart = {
-            if (followRoads) isAwaitingRoadStart = true
-            onStart(loop, reverse, returnToLocation && !loop, followRoads)
+            val effectiveFollowRoads = followRoads && !isTeleportRoute
+            if (effectiveFollowRoads) isAwaitingRoadStart = true
+            onStart(loop, reverse, returnToLocation && !loop, effectiveFollowRoads)
         },
         hideTeleport = hideTeleport,
+        isTeleportRoute = isTeleportRoute,
         isStarting = isAwaitingRoadStart,
     )
 }
