@@ -36,8 +36,6 @@ class TeleportRouteEngine
 
         @Volatile private var isLooping: Boolean = false
 
-        @Volatile private var boundaryIndices: List<Int> = emptyList()
-
         /**
          * @param waypoints Positions in order.
          * @param waitSecondsPerWaypoint Same length as [waypoints]; seconds to wait at each
@@ -53,7 +51,6 @@ class TeleportRouteEngine
             savedWaypointsRef.set(waypoints)
             savedWaitSecondsRef.set(waitSecondsPerWaypoint)
             this.isLooping = isLooping
-            this.boundaryIndices = waypoints.indices.toList()
             resumeIndex = 0
             resumeRemainingWaitMs = waitMsFor(0)
             launchReplay(onPositionUpdate, onComplete)
@@ -103,12 +100,12 @@ class TeleportRouteEngine
         override fun jumpToNextWaypoint(
             onPositionUpdate: (LatLng) -> Unit,
             onComplete: () -> Unit,
-        ): LatLng? = jumpToWaypoint(nextBoundaryAtOrAfter(boundaryIndices, resumeIndex + 1), onPositionUpdate, onComplete)
+        ): LatLng? = jumpToWaypoint(resumeIndex + 1, onPositionUpdate, onComplete)
 
         override fun jumpToPreviousWaypoint(
             onPositionUpdate: (LatLng) -> Unit,
             onComplete: () -> Unit,
-        ): LatLng? = jumpToWaypoint(previousBoundaryBefore(boundaryIndices, resumeIndex), onPositionUpdate, onComplete)
+        ): LatLng? = jumpToWaypoint(resumeIndex - 1, onPositionUpdate, onComplete)
 
         /**
          * Cancels any active replay job. Call from service onDestroy to stop movement without
