@@ -331,6 +331,42 @@ private fun DebugSection(
     )
 }
 
+// Play's Accessibility API policy requires an in-app disclosure with an explicit accept tap
+// before the user reaches Android's accessibility settings; dismissing must not count as consent.
+@Composable
+private fun AccessibilityDisclosureDialog(
+    onAccept: () -> Unit,
+    onDecline: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDecline,
+        title = { Text("Accessibility service use") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    "locationjoystick uses Android's Accessibility Service API only for the optional " +
+                        "Compass orientation feature of Tap to Walk.",
+                )
+                Text(
+                    "What it accesses: a screenshot of your screen, taken when you open the Tap to Walk " +
+                        "overlay or tap Test.",
+                )
+                Text(
+                    "Why: to find your game's compass icon and turn your tap into the correct walking direction.",
+                )
+                Text(
+                    "The screenshot is processed on your device and deleted right away. It is never saved, " +
+                        "sent, or shared. The service does not read text, collect personal data, or act on " +
+                        "your behalf.",
+                )
+                Text("You can turn the service off at any time in Android's accessibility settings.")
+            }
+        },
+        confirmButton = { LjTextButton(onClick = onAccept) { Text("Agree") } },
+        dismissButton = { LjTextButton(onClick = onDecline) { Text("No thanks") } },
+    )
+}
+
 @Composable
 private fun CompassOrientationSection(
     uiState: SettingsUiState,
@@ -343,6 +379,7 @@ private fun CompassOrientationSection(
     var testResult by remember { mutableStateOf<String?>(null) }
     var isTesting by remember { mutableStateOf(false) }
     var appPickerExpanded by remember { mutableStateOf(false) }
+    var showDisclosure by rememberSaveable { mutableStateOf(false) }
     val selectedApp = launchableApps.find { it.packageName == uiState.compassTestTargetPackage }
 
     Text("Compass orientation", style = MaterialTheme.typography.headlineSmall)
@@ -375,14 +412,21 @@ private fun CompassOrientationSection(
         }
         if (!uiState.isCompassServiceGranted) {
             Spacer(Modifier.width(8.dp))
-            LjButton(onClick = {
+            LjButton(onClick = { showDisclosure = true }) { Text("Open Settings") }
+        }
+    }
+    if (showDisclosure) {
+        AccessibilityDisclosureDialog(
+            onAccept = {
+                showDisclosure = false
                 context.startActivity(
                     Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     },
                 )
-            }) { Text("Open Settings") }
-        }
+            },
+            onDecline = { showDisclosure = false },
+        )
     }
     if (uiState.isCompassServiceGranted) {
         Spacer(Modifier.height(8.dp))

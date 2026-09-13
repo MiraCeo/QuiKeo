@@ -149,6 +149,16 @@ switches to the game themselves, switches back to Settings, then taps Test, whic
 `Activity.moveTaskToBack(true)` (revealing the game, which sits directly behind Settings in the
 task stack after that switch sequence) instead of launching an intent.
 
+### Prominent Disclosure
+
+Play's Accessibility API policy rejected a release that sent the user straight from Settings to
+Android's accessibility settings. The "Open Settings" button in Settings → Menus → Tap to Walk →
+"Compass orientation" now shows `AccessibilityDisclosureDialog` (`SettingsMenusSubScreen.kt`)
+first. It states the data accessed (a screenshot), the purpose (compass heading), and that the
+screenshot stays on-device and is never saved or shared. Only the "Agree" button opens
+`ACTION_ACCESSIBILITY_SETTINGS`. "No thanks" and dismissing the dialog do nothing. Keep this
+dialog in front of every path that leads the user to enable the service.
+
 ### Anti-cheat caveat
 
 Accessibility services running in the background are detectable by some games. The Settings UI discloses this. Turn off the accessibility service in system Accessibility Settings if the game penalises it — there is no separate in-app toggle.
