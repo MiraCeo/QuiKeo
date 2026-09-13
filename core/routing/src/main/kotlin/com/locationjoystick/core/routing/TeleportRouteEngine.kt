@@ -3,18 +3,9 @@ package com.locationjoystick.core.routing
 import android.util.Log
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.model.LatLng
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -35,12 +26,7 @@ class TeleportRouteEngine
     constructor() :
     AutoCloseable,
         RouteReplayer {
-        private val exceptionHandler =
-            CoroutineExceptionHandler { _, throwable -> Log.e(TAG, "Teleport replay coroutine crashed", throwable) }
-        private val engineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default + exceptionHandler)
-        private val jobMutex = Mutex()
-
-        @Volatile private var activeJob: Job? = null
+        private val jobController = ReplayJobController(TAG)
 
         @Volatile private var resumeIndex: Int = 0
 
@@ -83,15 +69,12 @@ class TeleportRouteEngine
         }
 
         override fun pause() {
-            activeJob?.cancel()
+            jobController.activeJob?.cancel()
             Log.i(TAG, "Teleport replay paused at index $resumeIndex")
         }
 
         override suspend fun stop() {
-            jobMutex.withLock {
-                activeJob?.cancelAndJoin()
-                activeJob = null
-            }
+            jobController.cancelAndJoinActive()
             savedWaypointsRef.set(emptyList())
             savedWaitSecondsRef.set(emptyList())
             resumeIndex = 0
@@ -108,8 +91,8 @@ class TeleportRouteEngine
             val waypoints = savedWaypointsRef.get()
             if (waypoints.isEmpty()) return null
             val clamped = target.coerceIn(0, waypoints.size - 1)
-            val wasRunning = activeJob?.isActive == true
-            activeJob?.cancel()
+            val wasRunning = jobController.activeJob?.isActive == true
+            jobController.activeJob?.cancel()
             resumeIndex = clamped
             resumeRemainingWaitMs = waitMsFor(clamped)
             if (wasRunning) launchReplay(onPositionUpdate, onComplete)
@@ -133,13 +116,11 @@ class TeleportRouteEngine
          * service is recreated.
          */
         fun cancelActiveReplay() {
-            activeJob?.cancel()
-            activeJob = null
+            jobController.cancelActiveReplay()
         }
 
         override fun close() {
-            activeJob?.cancel()
-            engineScope.cancel()
+            jobController.close()
         }
 
         private fun waitMsFor(index: Int): Long = savedWaitSecondsRef.get().getOrElse(index) { 0 }.coerceAtLeast(0) * 1000L
@@ -148,7 +129,7 @@ class TeleportRouteEngine
             onPositionUpdate: (LatLng) -> Unit,
             onComplete: () -> Unit,
         ) {
-            val previousJob = activeJob
+            val previousJob = jobController.activeJob
             previousJob?.cancel()
             val snapshot = savedWaypointsRef.get()
             if (snapshot.size < 2) {
@@ -158,8 +139,8 @@ class TeleportRouteEngine
             var index = resumeIndex
             var remainingWaitMs = resumeRemainingWaitMs
 
-            activeJob =
-                engineScope.launch {
+            jobController.activeJob =
+                jobController.scope.launch {
                     previousJob?.join()
                     onPositionUpdate(snapshot[index])
                     while (isActive) {

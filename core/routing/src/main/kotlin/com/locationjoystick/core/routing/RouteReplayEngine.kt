@@ -3,18 +3,9 @@ package com.locationjoystick.core.routing
 import android.util.Log
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.model.LatLng
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -51,19 +42,7 @@ class RouteReplayEngine
         private val routeInterpolator: RouteInterpolator,
     ) : AutoCloseable,
         RouteReplayer {
-        private val exceptionHandler =
-            CoroutineExceptionHandler { _, throwable ->
-                Log.e(TAG, "Replay coroutine crashed", throwable)
-            }
-
-        /** Scope for replay coroutines. Uses SupervisorJob so failures don't propagate. */
-        private val engineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default + exceptionHandler)
-
-        /** Serializes cancel+launch to prevent stale-job races on concurrent start/pause/resume calls. */
-        private val jobMutex = Mutex()
-
-        /** Current replay job. Only mutated under [jobMutex]. */
-        @Volatile private var activeJob: Job? = null
+        private val jobController = ReplayJobController(TAG)
 
         /** Position to resume from after pause. Set by [pause]. */
         @Volatile private var resumePosition: LatLng? = null
@@ -146,7 +125,7 @@ class RouteReplayEngine
             // Cancel but do NOT null activeJob here — launchReplay() calls activeJob?.cancel()
             // before launching the new coroutine, which is safe on an already-cancelled job.
             // Nulling immediately would allow a concurrent resume() to skip the cancel guard.
-            activeJob?.cancel()
+            jobController.activeJob?.cancel()
             Log.i(TAG, "Replay paused at index $resumeWaypointIndex")
         }
 
@@ -155,10 +134,7 @@ class RouteReplayEngine
          * Use this to fully reset after pause or to cancel a running replay.
          */
         override suspend fun stop() {
-            jobMutex.withLock {
-                activeJob?.cancelAndJoin()
-                activeJob = null
-            }
+            jobController.cancelAndJoinActive()
             savedWaypointsRef.set(emptyList())
             resumePosition = null
             resumeWaypointIndex = 1
@@ -203,8 +179,8 @@ class RouteReplayEngine
             val waypoints = savedWaypointsRef.get()
             if (waypoints.isEmpty()) return null
             val clamped = target.coerceIn(0, waypoints.size - 1)
-            val wasRunning = activeJob?.isActive == true
-            activeJob?.cancel()
+            val wasRunning = jobController.activeJob?.isActive == true
+            jobController.activeJob?.cancel()
             resumePosition = waypoints[clamped]
             resumeWaypointIndex = clamped + 1
             if (wasRunning) {
@@ -237,8 +213,7 @@ class RouteReplayEngine
          * usable after the service is recreated.
          */
         fun cancelActiveReplay() {
-            activeJob?.cancel()
-            activeJob = null
+            jobController.cancelActiveReplay()
         }
 
         /**
@@ -247,8 +222,7 @@ class RouteReplayEngine
          * since the engine is a @Singleton that outlives any single service instance.
          */
         override fun close() {
-            activeJob?.cancel()
-            engineScope.cancel()
+            jobController.close()
         }
 
         private fun launchReplay(
@@ -256,7 +230,7 @@ class RouteReplayEngine
             onComplete: () -> Unit,
         ) {
             val snapshot = savedWaypointsRef.get()
-            val previousJob = activeJob
+            val previousJob = jobController.activeJob
             previousJob?.cancel()
             if (snapshot.size < 2) {
                 onComplete()
@@ -265,8 +239,8 @@ class RouteReplayEngine
             var position = resumePosition ?: snapshot.first()
             var index = resumeWaypointIndex
 
-            activeJob =
-                engineScope.launch {
+            jobController.activeJob =
+                jobController.scope.launch {
                     previousJob?.join()
                     while (isActive) {
                         val waypoints = savedWaypointsRef.get()
