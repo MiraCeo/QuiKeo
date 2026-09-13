@@ -42,6 +42,7 @@ class RoamingRepository
         /** Propagates a live speed-profile change into the active roaming walk. */
         fun updateSpeed(speedMs: Double) {
             roamingEngine.updateSpeed(speedMs)
+            locationRepository.setSpeedInternal(speedMs.toFloat())
         }
 
         fun startRoaming(
@@ -54,6 +55,7 @@ class RoamingRepository
             )
             _isRoaming.value = true
             locationRepository.setMockMode(MockMode.ROAMING)
+            locationRepository.setSpeedInternal(speedMs.toFloat())
             roamingEngine.startRoaming(
                 config = config,
                 speedMs = speedMs,
@@ -69,6 +71,7 @@ class RoamingRepository
                     _isRoamingPaused.value = false
                     locationRepository.setMockMode(MockMode.TELEPORT)
                     locationRepository.setRouteWaypoints(null)
+                    locationRepository.setSpeedInternal(0f)
                     locationRepository.emitCompletion("Roaming complete")
                     Log.d(TAG, "Roaming completed or cancelled")
                 },
@@ -84,6 +87,7 @@ class RoamingRepository
             _isRoamingPaused.value = false
             locationRepository.setMockMode(MockMode.TELEPORT)
             locationRepository.setRouteWaypoints(null)
+            locationRepository.setSpeedInternal(0f)
         }
 
         /**
@@ -97,5 +101,6 @@ class RoamingRepository
             _isRoamingPaused.value = false
             locationRepository.setMockMode(MockMode.TELEPORT)
             locationRepository.setRouteWaypoints(null)
+            locationRepository.setSpeedInternal(0f)
         }
     }

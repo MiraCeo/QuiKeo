@@ -67,6 +67,20 @@ class LocationRepository
             _currentBearing.value = bearing
         }
 
+        private val _currentSpeedMps = MutableStateFlow<Float?>(null)
+
+        /**
+         * Speed published by movement engines that don't go through
+         * MockLocationService's updatePositionWithVector directly (route replay, roaming).
+         * Null until the first real movement of a session. Consumed by
+         * MockLocationService's reactive collector to update its own `currentSpeedMs` field.
+         */
+        val currentSpeedMps: StateFlow<Float?> = _currentSpeedMps.asStateFlow()
+
+        fun setSpeedInternal(speedMps: Float) {
+            _currentSpeedMps.value = speedMps
+        }
+
         private val _reportedAltitudeMeters = MutableStateFlow<Double?>(null)
 
         /** Actual altitude being reported this tick — the altitude-override widget button prefills from this. */

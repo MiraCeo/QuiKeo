@@ -154,6 +154,32 @@ class RoamingRepositoryTest {
             repository.stopRoaming()
         }
 
+    @Test
+    fun `startRoaming sets currentSpeedMps on LocationRepository`() =
+        runTest {
+            val config = createDefaultConfig()
+            repository.startRoaming(config, speedMs = 1.4)
+
+            assertEquals(1.4f, fakeLocationRepository.currentSpeedMps.value)
+
+            repository.stopRoaming()
+        }
+
+    // updateSpeed
+
+    @Test
+    fun `updateSpeed propagates to LocationRepository currentSpeedMps`() =
+        runTest {
+            val config = createDefaultConfig()
+            repository.startRoaming(config, speedMs = 1.4)
+
+            repository.updateSpeed(2.0)
+
+            assertEquals(2.0f, fakeLocationRepository.currentSpeedMps.value)
+
+            repository.stopRoaming()
+        }
+
     // stopRoaming
 
     @Test
@@ -183,6 +209,16 @@ class RoamingRepositoryTest {
     fun `stopRoaming without startRoaming does not throw`() =
         runTest {
             repository.stopRoaming()
+        }
+
+    @Test
+    fun `stopRoaming zeroes currentSpeedMps`() =
+        runTest {
+            val config = createDefaultConfig()
+            repository.startRoaming(config, speedMs = 1.4)
+            repository.stopRoaming()
+
+            assertEquals(0f, fakeLocationRepository.currentSpeedMps.value)
         }
 
     // onComplete callback
@@ -232,6 +268,25 @@ class RoamingRepositoryTest {
             assertFalse(repository.isRoaming.first())
             assertFalse(repository.isRoamingPaused.first())
             assertEquals(MockMode.TELEPORT, fakeLocationRepository.currentMode.first())
+        }
+
+    @Test
+    fun `roaming completion zeroes currentSpeedMps`() =
+        runTest {
+            val config = createDefaultConfig()
+
+            var capturedOnComplete: (() -> Unit)? = null
+            every {
+                fakeRoamingEngine.startRoaming(any(), any(), any(), any(), any())
+            } answers {
+                capturedOnComplete = arg(3)
+                Job()
+            }
+
+            repository.startRoaming(config, speedMs = 1.4)
+            capturedOnComplete?.invoke()
+
+            assertEquals(0f, fakeLocationRepository.currentSpeedMps.value)
         }
 
     // pauseRoaming / resumeRoaming

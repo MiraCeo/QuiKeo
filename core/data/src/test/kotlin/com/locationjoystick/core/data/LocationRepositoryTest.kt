@@ -109,6 +109,19 @@ class LocationRepositoryTest {
             }
         }
 
+    @Test
+    fun `setSpeedInternal emits new speed via currentSpeedMps`() =
+        runTest {
+            repository.currentSpeedMps.test {
+                assertNull(awaitItem())
+
+                repository.setSpeedInternal(1.4f)
+
+                assertEquals(1.4f, awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     // setReportedAltitude
 
     @Test

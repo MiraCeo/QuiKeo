@@ -354,6 +354,11 @@ class MockLocationService : Service() {
             }
         }
         serviceScope.launch {
+            locationRepository.currentSpeedMps.collect { speed ->
+                if (speed != null) currentSpeedMs = speed
+            }
+        }
+        serviceScope.launch {
             locationRepository.walkTarget.collect { target -> onWalkTargetChanged(target) }
         }
         // Applies a manual altitude override (widget button) to a running session immediately —
