@@ -25,6 +25,7 @@ internal object GpsJoystickMigrator {
     private const val TAG = "GpsJoystickMigrator"
 
     private val WIDTH_TABLE = intArrayOf(0, 1, 2, 4, 8, 16, 32, 64)
+    private val EMPTY = MigrationResult()
 
     fun parse(bytes: ByteArray): Result<MigrationResult> =
         runCatching {
@@ -77,7 +78,11 @@ internal object GpsJoystickMigrator {
     // Structural Realm parser
     // -------------------------------------------------------------------------
 
-    private fun parseRealm(bytes: ByteArray): MigrationResult {
+    /**
+     * Resolves the Realm top array to a table-name -> table-ref map.
+     * Returns null if the top ref, root array, or table-refs array is malformed.
+     */
+    private fun readTableDirectory(bytes: ByteArray): Map<String, Int>? {
         val topRef0 = readLongLE(bytes, 0)
         val topRef1 = readLongLE(bytes, 8)
         val flags = bytes[23].toInt() and 0xff
@@ -87,27 +92,17 @@ internal object GpsJoystickMigrator {
             // Streaming form footer (last 16 bytes: 8 bytes top_ref + 8 bytes magic)
             topRef = readLongLE(bytes, bytes.size - 16)
         }
-        if (topRef <= 0 || topRef + 8 > bytes.size) {
-            return MigrationResult(emptyList(), emptyList(), null, null, null)
-        }
+        if (topRef <= 0 || topRef + 8 > bytes.size) return null
 
-        val rootHdr =
-            parseArrayHeader(bytes, topRef.toInt())
-                ?: return MigrationResult(emptyList(), emptyList(), null, null, null)
-        if (!rootHdr.hasRefs || rootHdr.size < 2) {
-            return MigrationResult(emptyList(), emptyList(), null, null, null)
-        }
+        val rootHdr = parseArrayHeader(bytes, topRef.toInt()) ?: return null
+        if (!rootHdr.hasRefs || rootHdr.size < 2) return null
         val eb = rootHdr.elemBytes
         val schemaRef = readRef(bytes, topRef.toInt() + 8, 0, eb).toInt()
         val tablesRef = readRef(bytes, topRef.toInt() + 8, 1, eb).toInt()
 
         val schema = readStrings(bytes, schemaRef)
-        val trHdr =
-            parseArrayHeader(bytes, tablesRef)
-                ?: return MigrationResult(emptyList(), emptyList(), null, null, null)
-        if (!trHdr.hasRefs) {
-            return MigrationResult(emptyList(), emptyList(), null, null, null)
-        }
+        val trHdr = parseArrayHeader(bytes, tablesRef) ?: return null
+        if (!trHdr.hasRefs) return null
         val trEb = trHdr.elemBytes
 
         val tableRefs = mutableMapOf<String, Int>()
@@ -115,121 +110,131 @@ internal object GpsJoystickMigrator {
             val name = schema.getOrNull(i) ?: "table_$i"
             tableRefs[name] = readRef(bytes, tablesRef + 8, i, trEb).toInt()
         }
+        return tableRefs
+    }
 
-        // 1. Favorites (class_PlaceLocationData)
+    /** Parses `class_PlaceLocationData` rows into favorites. Empty list if the table is absent/malformed. */
+    private fun parseFavorites(
+        bytes: ByteArray,
+        tableRef: Int,
+    ): List<FavoriteLocation> {
         val favorites = mutableListOf<FavoriteLocation>()
-        val favRef = tableRefs["class_PlaceLocationData"] ?: 0
-        if (favRef > 0) {
-            val info = getTableInfo(bytes, favRef)
-            if (info != null) {
-                val namesIdx = info.columnNames.indexOf("name")
-                val latIdx = info.columnNames.indexOf("latitude")
-                val lonIdx = info.columnNames.indexOf("longitude")
-                val sortIdx = info.columnNames.indexOf("sortOrder")
-                val slotOffset = if (info.isCluster) 1 else 0
+        if (tableRef <= 0) return favorites
+        val info = getTableInfo(bytes, tableRef) ?: return favorites
 
-                val names = readColumn(bytes, info.leaves, namesIdx, slotOffset, ::readStrings)
-                val lats = readColumn(bytes, info.leaves, latIdx, slotOffset, ::readDoubles)
-                val lons = readColumn(bytes, info.leaves, lonIdx, slotOffset, ::readDoubles)
-                val sortOrders = readColumn(bytes, info.leaves, sortIdx, slotOffset) { b, o -> readIntArray(b, o) }
+        val namesIdx = info.columnNames.indexOf("name")
+        val latIdx = info.columnNames.indexOf("latitude")
+        val lonIdx = info.columnNames.indexOf("longitude")
+        val sortIdx = info.columnNames.indexOf("sortOrder")
+        val slotOffset = if (info.isCluster) 1 else 0
 
-                val baseTime = System.currentTimeMillis()
-                val count = minOf(lats.size, lons.size)
-                for (i in 0 until count) {
-                    val name = names.getOrNull(i)?.takeIf { it.isNotBlank() } ?: "Favorite ${i + 1}"
-                    val sortOrder = sortOrders.getOrNull(i)
-                    val order = if (sortOrder != null && sortOrder >= 0) sortOrder else i
-                    favorites.add(
-                        FavoriteLocation(
-                            id = UUID.randomUUID().toString(),
-                            name = name,
-                            position = LatLng(latitude = lats[i], longitude = lons[i]),
-                            createdAt = baseTime + order * 1000L,
-                        ),
-                    )
-                }
-            }
+        val names = readColumn(bytes, info.leaves, namesIdx, slotOffset, ::readStrings)
+        val lats = readColumn(bytes, info.leaves, latIdx, slotOffset, ::readDoubles)
+        val lons = readColumn(bytes, info.leaves, lonIdx, slotOffset, ::readDoubles)
+        val sortOrders = readColumn(bytes, info.leaves, sortIdx, slotOffset) { b, o -> readIntArray(b, o) }
+
+        val baseTime = System.currentTimeMillis()
+        val count = minOf(lats.size, lons.size)
+        for (i in 0 until count) {
+            val name = names.getOrNull(i)?.takeIf { it.isNotBlank() } ?: "Favorite ${i + 1}"
+            val sortOrder = sortOrders.getOrNull(i)
+            val order = if (sortOrder != null && sortOrder >= 0) sortOrder else i
+            favorites.add(
+                FavoriteLocation(
+                    id = UUID.randomUUID().toString(),
+                    name = name,
+                    position = LatLng(latitude = lats[i], longitude = lons[i]),
+                    createdAt = baseTime + order * 1000L,
+                ),
+            )
+        }
+        return favorites
+    }
+
+    /** Parses `class_RouteData` + `class_CoordinateData` rows into routes. Empty list if either table is absent. */
+    private fun parseRoutes(
+        bytes: ByteArray,
+        routeRef: Int,
+        coordRef: Int,
+    ): List<Route> {
+        val routes = mutableListOf<Route>()
+        if (routeRef <= 0 || coordRef <= 0) return routes
+
+        val cInfo = getTableInfo(bytes, coordRef)
+        var allLats = emptyList<Double>()
+        var allLons = emptyList<Double>()
+        if (cInfo != null) {
+            val latIdx = cInfo.columnNames.indexOf("latitude")
+            val lonIdx = cInfo.columnNames.indexOf("longitude")
+            val slotOffset = if (cInfo.isCluster) 1 else 0
+            allLats = readColumn(bytes, cInfo.leaves, latIdx, slotOffset, ::readDoubles)
+            allLons = readColumn(bytes, cInfo.leaves, lonIdx, slotOffset, ::readDoubles)
         }
 
-        // 2. Routes (class_RouteData + class_CoordinateData)
-        val routes = mutableListOf<Route>()
-        val routeRef = tableRefs["class_RouteData"] ?: 0
-        val coordRef = tableRefs["class_CoordinateData"] ?: 0
-        if (routeRef > 0 && coordRef > 0) {
-            val cInfo = getTableInfo(bytes, coordRef)
-            var allLats = emptyList<Double>()
-            var allLons = emptyList<Double>()
-            if (cInfo != null) {
-                val latIdx = cInfo.columnNames.indexOf("latitude")
-                val lonIdx = cInfo.columnNames.indexOf("longitude")
-                val slotOffset = if (cInfo.isCluster) 1 else 0
-                allLats = readColumn(bytes, cInfo.leaves, latIdx, slotOffset, ::readDoubles)
-                allLons = readColumn(bytes, cInfo.leaves, lonIdx, slotOffset, ::readDoubles)
-            }
+        val rInfo = getTableInfo(bytes, routeRef) ?: return routes
+        val nameIdx = rInfo.columnNames.indexOf("name")
+        val coordsIdx = rInfo.columnNames.indexOf("coordinates")
+        val sortIdx = rInfo.columnNames.indexOf("sortOrder")
+        val slotOffset = if (rInfo.isCluster) 1 else 0
+        val baseTime = System.currentTimeMillis()
 
-            val rInfo = getTableInfo(bytes, routeRef)
-            if (rInfo != null) {
-                val nameIdx = rInfo.columnNames.indexOf("name")
-                val coordsIdx = rInfo.columnNames.indexOf("coordinates")
-                val sortIdx = rInfo.columnNames.indexOf("sortOrder")
-                val slotOffset = if (rInfo.isCluster) 1 else 0
-                val baseTime = System.currentTimeMillis()
+        for (leaf in rInfo.leaves) {
+            val lHdr = parseArrayHeader(bytes, leaf) ?: continue
+            val lEb = lHdr.elemBytes
+            val rNames = readLeafColumn(bytes, leaf, lEb, nameIdx, slotOffset, ::readStrings)
+            val rSortOrders = readLeafColumn(bytes, leaf, lEb, sortIdx, slotOffset) { b, o -> readIntArray(b, o) }
 
-                for (leaf in rInfo.leaves) {
-                    val lHdr = parseArrayHeader(bytes, leaf) ?: continue
-                    val lEb = lHdr.elemBytes
-                    val rNames = readLeafColumn(bytes, leaf, lEb, nameIdx, slotOffset, ::readStrings)
-                    val rSortOrders = readLeafColumn(bytes, leaf, lEb, sortIdx, slotOffset) { b, o -> readIntArray(b, o) }
+            if (coordsIdx == -1) continue
+            val coordsRef = readRef(bytes, leaf + 8, coordsIdx + slotOffset, lEb).toInt()
+            val crHdr = parseArrayHeader(bytes, coordsRef) ?: continue
+            if (!crHdr.hasRefs) continue
+            val crEb = crHdr.elemBytes
 
-                    if (coordsIdx != -1) {
-                        val coordsRef = readRef(bytes, leaf + 8, coordsIdx + slotOffset, lEb).toInt()
-                        val crHdr = parseArrayHeader(bytes, coordsRef)
-                        if (crHdr != null && crHdr.hasRefs) {
-                            val crEb = crHdr.elemBytes
-                            for (ri in 0 until crHdr.size) {
-                                val rName = rNames.getOrNull(ri)?.takeIf { it.isNotBlank() } ?: "Route ${ri + 1}"
-                                val sortOrder = rSortOrders.getOrNull(ri)
-                                val order = if (sortOrder != null && sortOrder >= 0) sortOrder else routes.size
-                                val linkRef = readRef(bytes, coordsRef + 8, ri, crEb).toInt()
-                                val indices = if (linkRef > 0) readUintArray(bytes, linkRef) else emptyList()
-                                val waypoints =
-                                    indices.mapIndexedNotNull { wi, idx ->
-                                        if (idx in allLats.indices && idx in allLons.indices) {
-                                            Waypoint(
-                                                id = UUID.randomUUID().toString(),
-                                                position = LatLng(latitude = allLats[idx], longitude = allLons[idx]),
-                                                orderIndex = wi,
-                                            )
-                                        } else {
-                                            null
-                                        }
-                                    }
-                                val routeTime = baseTime + order * 1000L
-                                routes.add(
-                                    Route(
-                                        id = UUID.randomUUID().toString(),
-                                        name = rName,
-                                        waypoints = waypoints,
-                                        isLooping = false,
-                                        routeType = RouteType.STRAIGHT,
-                                        createdAt = routeTime,
-                                        updatedAt = routeTime,
-                                    ),
-                                )
-                            }
+            for (ri in 0 until crHdr.size) {
+                val rName = rNames.getOrNull(ri)?.takeIf { it.isNotBlank() } ?: "Route ${ri + 1}"
+                val sortOrder = rSortOrders.getOrNull(ri)
+                val order = if (sortOrder != null && sortOrder >= 0) sortOrder else routes.size
+                val linkRef = readRef(bytes, coordsRef + 8, ri, crEb).toInt()
+                val indices = if (linkRef > 0) readUintArray(bytes, linkRef) else emptyList()
+                val waypoints =
+                    indices.mapIndexedNotNull { wi, idx ->
+                        if (idx in allLats.indices && idx in allLons.indices) {
+                            Waypoint(
+                                id = UUID.randomUUID().toString(),
+                                position = LatLng(latitude = allLats[idx], longitude = allLons[idx]),
+                                orderIndex = wi,
+                            )
+                        } else {
+                            null
                         }
                     }
-                }
+                val routeTime = baseTime + order * 1000L
+                routes.add(
+                    Route(
+                        id = UUID.randomUUID().toString(),
+                        name = rName,
+                        waypoints = waypoints,
+                        isLooping = false,
+                        routeType = RouteType.STRAIGHT,
+                        createdAt = routeTime,
+                        updatedAt = routeTime,
+                    ),
+                )
             }
         }
+        return routes
+    }
 
-        return MigrationResult(
-            favorites = favorites,
-            routes = routes,
-            walkSpeed = null,
-            runSpeed = null,
-            bikeSpeed = null,
-        )
+    private fun parseRealm(bytes: ByteArray): MigrationResult {
+        val tableRefs = readTableDirectory(bytes) ?: return EMPTY
+        val favorites = parseFavorites(bytes, tableRefs["class_PlaceLocationData"] ?: 0)
+        val routes =
+            parseRoutes(
+                bytes,
+                tableRefs["class_RouteData"] ?: 0,
+                tableRefs["class_CoordinateData"] ?: 0,
+            )
+        return MigrationResult(favorites = favorites, routes = routes, walkSpeed = null, runSpeed = null, bikeSpeed = null)
     }
 
     /** Reads one column's value array for a single leaf, or `emptyList()` if the column is absent. */
