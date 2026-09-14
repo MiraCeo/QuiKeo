@@ -1,5 +1,20 @@
 # Contributing
 
+## Building
+
+Prerequisites: Android Studio (or JDK 17 + Android SDK command-line tools), API 28+ SDK.
+
+```bash
+git clone https://github.com/shortcuts/locationjoystick.git
+cd locationjoystick
+./gradlew assembleDebug
+adb install app/build/outputs/apk/debug/app-debug.apk
+```
+
+Release build: `./gradlew assembleRelease`. AAB for Play Store: `make bundle`.
+
+Releases are automated via [release-please](https://github.com/googleapis/release-please): merging to `main` opens/updates a release PR from Conventional Commits; merging that PR tags the version and triggers CI to build, sign, and upload the APK to GitHub Releases.
+
 ## Before Opening a PR
 
 1. Read [AGENTS.md](AGENTS.md) — code standards, modules, arch rules, agent tooling.

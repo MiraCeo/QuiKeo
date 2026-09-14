@@ -51,6 +51,7 @@ Rules:
 - Doc changes go in the same commit as the code change, not a follow-up.
 - New user-visible feature → create `docs/wiki/<feature>.html` AND add it to `NAV_ITEMS` in `docs/wiki/wiki-init.js`. Follow `docs/wiki/CONTRIBUTING.md` for page structure, nav ordering, and writing style. Wiki pages are for **app users, not developers** — no code symbols, class names, Android internals, or library names.
 - Wiki prose must pass the audience test in `docs/wiki/CONTRIBUTING.md`: could a non-technical user understand every sentence? If not, rewrite.
+- **README.md and the wiki are user-facing, not developer docs.** Wiki is the source of truth for feature detail; README only covers what the app does, how to install it, and how to join the Discord — for everything else, link to the wiki or to AGENTS.md/CONTRIBUTING.md. Write both in plain English: short sentences, no code symbols, no class/module names, no build steps. Assume the reader already knows how to install an app. Developer-facing detail (build steps, architecture, tech stack) goes in CONTRIBUTING.md/AGENTS.md, never README.md.
 
 ---
 
