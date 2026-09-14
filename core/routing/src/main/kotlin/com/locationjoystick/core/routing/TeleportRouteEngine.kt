@@ -66,6 +66,10 @@ class TeleportRouteEngine
             Log.i(TAG, "Teleport replay paused at index $resumeIndex")
         }
 
+        // Nothing moves at a "speed" in a teleport route; report 0 so speed-cycle UI doesn't
+        // show a stale value.
+        override fun updateSpeed(speedMs: Double): Float = 0f
+
         override suspend fun stop() {
             jobController.cancelAndJoinActive()
             savedWaypointsRef.set(emptyList())

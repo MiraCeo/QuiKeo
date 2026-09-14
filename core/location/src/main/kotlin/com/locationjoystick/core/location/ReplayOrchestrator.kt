@@ -64,8 +64,8 @@ internal class ReplayOrchestrator(
     /**
      * Which engine is driving the current replay. Set once in [handleStart]/[handleEphemeralStart],
      * read by every pause/resume/stop/jump lifecycle method so they don't need to know which
-     * engine is actually running — see the design note in the teleport-route plan for why this
-     * replaces a repeated `if (isTeleportRouteActive) ... else ...` at every call site.
+     * engine is actually running — replaces a repeated `if (isTeleportRouteActive) ... else ...`
+     * at every call site.
      */
     @Volatile private var activeReplayer: RouteReplayer = routeReplayEngine
 
@@ -95,20 +95,8 @@ internal class ReplayOrchestrator(
                     startTeleportReplayWithWaypoints(
                         waypoints = orderedWaypoints,
                         isLooping = isLooping,
-                        persistMetadata = {
-                            locationRepository.setActiveRouteId(routeId)
-                            locationRepository.setIsReplayBackward(isBackward)
-                            locationRepository.setRouteWaypoints(orderedWaypoints.map { it.position })
-                        },
-                        onComplete = {
-                            locationRepository.setRouteWaypoints(null)
-                            locationRepository.setActiveRouteId(null)
-                            if (returnPosition != null) {
-                                walkToPosition(returnPosition, speedMs)
-                            }
-                            finishReplay()
-                            locationRepository.emitCompletion("Route complete")
-                        },
+                        persistMetadata = buildPersistMetadata(routeId, isBackward, orderedWaypoints.map { it.position }),
+                        onComplete = buildStartOnComplete(returnPosition, speedMs),
                     )
                     return@launch
                 }
@@ -126,26 +114,41 @@ internal class ReplayOrchestrator(
                         isLooping = isLooping,
                         followRoadsToStart = followRoadsToStart,
                         boundaryIndices = boundaryIndices,
-                        persistMetadata = {
-                            locationRepository.setActiveRouteId(routeId)
-                            locationRepository.setIsReplayBackward(isBackward)
-                            locationRepository.setRouteWaypoints(replayWaypoints)
-                        },
-                        onComplete = {
-                            locationRepository.setRouteWaypoints(null)
-                            locationRepository.setActiveRouteId(null)
-                            if (returnPosition != null) {
-                                walkToPosition(returnPosition, speedMs)
-                            }
-                            finishReplay()
-                            locationRepository.emitCompletion("Route complete")
-                        },
+                        persistMetadata = buildPersistMetadata(routeId, isBackward, replayWaypoints),
+                        onComplete = buildStartOnComplete(returnPosition, speedMs),
                     )
                 } finally {
                     if (followRoadsToStart) locationRepository.setRoadRouteFetchInFlight(false)
                 }
             }
     }
+
+    /** Shared `persistMetadata` builder for [handleStart]'s two route-type branches. */
+    private fun buildPersistMetadata(
+        routeId: String,
+        isBackward: Boolean,
+        metadataWaypoints: List<LatLng>,
+    ): suspend () -> Unit =
+        {
+            locationRepository.setActiveRouteId(routeId)
+            locationRepository.setIsReplayBackward(isBackward)
+            locationRepository.setRouteWaypoints(metadataWaypoints)
+        }
+
+    /** Shared `onComplete` builder for [handleStart]'s two route-type branches. */
+    private fun buildStartOnComplete(
+        returnPosition: LatLng?,
+        speedMs: Double,
+    ): suspend () -> Unit =
+        {
+            locationRepository.setRouteWaypoints(null)
+            locationRepository.setActiveRouteId(null)
+            if (returnPosition != null) {
+                walkToPosition(returnPosition, speedMs)
+            }
+            finishReplay()
+            locationRepository.emitCompletion("Route complete")
+        }
 
     fun handleEphemeralStart(
         waypoints: List<LatLng>,
@@ -174,12 +177,7 @@ internal class ReplayOrchestrator(
      * moves at a "speed" — but still reports 0 so speed-cycle UI doesn't show a stale value.
      */
     fun updateSpeed(speedMs: Double) {
-        if (activeReplayer === teleportRouteEngine) {
-            onSpeedChange(0f)
-            return
-        }
-        routeReplayEngine.updateSpeed(speedMs)
-        onSpeedChange(speedMs.toFloat())
+        onSpeedChange(activeReplayer.updateSpeed(speedMs))
     }
 
     fun handlePause() {
@@ -288,6 +286,38 @@ internal class ReplayOrchestrator(
     }
 
     /**
+     * Shared setup for both [startReplayWithWaypoints] and [startTeleportReplayWithWaypoints]:
+     * stop roaming if active, bail out on too few waypoints, report the starting speed, flip
+     * mode/state to running, persist metadata, optionally walk to the start position (only the
+     * walking engine needs this — a teleport route jumps to its first point directly), then let
+     * the caller start its own engine.
+     */
+    private suspend fun startReplaySetup(
+        waypointCount: Int,
+        reportedSpeedMs: Float,
+        persistMetadata: (suspend () -> Unit)?,
+        walkToStart: (suspend () -> Unit)?,
+        startEngine: () -> Unit,
+    ) {
+        if (locationRepository.currentMode.value == MockMode.ROAMING) roamingRepository.stopRoaming()
+        if (waypointCount < 2) return
+
+        onSpeedChange(reportedSpeedMs)
+
+        // Set mode BEFORE state so the state observer sees ROUTE_REPLAY and
+        // correctly skips starting the background update loop.
+        locationRepository.setMockMode(MockMode.ROUTE_REPLAY)
+        persistMetadata?.invoke()
+        // Trigger RUNNING after mode is set.
+        onStateChange(MockLocationState.RUNNING)
+        locationRepository.startSpoofing()
+
+        walkToStart?.invoke()
+
+        startEngine()
+    }
+
+    /**
      * Shared engine for both named-route and ephemeral replay.
      *
      * @param waypoints Ordered list of positions to replay (≥2).
@@ -308,39 +338,31 @@ internal class ReplayOrchestrator(
             locationRepository.emitCompletion("Route complete")
         },
     ) {
-        if (locationRepository.currentMode.value == MockMode.ROAMING) roamingRepository.stopRoaming()
-        if (waypoints.size < 2) return
-
-        onSpeedChange(speedMs.toFloat())
-
-        // Set mode BEFORE state so the state observer sees ROUTE_REPLAY and
-        // correctly skips starting the background update loop.
-        locationRepository.setMockMode(MockMode.ROUTE_REPLAY)
-        persistMetadata?.invoke()
-        // Trigger RUNNING after mode is set.
-        onStateChange(MockLocationState.RUNNING)
-        locationRepository.startSpoofing()
-
-        walkToPosition(waypoints.first(), speedMs, followRoadsToStart)
-
-        routeReplayEngine.start(
-            waypoints = waypoints,
-            speedMs = speedMs,
-            isLooping = isLooping,
-            onPositionUpdate = ::tickPosition,
-            onComplete = { scope.launch { onComplete() } },
-            boundaryIndices = boundaryIndices,
+        startReplaySetup(
+            waypointCount = waypoints.size,
+            reportedSpeedMs = speedMs.toFloat(),
+            persistMetadata = persistMetadata,
+            walkToStart = { walkToPosition(waypoints.first(), speedMs, followRoadsToStart) },
+            startEngine = {
+                routeReplayEngine.start(
+                    waypoints = waypoints,
+                    speedMs = speedMs,
+                    isLooping = isLooping,
+                    onPositionUpdate = ::tickPosition,
+                    onComplete = { scope.launch { onComplete() } },
+                    boundaryIndices = boundaryIndices,
+                )
+                // If pause was requested during walk-to-start (before engine launched),
+                // ensure the engine is paused now that it has been initialized.
+                if (locationRepository.mockLocationState.value == MockLocationState.PAUSED) routeReplayEngine.pause()
+            },
         )
-
-        // If pause was requested during walk-to-start (before engine launched),
-        // ensure the engine is paused now that it has been initialized.
-        if (locationRepository.mockLocationState.value == MockLocationState.PAUSED) routeReplayEngine.pause()
     }
 
     /**
      * Starts a teleport-route replay: same setup as [startReplayWithWaypoints] but skips
-     * [walkToPosition] entirely — a teleport route jumps to its first point too, no walk-to-start
-     * — and drives [teleportRouteEngine] instead of [routeReplayEngine].
+     * the walk-to-start step entirely — a teleport route jumps to its first point too, no
+     * walk-to-start — and drives [teleportRouteEngine] instead of [routeReplayEngine].
      *
      * @param waypoints Ordered list of waypoints to replay (≥2), each carrying its own wait
      *   duration.
@@ -357,28 +379,22 @@ internal class ReplayOrchestrator(
             locationRepository.emitCompletion("Route complete")
         },
     ) {
-        if (locationRepository.currentMode.value == MockMode.ROAMING) roamingRepository.stopRoaming()
-        if (waypoints.size < 2) return
-
-        onSpeedChange(0f)
-
-        // Set mode BEFORE state so the state observer sees ROUTE_REPLAY and
-        // correctly skips starting the background update loop.
-        locationRepository.setMockMode(MockMode.ROUTE_REPLAY)
-        persistMetadata?.invoke()
-        // Trigger RUNNING after mode is set.
-        onStateChange(MockLocationState.RUNNING)
-        locationRepository.startSpoofing()
-
-        teleportRouteEngine.start(
-            waypoints = waypoints,
-            isLooping = isLooping,
-            onPositionUpdate = ::tickPosition,
-            onComplete = { scope.launch { onComplete() } },
+        startReplaySetup(
+            waypointCount = waypoints.size,
+            reportedSpeedMs = 0f,
+            persistMetadata = persistMetadata,
+            walkToStart = null,
+            startEngine = {
+                teleportRouteEngine.start(
+                    waypoints = waypoints,
+                    isLooping = isLooping,
+                    onPositionUpdate = ::tickPosition,
+                    onComplete = { scope.launch { onComplete() } },
+                )
+                // If pause was requested before the engine launched, ensure it's paused now.
+                if (locationRepository.mockLocationState.value == MockLocationState.PAUSED) teleportRouteEngine.pause()
+            },
         )
-
-        // If pause was requested before the engine launched, ensure it's paused now.
-        if (locationRepository.mockLocationState.value == MockLocationState.PAUSED) teleportRouteEngine.pause()
     }
 
     /**

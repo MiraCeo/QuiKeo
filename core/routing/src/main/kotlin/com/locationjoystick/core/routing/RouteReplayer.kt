@@ -9,6 +9,13 @@ import com.locationjoystick.core.model.LatLng
 interface RouteReplayer {
     fun pause()
 
+    /**
+     * Updates the speed used by the active (or next-resumed) replay and returns the value
+     * the caller should report as the current speed — a teleport route always reports 0f
+     * since nothing moves at a "speed" there.
+     */
+    fun updateSpeed(speedMs: Double): Float
+
     fun resume(
         onPositionUpdate: (LatLng) -> Unit,
         onComplete: () -> Unit,

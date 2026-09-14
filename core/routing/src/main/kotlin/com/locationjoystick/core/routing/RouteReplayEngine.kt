@@ -142,8 +142,9 @@ class RouteReplayEngine
          * next tick — no restart needed.
          * @param speedMs New movement speed in meters per second
          */
-        fun updateSpeed(speedMs: Double) {
+        override fun updateSpeed(speedMs: Double): Float {
             savedSpeedMs = speedMs
+            return speedMs.toFloat()
         }
 
         /**
