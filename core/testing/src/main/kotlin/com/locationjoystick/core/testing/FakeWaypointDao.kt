@@ -38,6 +38,13 @@ class FakeWaypointDao : WaypointDao {
         state.value = state.value.map { if (it.id == waypointId) it.copy(waitSeconds = waitSeconds) else it }
     }
 
+    fun updateWaitSecondsForRoute(
+        routeId: String,
+        waitSeconds: Int,
+    ) {
+        state.value = state.value.map { if (it.routeId == routeId) it.copy(waitSeconds = waitSeconds) else it }
+    }
+
     fun deleteAll() {
         state.value = emptyList()
     }

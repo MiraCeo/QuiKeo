@@ -6,11 +6,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -22,7 +25,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -148,6 +153,26 @@ class RouteDetailViewModel
                 }
             }
         }
+
+        fun setAllWaypointsWaitSeconds(waitSeconds: Int) {
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    routeRepository.setAllWaypointsWaitSeconds(routeId, waitSeconds)
+                } catch (e: Exception) {
+                    Log.e(TAG, "set all waypoints wait seconds failed", e)
+                }
+            }
+        }
+
+        fun setRandomizeTeleportOrder(randomize: Boolean) {
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    routeRepository.setRandomizeTeleportOrder(routeId, randomize)
+                } catch (e: Exception) {
+                    Log.e(TAG, "set randomize teleport order failed", e)
+                }
+            }
+        }
     }
 
 @Preview(showBackground = true)
@@ -177,6 +202,7 @@ fun RouteDetailScreen(
     var editedName by remember { mutableStateOf("") }
     var isNameInitialized by remember { mutableStateOf(false) }
     var editingWaypointId by remember { mutableStateOf<String?>(null) }
+    var isSettingAllWait by remember { mutableStateOf(false) }
 
     LaunchedEffect(route) {
         if (route != null && !isNameInitialized) {
@@ -314,6 +340,41 @@ fun RouteDetailScreen(
                         }
                     }
 
+                    // Randomize order + mass wait-time edit — teleport routes only
+                    if (isTeleportRoute) {
+                        item {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    stringResource(R.string.route_detail_randomize_order),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                Switch(
+                                    checked = route!!.randomizeTeleportOrder,
+                                    onCheckedChange = { viewModel.setRandomizeTeleportOrder(it) },
+                                )
+                            }
+                            Text(
+                                stringResource(R.string.route_detail_randomize_order_description),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        item {
+                            OutlinedButton(
+                                onClick = { isSettingAllWait = true },
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                Icon(LjIcons.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Text(stringResource(R.string.route_detail_set_all_wait_cd))
+                            }
+                        }
+                    }
+
                     item {
                         Text(
                             stringResource(R.string.route_detail_waypoints),
@@ -368,6 +429,17 @@ fun RouteDetailScreen(
                 }
             }
         }
+    }
+
+    if (isSettingAllWait) {
+        TeleportWaitDialog(
+            titleRes = R.string.route_detail_set_all_wait_title,
+            onDismiss = { isSettingAllWait = false },
+            onConfirm = { seconds ->
+                viewModel.setAllWaypointsWaitSeconds(seconds)
+                isSettingAllWait = false
+            },
+        )
     }
 
     editingWaypointId?.let { waypointId ->

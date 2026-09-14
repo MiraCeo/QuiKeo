@@ -95,6 +95,7 @@ internal class ReplayOrchestrator(
                     startTeleportReplayWithWaypoints(
                         waypoints = orderedWaypoints,
                         isLooping = isLooping,
+                        randomizeOrder = route.randomizeTeleportOrder,
                         persistMetadata = buildPersistMetadata(routeId, isBackward, orderedWaypoints.map { it.position }),
                         onComplete = buildStartOnComplete(returnPosition, speedMs),
                     )
@@ -373,6 +374,7 @@ internal class ReplayOrchestrator(
     private suspend fun startTeleportReplayWithWaypoints(
         waypoints: List<Waypoint>,
         isLooping: Boolean,
+        randomizeOrder: Boolean = false,
         persistMetadata: (suspend () -> Unit)? = null,
         onComplete: suspend () -> Unit = {
             finishReplay()
@@ -388,6 +390,7 @@ internal class ReplayOrchestrator(
                 teleportRouteEngine.start(
                     waypoints = waypoints,
                     isLooping = isLooping,
+                    randomizeOrder = randomizeOrder,
                     onPositionUpdate = ::tickPosition,
                     onComplete = { scope.launch { onComplete() } },
                 )

@@ -128,6 +128,20 @@ never goes stale.
   teleport routes only) — reuses the same validation as the creator's placement-time
   modal (minimum `AppConstants.RouteConstants.MIN_TELEPORT_WAIT_SECONDS`). Saves live on
   confirm, like the per-route speed profile control above.
+- **Bulk wait-time edit**: the Route Detail screen (teleport routes only) shows a "Set
+  wait time for all waypoints" button above the waypoint list, reusing the same wait
+  dialog and validation as the per-waypoint edit. Overwrites `waitSeconds` on every
+  waypoint in the route in one write (`RouteRepository.setAllWaypointsWaitSeconds`,
+  `RouteDao.updateWaitSecondsForRoute`) — added so a large route (dozens of stops) can
+  be retimed without opening each waypoint individually (issue #72 follow-up).
+- **Randomize order**: a per-route toggle (`Route.randomizeTeleportOrder`, Route Detail
+  screen, teleport routes only) shuffles the waypoint jump order. `TeleportRouteEngine`
+  shuffles once on `start()` and again every time the loop restarts (`isLooping = true`
+  and the last waypoint is reached), never mid-loop. Loop/no-loop is controlled entirely
+  by the existing Loop checkbox on the start sheet — this toggle only changes the order,
+  not whether it repeats. Persists on the route (round-trips through `ExportData` like
+  `speedProfileId`) rather than being chosen per-start, matching the speed-profile pin
+  pattern above.
 - **No road-following**: "Follow roads" is hidden entirely on the start sheet for a
   teleport route — it has no meaning when nothing walks between points.
 - **Loop / Reverse / Return to location**: unaffected — these only decide which

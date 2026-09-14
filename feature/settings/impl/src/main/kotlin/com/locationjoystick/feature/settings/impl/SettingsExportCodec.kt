@@ -115,6 +115,7 @@ internal object SettingsExportCodec {
             obj.put("isLooping", route.isLooping)
             obj.put("routeType", route.routeType.name)
             obj.put("speedProfileId", route.speedProfileId ?: JSONObject.NULL)
+            obj.put("randomizeTeleportOrder", route.randomizeTeleportOrder)
             obj.put("createdAt", route.createdAt)
             val wpArray = JSONArray()
             route.waypoints.forEach { wp ->
@@ -317,6 +318,7 @@ internal object SettingsExportCodec {
                         isLooping = obj.optBoolean("isLooping", false),
                         routeType = routeType,
                         speedProfileId = if (obj.isNull("speedProfileId")) null else obj.optString("speedProfileId").ifEmpty { null },
+                        randomizeTeleportOrder = obj.optBoolean("randomizeTeleportOrder", false),
                         createdAt = obj.optLong("createdAt", 0),
                     ),
                 )

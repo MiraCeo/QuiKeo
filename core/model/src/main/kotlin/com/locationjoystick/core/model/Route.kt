@@ -9,6 +9,8 @@ data class Route(
     val isLooping: Boolean = false,
     val routeType: RouteType = RouteType.STRAIGHT,
     val speedProfileId: String? = null,
+    /** TELEPORT routes only: shuffle waypoint order on start and again at each loop restart. */
+    val randomizeTeleportOrder: Boolean = false,
     override val createdAt: Long = 0L,
     val updatedAt: Long = 0L,
 ) : HasCreatedAt

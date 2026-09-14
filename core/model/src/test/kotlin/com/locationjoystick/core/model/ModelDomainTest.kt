@@ -237,10 +237,11 @@ class ModelDomainTest {
     // Enum values
 
     @Test
-    fun `RouteType has STRAIGHT and GUIDED`() {
-        assertEquals(2, RouteType.entries.size)
+    fun `RouteType has STRAIGHT, GUIDED, and TELEPORT`() {
+        assertEquals(3, RouteType.entries.size)
         assertEquals(RouteType.STRAIGHT, RouteType.valueOf("STRAIGHT"))
         assertEquals(RouteType.GUIDED, RouteType.valueOf("GUIDED"))
+        assertEquals(RouteType.TELEPORT, RouteType.valueOf("TELEPORT"))
     }
 
     @Test

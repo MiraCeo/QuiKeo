@@ -35,22 +35,28 @@ class TeleportRouteEngine
 
         @Volatile private var isLooping: Boolean = false
 
+        @Volatile private var randomizeOrder: Boolean = false
+
         /**
          * @param waypoints Positions in order, each carrying its own wait duration via
          *   [Waypoint.waitSeconds].
+         * @param randomizeOrder Shuffles [waypoints] before the first jump, and again every time
+         *   the loop restarts (see [launchReplay]) — never mid-loop.
          */
         fun start(
             waypoints: List<Waypoint>,
             isLooping: Boolean = false,
+            randomizeOrder: Boolean = false,
             onPositionUpdate: (LatLng) -> Unit,
             onComplete: () -> Unit,
         ) {
-            savedWaypointsRef.set(waypoints)
+            savedWaypointsRef.set(if (randomizeOrder) waypoints.shuffled() else waypoints)
             this.isLooping = isLooping
+            this.randomizeOrder = randomizeOrder
             resumeIndex = 0
             resumeRemainingWaitMs = waitMsFor(0)
             launchReplay(onPositionUpdate, onComplete)
-            Log.i(TAG, "Teleport replay started: ${waypoints.size} waypoints looping=$isLooping")
+            Log.i(TAG, "Teleport replay started: ${waypoints.size} waypoints looping=$isLooping randomized=$randomizeOrder")
         }
 
         override fun resume(
@@ -131,7 +137,7 @@ class TeleportRouteEngine
             onPositionUpdate: (LatLng) -> Unit,
             onComplete: () -> Unit,
         ) {
-            val snapshot = savedWaypointsRef.get()
+            var snapshot = savedWaypointsRef.get()
             if (snapshot.size < 2) {
                 jobController.cancel()
                 onComplete()
@@ -159,6 +165,10 @@ class TeleportRouteEngine
                     if (atEnd) {
                         if (isLooping) {
                             index = 0
+                            if (randomizeOrder) {
+                                snapshot = snapshot.shuffled()
+                                savedWaypointsRef.set(snapshot)
+                            }
                         } else {
                             if (isActive) {
                                 try {

@@ -104,6 +104,33 @@ class RouteRepository
                 }
             }
 
+        suspend fun setAllWaypointsWaitSeconds(
+            routeId: String,
+            waitSeconds: Int,
+        ): Result<Unit> =
+            withContext(ioDispatcher) {
+                runCatching {
+                    routeDao.updateWaitSecondsForRoute(routeId, waitSeconds)
+                }.onFailure { e ->
+                    Log.e(TAG, "Failed to set all waypoints wait seconds: $routeId", e)
+                }
+            }
+
+        suspend fun setRandomizeTeleportOrder(
+            routeId: String,
+            randomize: Boolean,
+        ): Result<Unit> =
+            withContext(ioDispatcher) {
+                runCatching {
+                    val entity = routeDao.getById(routeId)
+                    if (entity != null) {
+                        routeDao.update(entity.copy(randomizeTeleportOrder = randomize, updatedAt = System.currentTimeMillis()))
+                    }
+                }.onFailure { e ->
+                    Log.e(TAG, "Failed to set randomize teleport order: $routeId", e)
+                }
+            }
+
         suspend fun renameRoute(
             routeId: String,
             name: String,

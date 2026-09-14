@@ -436,6 +436,7 @@ internal fun TeleportWaitDialog(
     onDismiss: () -> Unit,
     onConfirm: (Int) -> Unit,
     initialSeconds: Int = AppConstants.RouteConstants.DEFAULT_TELEPORT_WAIT_SECONDS,
+    titleRes: Int = R.string.route_creator_wait_duration,
 ) {
     var text by remember { mutableStateOf(initialSeconds.toString()) }
     val seconds = text.toIntOrNull()
@@ -443,7 +444,7 @@ internal fun TeleportWaitDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.route_creator_wait_duration)) },
+        title = { Text(stringResource(titleRes)) },
         text = {
             OutlinedTextField(
                 value = text,

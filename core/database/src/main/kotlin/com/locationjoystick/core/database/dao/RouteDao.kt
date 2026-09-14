@@ -76,6 +76,12 @@ interface RouteDao {
         waitSeconds: Int,
     )
 
+    @Query("UPDATE waypoints SET waitSeconds = :waitSeconds WHERE routeId = :routeId")
+    suspend fun updateWaitSecondsForRoute(
+        routeId: String,
+        waitSeconds: Int,
+    )
+
     @Query("DELETE FROM routes")
     suspend fun deleteAll()
 

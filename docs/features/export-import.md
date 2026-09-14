@@ -14,6 +14,8 @@ Each entry in `favoriteLocations` includes the optional `category` field (`Favor
 
 Each entry in `routes` includes the optional `speedProfileId` field (`Route.speedProfileId`), round-tripping the same way `FavoriteLocation.category` does. Old exports without it import cleanly — a missing or `null` `speedProfileId` defaults to `null`.
 
+Each entry in `routes` also includes `randomizeTeleportOrder` (`Route.randomizeTeleportOrder`). Old exports without it import cleanly — a missing field defaults to `false`.
+
 Each waypoint in a route includes `waitSeconds` (`Waypoint.waitSeconds`, used by teleport routes — see @docs/features/routes.md, "Teleport Routes"). Old exports without it import cleanly — a missing `waitSeconds` defaults to `0`.
 
 Schema version: `AppConstants.ExportConstants.SCHEMA_VERSION`.
