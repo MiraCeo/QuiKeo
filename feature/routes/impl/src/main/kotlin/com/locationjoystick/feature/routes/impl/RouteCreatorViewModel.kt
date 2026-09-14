@@ -33,14 +33,16 @@ private fun Double.toRadians(): Double = Math.toRadians(this)
 private const val TAG = "RouteCreatorViewModel"
 
 data class CreatorState(
-    val waypoints: List<LatLng> = emptyList(),
+    /** Each placed point paired with its wait duration — only nonzero for [RouteType.TELEPORT]. */
+    val placedWaypoints: List<Pair<LatLng, Int>> = emptyList(),
     val segments: List<List<LatLng>> = emptyList(),
     val totalDistanceMeters: Double = 0.0,
     val isLoadingSegment: Boolean = false,
     val osrmError: Boolean = false,
-    /** Index-aligned with [waypoints]; only ever populated for [RouteType.TELEPORT]. */
-    val waitSecondsList: List<Int> = emptyList(),
-)
+) {
+    /** Positions only, in placement order. */
+    val waypoints: List<LatLng> get() = placedWaypoints.map { it.first }
+}
 
 @HiltViewModel
 class RouteCreatorViewModel
@@ -88,22 +90,20 @@ class RouteCreatorViewModel
             latLng: LatLng,
             waitSeconds: Int = 0,
         ) {
-            val currentWaypoints = _state.value.waypoints
-            val newWaypoints = currentWaypoints + latLng
-            val newWaitSecondsList = _state.value.waitSecondsList + waitSeconds
+            val currentPlaced = _state.value.placedWaypoints
+            val newPlaced = currentPlaced + (latLng to waitSeconds)
 
-            if (newWaypoints.size < 2) {
+            if (newPlaced.size < 2) {
                 _state.value =
                     _state.value.copy(
-                        waypoints = newWaypoints,
+                        placedWaypoints = newPlaced,
                         segments = emptyList(),
                         totalDistanceMeters = 0.0,
-                        waitSecondsList = newWaitSecondsList,
                     )
                 return
             }
 
-            val lastWaypoint = currentWaypoints.last()
+            val lastWaypoint = currentPlaced.last().first
 
             if (routeType == RouteType.STRAIGHT || routeType == RouteType.TELEPORT) {
                 val segment = listOf(lastWaypoint, latLng)
@@ -114,10 +114,9 @@ class RouteCreatorViewModel
                     }
                 _state.value =
                     _state.value.copy(
-                        waypoints = newWaypoints,
+                        placedWaypoints = newPlaced,
                         segments = currentSegments,
                         totalDistanceMeters = distance,
-                        waitSecondsList = newWaitSecondsList,
                     )
                 return
             }
@@ -140,12 +139,11 @@ class RouteCreatorViewModel
                         }
                     _state.value =
                         _state.value.copy(
-                            waypoints = newWaypoints,
+                            placedWaypoints = newPlaced,
                             segments = currentSegments,
                             totalDistanceMeters = distance,
                             isLoadingSegment = false,
                             osrmError = false,
-                            waitSecondsList = newWaitSecondsList,
                         )
                 } catch (e: Exception) {
                     Log.e(TAG, "Error fetching OSRM route", e)
@@ -156,9 +154,9 @@ class RouteCreatorViewModel
 
         fun undoLastWaypoint() {
             val current = _state.value
-            if (current.waypoints.isEmpty()) return
+            if (current.placedWaypoints.isEmpty()) return
 
-            val newWaypoints = current.waypoints.dropLast(1)
+            val newPlaced = current.placedWaypoints.dropLast(1)
             val newSegments =
                 if (current.segments.isNotEmpty()) {
                     current.segments.dropLast(1)
@@ -173,16 +171,15 @@ class RouteCreatorViewModel
 
             _state.value =
                 current.copy(
-                    waypoints = newWaypoints,
+                    placedWaypoints = newPlaced,
                     segments = newSegments,
                     totalDistanceMeters = distance,
-                    waitSecondsList = current.waitSecondsList.dropLast(1),
                 )
         }
 
         fun saveRoute(name: String) {
             val current = _state.value
-            if (current.waypoints.size < 2) return
+            if (current.placedWaypoints.size < 2) return
 
             val uuid = UUID.randomUUID().toString()
             // For GUIDED routes, persist the dense OSRM-interpolated segment points so replay
@@ -199,7 +196,7 @@ class RouteCreatorViewModel
                         id = UUID.randomUUID().toString(),
                         position = latLng,
                         orderIndex = idx,
-                        waitSeconds = current.waitSecondsList.getOrElse(idx) { 0 },
+                        waitSeconds = current.placedWaypoints.getOrNull(idx)?.second ?: 0,
                     )
                 }
 

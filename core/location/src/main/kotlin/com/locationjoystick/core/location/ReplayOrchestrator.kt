@@ -11,6 +11,7 @@ import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.MockLocationState
 import com.locationjoystick.core.model.MockMode
 import com.locationjoystick.core.model.RouteType
+import com.locationjoystick.core.model.Waypoint
 import com.locationjoystick.core.routing.OsrmClient
 import com.locationjoystick.core.routing.OsrmFailureReason
 import com.locationjoystick.core.routing.RouteReplayEngine
@@ -92,8 +93,7 @@ internal class ReplayOrchestrator(
                 if (route.routeType == RouteType.TELEPORT) {
                     activeReplayer = teleportRouteEngine
                     startTeleportReplayWithWaypoints(
-                        waypoints = orderedWaypoints.map { it.position },
-                        waitSecondsPerWaypoint = orderedWaypoints.map { it.waitSeconds },
+                        waypoints = orderedWaypoints,
                         isLooping = isLooping,
                         persistMetadata = {
                             locationRepository.setActiveRouteId(routeId)
@@ -342,15 +342,14 @@ internal class ReplayOrchestrator(
      * [walkToPosition] entirely — a teleport route jumps to its first point too, no walk-to-start
      * — and drives [teleportRouteEngine] instead of [routeReplayEngine].
      *
-     * @param waypoints Ordered list of positions to replay (≥2).
-     * @param waitSecondsPerWaypoint Same length as [waypoints]; seconds to wait at each stop.
+     * @param waypoints Ordered list of waypoints to replay (≥2), each carrying its own wait
+     *   duration.
      * @param isLooping Whether to loop at the end.
      * @param persistMetadata If non-null, invoked before replay starts to persist route metadata.
      * @param onComplete Invoked on the service scope when the replay engine signals completion.
      */
     private suspend fun startTeleportReplayWithWaypoints(
-        waypoints: List<LatLng>,
-        waitSecondsPerWaypoint: List<Int>,
+        waypoints: List<Waypoint>,
         isLooping: Boolean,
         persistMetadata: (suspend () -> Unit)? = null,
         onComplete: suspend () -> Unit = {
@@ -373,7 +372,6 @@ internal class ReplayOrchestrator(
 
         teleportRouteEngine.start(
             waypoints = waypoints,
-            waitSecondsPerWaypoint = waitSecondsPerWaypoint,
             isLooping = isLooping,
             onPositionUpdate = ::tickPosition,
             onComplete = { scope.launch { onComplete() } },

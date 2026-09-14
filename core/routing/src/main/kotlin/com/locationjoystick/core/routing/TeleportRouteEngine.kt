@@ -3,6 +3,7 @@ package com.locationjoystick.core.routing
 import android.util.Log
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.model.LatLng
+import com.locationjoystick.core.model.Waypoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import java.util.concurrent.atomic.AtomicReference
@@ -30,25 +31,21 @@ class TeleportRouteEngine
         @Volatile private var resumeIndex: Int = 0
 
         @Volatile private var resumeRemainingWaitMs: Long = 0L
-        private val savedWaypointsRef = AtomicReference<List<LatLng>>(emptyList())
-        private val savedWaitSecondsRef = AtomicReference<List<Int>>(emptyList())
+        private val savedWaypointsRef = AtomicReference<List<Waypoint>>(emptyList())
 
         @Volatile private var isLooping: Boolean = false
 
         /**
-         * @param waypoints Positions in order.
-         * @param waitSecondsPerWaypoint Same length as [waypoints]; seconds to wait at each
-         *   before jumping onward.
+         * @param waypoints Positions in order, each carrying its own wait duration via
+         *   [Waypoint.waitSeconds].
          */
         fun start(
-            waypoints: List<LatLng>,
-            waitSecondsPerWaypoint: List<Int>,
+            waypoints: List<Waypoint>,
             isLooping: Boolean = false,
             onPositionUpdate: (LatLng) -> Unit,
             onComplete: () -> Unit,
         ) {
             savedWaypointsRef.set(waypoints)
-            savedWaitSecondsRef.set(waitSecondsPerWaypoint)
             this.isLooping = isLooping
             resumeIndex = 0
             resumeRemainingWaitMs = waitMsFor(0)
@@ -72,7 +69,6 @@ class TeleportRouteEngine
         override suspend fun stop() {
             jobController.cancelAndJoinActive()
             savedWaypointsRef.set(emptyList())
-            savedWaitSecondsRef.set(emptyList())
             resumeIndex = 0
             resumeRemainingWaitMs = 0L
             Log.i(TAG, "Teleport replay stopped")
@@ -93,7 +89,7 @@ class TeleportRouteEngine
             resumeRemainingWaitMs = waitMsFor(clamped)
             if (wasRunning) launchReplay(onPositionUpdate, onComplete)
             Log.i(TAG, "Jumped to waypoint $clamped, wait timer reset")
-            return waypoints[clamped]
+            return waypoints[clamped].position
         }
 
         override fun jumpToNextWaypoint(
@@ -119,7 +115,13 @@ class TeleportRouteEngine
             jobController.close()
         }
 
-        private fun waitMsFor(index: Int): Long = savedWaitSecondsRef.get().getOrElse(index) { 0 }.coerceAtLeast(0) * 1000L
+        private fun waitMsFor(index: Int): Long =
+            savedWaypointsRef
+                .get()
+                .getOrNull(index)
+                ?.waitSeconds
+                ?.coerceAtLeast(0)
+                ?.times(1000L) ?: 0L
 
         private fun launchReplay(
             onPositionUpdate: (LatLng) -> Unit,
@@ -135,7 +137,7 @@ class TeleportRouteEngine
             var remainingWaitMs = resumeRemainingWaitMs
 
             jobController.launch {
-                onPositionUpdate(snapshot[index])
+                onPositionUpdate(snapshot[index].position)
                 while (isActive) {
                     delay(AppConstants.LocationConstants.UPDATE_INTERVAL_MS)
                     remainingWaitMs -= AppConstants.LocationConstants.UPDATE_INTERVAL_MS
@@ -143,7 +145,7 @@ class TeleportRouteEngine
                     if (remainingWaitMs > 0) {
                         // Still waiting: re-push the frozen position so the fix never goes stale.
                         try {
-                            onPositionUpdate(snapshot[index])
+                            onPositionUpdate(snapshot[index].position)
                         } catch (e: Exception) {
                             Log.e(TAG, "onPositionUpdate failed", e)
                         }
@@ -170,7 +172,7 @@ class TeleportRouteEngine
                     resumeIndex = index
                     resumeRemainingWaitMs = remainingWaitMs
                     try {
-                        onPositionUpdate(snapshot[index])
+                        onPositionUpdate(snapshot[index].position)
                     } catch (e: Exception) {
                         Log.e(TAG, "onPositionUpdate failed", e)
                     }

@@ -1,6 +1,7 @@
 package com.locationjoystick.core.routing
 
 import com.locationjoystick.core.model.LatLng
+import com.locationjoystick.core.model.Waypoint
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -15,12 +16,16 @@ class TeleportRouteEngineTest {
     private val pointB = LatLng(1.0, 0.0)
     private val pointC = LatLng(2.0, 0.0)
 
+    private fun wp(
+        position: LatLng,
+        waitSeconds: Int,
+    ) = Waypoint(id = "", position = position, orderIndex = 0, waitSeconds = waitSeconds)
+
     @Test
     fun `start reports first waypoint position with no delay`() {
         val latch = CountDownLatch(1)
         engine.start(
-            waypoints = listOf(pointA, pointB),
-            waitSecondsPerWaypoint = listOf(5, 5),
+            waypoints = listOf(wp(pointA, 5), wp(pointB, 5)),
             onPositionUpdate = { if (it == pointA) latch.countDown() },
             onComplete = {},
         )
@@ -33,8 +38,7 @@ class TeleportRouteEngineTest {
     fun `stays frozen at waypoint until wait elapses then jumps`() {
         val positions = mutableListOf<LatLng>()
         engine.start(
-            waypoints = listOf(pointA, pointB),
-            waitSecondsPerWaypoint = listOf(2, 2),
+            waypoints = listOf(wp(pointA, 2), wp(pointB, 2)),
             onPositionUpdate = { positions.add(it) },
             onComplete = {},
         )
@@ -50,8 +54,7 @@ class TeleportRouteEngineTest {
         val jumpToB = CountDownLatch(1)
         val jumpToC = CountDownLatch(1)
         engine.start(
-            waypoints = listOf(pointA, pointB, pointC),
-            waitSecondsPerWaypoint = listOf(1, 2, 1),
+            waypoints = listOf(wp(pointA, 1), wp(pointB, 2), wp(pointC, 1)),
             onPositionUpdate = {
                 if (it == pointB) jumpToB.countDown()
                 if (it == pointC) jumpToC.countDown()
@@ -68,8 +71,7 @@ class TeleportRouteEngineTest {
         val completeCount = AtomicInteger(0)
         val latch = CountDownLatch(1)
         engine.start(
-            waypoints = listOf(pointA, pointB),
-            waitSecondsPerWaypoint = listOf(1, 1),
+            waypoints = listOf(wp(pointA, 1), wp(pointB, 1)),
             isLooping = false,
             onPositionUpdate = {},
             onComplete = {
@@ -88,8 +90,7 @@ class TeleportRouteEngineTest {
         val completeCount = AtomicInteger(0)
         val visitedA = CountDownLatch(2) // start + one loop-back
         engine.start(
-            waypoints = listOf(pointA, pointB),
-            waitSecondsPerWaypoint = listOf(1, 1),
+            waypoints = listOf(wp(pointA, 1), wp(pointB, 1)),
             isLooping = true,
             onPositionUpdate = { if (it == pointA) visitedA.countDown() },
             onComplete = { completeCount.incrementAndGet() },
@@ -103,8 +104,7 @@ class TeleportRouteEngineTest {
     fun `pause then resume preserves remaining wait instead of resetting it`() {
         val jumpedToB = CountDownLatch(1)
         engine.start(
-            waypoints = listOf(pointA, pointB),
-            waitSecondsPerWaypoint = listOf(3, 3),
+            waypoints = listOf(wp(pointA, 3), wp(pointB, 3)),
             onPositionUpdate = {},
             onComplete = {},
         )
@@ -125,8 +125,7 @@ class TeleportRouteEngineTest {
     @Test
     fun `jumpToNextWaypoint teleports immediately and resets target wait to full`() {
         engine.start(
-            waypoints = listOf(pointA, pointB, pointC),
-            waitSecondsPerWaypoint = listOf(10, 10, 10),
+            waypoints = listOf(wp(pointA, 10), wp(pointB, 10), wp(pointC, 10)),
             onPositionUpdate = {},
             onComplete = {},
         )
@@ -143,8 +142,7 @@ class TeleportRouteEngineTest {
     fun `jumping back mid-wait resets the landed waypoint's timer to full (issue scenario)`() {
         val visitedB = CountDownLatch(1)
         engine.start(
-            waypoints = listOf(pointA, pointB),
-            waitSecondsPerWaypoint = listOf(1, 10),
+            waypoints = listOf(wp(pointA, 1), wp(pointB, 10)),
             onPositionUpdate = { if (it == pointB) visitedB.countDown() },
             onComplete = {},
         )
@@ -181,8 +179,7 @@ class TeleportRouteEngineTest {
     @Test
     fun `stop clears state so a subsequent start behaves like a fresh start`() {
         engine.start(
-            waypoints = listOf(pointA, pointB),
-            waitSecondsPerWaypoint = listOf(10, 10),
+            waypoints = listOf(wp(pointA, 10), wp(pointB, 10)),
             onPositionUpdate = {},
             onComplete = {},
         )
@@ -192,8 +189,7 @@ class TeleportRouteEngineTest {
         val latch = CountDownLatch(1)
         val positions = mutableListOf<LatLng>()
         engine.start(
-            waypoints = listOf(pointB, pointC),
-            waitSecondsPerWaypoint = listOf(1, 1),
+            waypoints = listOf(wp(pointB, 1), wp(pointC, 1)),
             onPositionUpdate = {
                 positions.add(it)
                 latch.countDown()
@@ -210,7 +206,6 @@ class TeleportRouteEngineTest {
         var completed = false
         engine.start(
             waypoints = emptyList(),
-            waitSecondsPerWaypoint = emptyList(),
             onPositionUpdate = {},
             onComplete = { completed = true },
         )
@@ -221,8 +216,7 @@ class TeleportRouteEngineTest {
     fun `start with single waypoint calls onComplete immediately`() {
         var completed = false
         engine.start(
-            waypoints = listOf(pointA),
-            waitSecondsPerWaypoint = listOf(5),
+            waypoints = listOf(wp(pointA, 5)),
             onPositionUpdate = {},
             onComplete = { completed = true },
         )

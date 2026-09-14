@@ -1,79 +1,67 @@
 package com.locationjoystick.feature.routes.impl
 
 import com.locationjoystick.core.model.LatLng
-import com.locationjoystick.core.model.RouteType
 import com.locationjoystick.core.model.Waypoint
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.UUID
 
 /**
- * Regression tests for the parallel-array bookkeeping between
- * [CreatorState.waypoints] and [CreatorState.waitSecondsList] that
- * [RouteCreatorViewModel.addWaypoint]/`undoLastWaypoint`/`saveRoute` maintain for
- * [RouteType.TELEPORT] routes — mirrors the extraction-logic-test pattern in
- * [RouteCreatorSaveRouteTest].
+ * Regression tests for [RouteCreatorViewModel]'s combined `placedWaypoints: List<Pair<LatLng,
+ * Int>>` bookkeeping (position + wait duration in one list) — replaces the old parallel
+ * `waypoints`/`waitSecondsList` arrays this task removed. Mirrors the extraction-logic-test
+ * pattern in [RouteCreatorSaveRouteTest].
  */
 class RouteCreatorTeleportWaitTest {
-    // Mirrors RouteCreatorViewModel.addWaypoint's waitSecondsList append.
+    // Mirrors RouteCreatorViewModel.addWaypoint's placedWaypoints append.
     private fun addWaypoint(
-        waypoints: List<LatLng>,
-        waitSecondsList: List<Int>,
+        placedWaypoints: List<Pair<LatLng, Int>>,
         newPoint: LatLng,
         waitSeconds: Int,
-    ): Pair<List<LatLng>, List<Int>> = (waypoints + newPoint) to (waitSecondsList + waitSeconds)
+    ): List<Pair<LatLng, Int>> = placedWaypoints + (newPoint to waitSeconds)
 
-    // Mirrors RouteCreatorViewModel.undoLastWaypoint's waitSecondsList dropLast.
-    private fun undoLastWaypoint(
-        waypoints: List<LatLng>,
-        waitSecondsList: List<Int>,
-    ): Pair<List<LatLng>, List<Int>> = waypoints.dropLast(1) to waitSecondsList.dropLast(1)
+    // Mirrors RouteCreatorViewModel.undoLastWaypoint's placedWaypoints dropLast.
+    private fun undoLastWaypoint(placedWaypoints: List<Pair<LatLng, Int>>): List<Pair<LatLng, Int>> = placedWaypoints.dropLast(1)
 
     // Mirrors RouteCreatorViewModel.saveRoute's per-index Waypoint construction.
     private fun buildWaypoints(
         positions: List<LatLng>,
-        waitSecondsList: List<Int>,
+        placedWaypoints: List<Pair<LatLng, Int>>,
     ): List<Waypoint> =
         positions.mapIndexed { idx, latLng ->
             Waypoint(
                 id = UUID.randomUUID().toString(),
                 position = latLng,
                 orderIndex = idx,
-                waitSeconds = waitSecondsList.getOrElse(idx) { 0 },
+                waitSeconds = placedWaypoints.getOrNull(idx)?.second ?: 0,
             )
         }
 
     @Test
-    fun `addWaypoint appends waitSeconds at the matching index`() {
-        var (waypoints, waits) = listOf<LatLng>() to listOf<Int>()
-        val addResult1 = addWaypoint(waypoints, waits, LatLng(0.0, 0.0), 3)
-        waypoints = addResult1.first
-        waits = addResult1.second
-        val addResult2 = addWaypoint(waypoints, waits, LatLng(1.0, 1.0), 7)
-        waypoints = addResult2.first
-        waits = addResult2.second
+    fun `addWaypoint appends position and waitSeconds together`() {
+        var placed = listOf<Pair<LatLng, Int>>()
+        placed = addWaypoint(placed, LatLng(0.0, 0.0), 3)
+        placed = addWaypoint(placed, LatLng(1.0, 1.0), 7)
 
-        assertEquals(listOf(3, 7), waits)
-        assertEquals(2, waypoints.size)
+        assertEquals(listOf(3, 7), placed.map { it.second })
+        assertEquals(2, placed.size)
     }
 
     @Test
-    fun `undoLastWaypoint drops the last waitSecondsList entry along with the waypoint`() {
-        val waypoints = listOf(LatLng(0.0, 0.0), LatLng(1.0, 1.0))
-        val waits = listOf(3, 7)
+    fun `undoLastWaypoint drops the last position and its waitSeconds together`() {
+        val placed = listOf(LatLng(0.0, 0.0) to 3, LatLng(1.0, 1.0) to 7)
 
-        val (newWaypoints, newWaits) = undoLastWaypoint(waypoints, waits)
+        val newPlaced = undoLastWaypoint(placed)
 
-        assertEquals(listOf(LatLng(0.0, 0.0)), newWaypoints)
-        assertEquals(listOf(3), newWaits)
+        assertEquals(listOf(LatLng(0.0, 0.0) to 3), newPlaced)
     }
 
     @Test
-    fun `saveRoute persists each Waypoint waitSeconds from waitSecondsList`() {
+    fun `saveRoute persists each Waypoint waitSeconds from the paired list`() {
         val positions = listOf(LatLng(0.0, 0.0), LatLng(1.0, 1.0))
-        val waits = listOf(3, 7)
+        val placed = listOf(LatLng(0.0, 0.0) to 3, LatLng(1.0, 1.0) to 7)
 
-        val result = buildWaypoints(positions, waits)
+        val result = buildWaypoints(positions, placed)
 
         assertEquals(3, result[0].waitSeconds)
         assertEquals(7, result[1].waitSeconds)
@@ -81,9 +69,8 @@ class RouteCreatorTeleportWaitTest {
 
     @Test
     fun `non-teleport addWaypoint with waitSeconds 0 behaves like before the signature change`() {
-        val (waypoints, waits) = addWaypoint(emptyList(), emptyList(), LatLng(5.0, 5.0), 0)
+        val placed = addWaypoint(emptyList(), LatLng(5.0, 5.0), 0)
 
-        assertEquals(listOf(LatLng(5.0, 5.0)), waypoints)
-        assertEquals(listOf(0), waits)
+        assertEquals(listOf(LatLng(5.0, 5.0) to 0), placed)
     }
 }
