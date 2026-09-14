@@ -15,6 +15,10 @@
     <string name="route_detail_speed_profile">"Speed profile"</string>
     <string name="route_detail_waypoints">"Waypoints"</string>
     <string name="route_detail_remove_waypoint_cd">"Remove waypoint"</string>
+    <string name="route_detail_speed_profile_none">"None"</string>
+    <string name="route_detail_waypoint_number">"Waypoint %1$d"</string>
+    <string name="route_detail_wait_seconds">"Wait here: %1$d s"</string>
+    <string name="route_detail_edit_wait_cd">"Edit wait duration"</string>
     <string name="routes_screen_sort">"Sort"</string>
     <string name="routes_screen_add_route_cd">"Add route"</string>
     <string name="routes_screen_draw_a_route">"Draw a route"</string>

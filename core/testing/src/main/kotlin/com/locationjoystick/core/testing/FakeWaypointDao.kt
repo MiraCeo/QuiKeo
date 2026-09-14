@@ -31,6 +31,13 @@ class FakeWaypointDao : WaypointDao {
 
     fun snapshot(): List<WaypointEntity> = state.value
 
+    fun updateWaitSeconds(
+        waypointId: String,
+        waitSeconds: Int,
+    ) {
+        state.value = state.value.map { if (it.id == waypointId) it.copy(waitSeconds = waitSeconds) else it }
+    }
+
     fun deleteAll() {
         state.value = emptyList()
     }

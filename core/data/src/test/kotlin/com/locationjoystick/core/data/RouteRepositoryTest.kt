@@ -415,6 +415,50 @@ class RouteRepositoryTest {
             }
         }
 
+    // setWaypointWaitSeconds
+
+    @Test
+    fun `setWaypointWaitSeconds returns success`() =
+        runTest {
+            val route =
+                createRoute(
+                    "route-1",
+                    "Test",
+                    waypoints = listOf(Waypoint(id = "wp-1", position = LatLng(0.0, 0.0), orderIndex = 0)),
+                )
+            repository.insertRoute(route)
+
+            val result = repository.setWaypointWaitSeconds("wp-1", 30)
+            assertTrue(result.isSuccess)
+        }
+
+    @Test
+    fun `setWaypointWaitSeconds changes the waypoint's waitSeconds`() =
+        runTest {
+            val route =
+                createRoute(
+                    "route-1",
+                    "Test",
+                    waypoints = listOf(Waypoint(id = "wp-1", position = LatLng(0.0, 0.0), orderIndex = 0)),
+                )
+            repository.insertRoute(route)
+
+            repository.setWaypointWaitSeconds("wp-1", 30)
+
+            repository.getRouteWithWaypoints("route-1").test {
+                val result = awaitItem()
+                assertEquals(30, result!!.waypoints.first().waitSeconds)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `setWaypointWaitSeconds non-existent id succeeds silently`() =
+        runTest {
+            val result = repository.setWaypointWaitSeconds("does-not-exist", 30)
+            assertTrue(result.isSuccess)
+        }
+
     // GUIDED route type
 
     @Test

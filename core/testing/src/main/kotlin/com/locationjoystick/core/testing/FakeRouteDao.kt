@@ -56,6 +56,13 @@ class FakeRouteDao(
         waypointDao.delete(waypointId)
     }
 
+    override suspend fun updateWaitSeconds(
+        waypointId: String,
+        waitSeconds: Int,
+    ) {
+        waypointDao.updateWaitSeconds(waypointId, waitSeconds)
+    }
+
     override suspend fun deleteAll() {
         routeState.value = emptyList()
     }

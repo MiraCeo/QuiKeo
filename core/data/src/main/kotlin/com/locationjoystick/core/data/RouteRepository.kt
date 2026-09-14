@@ -92,6 +92,18 @@ class RouteRepository
                 }
             }
 
+        suspend fun setWaypointWaitSeconds(
+            waypointId: String,
+            waitSeconds: Int,
+        ): Result<Unit> =
+            withContext(ioDispatcher) {
+                runCatching {
+                    routeDao.updateWaitSeconds(waypointId, waitSeconds)
+                }.onFailure { e ->
+                    Log.e(TAG, "Failed to set waypoint wait seconds: $waypointId", e)
+                }
+            }
+
         suspend fun renameRoute(
             routeId: String,
             name: String,

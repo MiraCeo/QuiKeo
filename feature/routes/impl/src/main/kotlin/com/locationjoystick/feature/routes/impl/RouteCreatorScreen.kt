@@ -432,11 +432,12 @@ private fun SaveRouteDialog(
 }
 
 @Composable
-private fun TeleportWaitDialog(
+internal fun TeleportWaitDialog(
     onDismiss: () -> Unit,
     onConfirm: (Int) -> Unit,
+    initialSeconds: Int = AppConstants.RouteConstants.DEFAULT_TELEPORT_WAIT_SECONDS,
 ) {
-    var text by remember { mutableStateOf(AppConstants.RouteConstants.DEFAULT_TELEPORT_WAIT_SECONDS.toString()) }
+    var text by remember { mutableStateOf(initialSeconds.toString()) }
     val seconds = text.toIntOrNull()
     val isValid = seconds != null && seconds >= AppConstants.RouteConstants.MIN_TELEPORT_WAIT_SECONDS
 

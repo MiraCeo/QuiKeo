@@ -2,7 +2,6 @@ package com.locationjoystick.feature.routes.impl
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,17 +13,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -52,6 +50,7 @@ import com.locationjoystick.core.designsystem.component.LjOverflowMenu
 import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.model.Route
+import com.locationjoystick.core.model.RouteType
 import com.locationjoystick.core.model.SpeedProfile
 import com.locationjoystick.feature.routes.impl.R
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -136,6 +135,19 @@ class RouteDetailViewModel
                 }
             }
         }
+
+        fun setWaypointWaitSeconds(
+            waypointId: String,
+            waitSeconds: Int,
+        ) {
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    routeRepository.setWaypointWaitSeconds(waypointId, waitSeconds)
+                } catch (e: Exception) {
+                    Log.e(TAG, "set waypoint wait seconds failed", e)
+                }
+            }
+        }
     }
 
 @Preview(showBackground = true)
@@ -164,6 +176,7 @@ fun RouteDetailScreen(
 
     var editedName by remember { mutableStateOf("") }
     var isNameInitialized by remember { mutableStateOf(false) }
+    var editingWaypointId by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(route) {
         if (route != null && !isNameInitialized) {
@@ -222,6 +235,7 @@ fun RouteDetailScreen(
             if (route == null) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             } else {
+                val isTeleportRoute = route!!.routeType == RouteType.TELEPORT
                 LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -249,31 +263,51 @@ fun RouteDetailScreen(
                         }
                     }
 
-                    // Speed profile selection
-                    item {
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            Text(
-                                stringResource(R.string.route_detail_speed_profile),
-                                style = MaterialTheme.typography.labelLarge,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                            Spacer(Modifier.height(8.dp))
-                            // Segmented row is wrapped in a scrollable Row *without* fillMaxWidth —
-                            // combining fillMaxWidth with horizontalScroll forces the row's
-                            // constrained width onto its children instead of letting them size
-                            // naturally, which squeezed/clipped the buttons instead of scrolling.
-                            SingleChoiceSegmentedButtonRow(
-                                modifier = Modifier.horizontalScroll(rememberScrollState()),
-                            ) {
+                    // Speed profile selection — hidden for teleport routes, which never read speedProfileId
+                    if (!isTeleportRoute) {
+                        item {
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                Text(
+                                    stringResource(R.string.route_detail_speed_profile),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                                Spacer(Modifier.height(8.dp))
+
                                 val options = listOf<SpeedProfile?>(null) + speedProfiles
-                                options.forEachIndexed { index, profile ->
-                                    SegmentedButton(
-                                        selected = route!!.speedProfileId == profile?.id,
-                                        onClick = { viewModel.setSpeedProfile(profile?.id) },
-                                        shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                                var expanded by remember { mutableStateOf(false) }
+                                val noneLabel = stringResource(R.string.route_detail_speed_profile_none)
+                                val selectedLabel =
+                                    speedProfiles.find { it.id == route!!.speedProfileId }?.name ?: noneLabel
+
+                                ExposedDropdownMenuBox(
+                                    expanded = expanded,
+                                    onExpandedChange = { expanded = it },
+                                ) {
+                                    OutlinedTextField(
+                                        value = selectedLabel,
+                                        onValueChange = {},
+                                        readOnly = true,
+                                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true),
+                                    )
+                                    ExposedDropdownMenu(
+                                        expanded = expanded,
+                                        onDismissRequest = { expanded = false },
                                     ) {
-                                        Text(profile?.name ?: "None")
+                                        options.forEach { profile ->
+                                            DropdownMenuItem(
+                                                text = { Text(profile?.name ?: noneLabel) },
+                                                onClick = {
+                                                    viewModel.setSpeedProfile(profile?.id)
+                                                    expanded = false
+                                                },
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -293,6 +327,14 @@ fun RouteDetailScreen(
                     items(route!!.waypoints, key = { it.id }) { waypoint ->
                         LjListItemCard(
                             trailing = {
+                                if (isTeleportRoute) {
+                                    IconButton(onClick = { editingWaypointId = waypoint.id }) {
+                                        Icon(
+                                            LjIcons.Edit,
+                                            contentDescription = stringResource(R.string.route_detail_edit_wait_cd),
+                                        )
+                                    }
+                                }
                                 IconButton(onClick = { viewModel.removeWaypoint(waypoint.id) }) {
                                     Icon(
                                         LjIcons.Delete,
@@ -303,7 +345,7 @@ fun RouteDetailScreen(
                             },
                         ) {
                             Text(
-                                "Waypoint ${waypoint.orderIndex + 1}",
+                                stringResource(R.string.route_detail_waypoint_number, waypoint.orderIndex + 1),
                                 color = MaterialTheme.colorScheme.onSurface,
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Medium,
@@ -314,10 +356,31 @@ fun RouteDetailScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.bodySmall,
                             )
+                            if (isTeleportRoute) {
+                                Text(
+                                    stringResource(R.string.route_detail_wait_seconds, waypoint.waitSeconds),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                            }
                         }
                     }
                 }
             }
+        }
+    }
+
+    editingWaypointId?.let { waypointId ->
+        val waypoint = route?.waypoints?.find { it.id == waypointId }
+        if (waypoint != null) {
+            TeleportWaitDialog(
+                initialSeconds = waypoint.waitSeconds,
+                onDismiss = { editingWaypointId = null },
+                onConfirm = { seconds ->
+                    viewModel.setWaypointWaitSeconds(waypointId, seconds)
+                    editingWaypointId = null
+                },
+            )
         }
     }
 }
