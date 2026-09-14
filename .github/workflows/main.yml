@@ -80,6 +80,17 @@ jobs:
       - name: Run Unit Tests
         run: make test
 
+      - name: Verify What's New changelog exists for this release
+        if: ${{ needs.release-please.outputs.release_created == 'true' }}
+        run: |
+          TAG=${{ needs.release-please.outputs.tag_name }}
+          VERSION=${TAG#v}
+          FILE="docs/wiki/changelog/${VERSION}.json"
+          if [ ! -f "$FILE" ]; then
+            echo "::error::Missing $FILE — add it before this release ships (see docs/features/whats-new.md)."
+            exit 1
+          fi
+
       - name: Decode keystore
         if: ${{ needs.release-please.outputs.release_created == 'true' }}
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > release.keystore

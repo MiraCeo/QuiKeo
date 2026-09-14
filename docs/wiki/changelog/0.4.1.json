@@ -1,0 +1,7 @@
+{
+  "version": "0.4.1",
+  "date": "2026-06-04",
+  "entries": [
+    { "category": "fix", "scope": "General", "summary": "Minor internal maintenance release with no user-visible changes." }
+  ]
+}

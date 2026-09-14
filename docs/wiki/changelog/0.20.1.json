@@ -1,0 +1,7 @@
+{
+  "version": "0.20.1",
+  "date": "2026-09-10",
+  "entries": [
+    { "category": "fix", "scope": "Route System", "summary": "Changing the speed profile mid-replay now takes effect even when the route has a pinned speed profile." }
+  ]
+}

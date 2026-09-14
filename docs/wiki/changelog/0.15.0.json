@@ -1,0 +1,15 @@
+{
+  "version": "0.15.0",
+  "date": "2026-07-28",
+  "entries": [
+    { "category": "feat", "scope": "Group Sync", "summary": "Added a teleport-to-leader button to the floating widget for followers." },
+    { "category": "feat", "scope": "Route System", "summary": "Road-following routes now retry across more servers when one is slow or unavailable." },
+    { "category": "fix", "scope": "Group Sync", "summary": "Followers now automatically rejoin their group after a device restart." },
+    { "category": "fix", "scope": "Group Sync", "summary": "Fixed follower and leader mode not resuming until the Group Sync screen was opened." },
+    { "category": "fix", "scope": "Group Sync", "summary": "Improved reliability of group sync and QR discovery on mobile hotspot networks." },
+    { "category": "fix", "scope": "Foreground Service", "summary": "Spoofing now keeps working reliably after the screen locks." },
+    { "category": "fix", "scope": "Click-to-Move / Teleport", "summary": "Fixed a bug where adding the next walk point could corrupt the current walk or route on the floating map." },
+    { "category": "fix", "scope": "Floating Widget", "summary": "Fixed the widget button occasionally not responding to a tap on noisy touchscreens." },
+    { "category": "fix", "scope": "Speed Profiles", "summary": "Fixed an incorrect Slow Walk speed value." }
+  ]
+}
