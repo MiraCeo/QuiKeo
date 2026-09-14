@@ -24,6 +24,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -417,6 +418,7 @@ private fun RouteCard(
     if (showStartDialog) {
         ModalBottomSheet(
             onDismissRequest = { showStartDialog = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             containerColor = MaterialTheme.colorScheme.surface,
         ) {
             Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
