@@ -1,0 +1,17 @@
+{
+  "version": "0.21.0",
+  "date": "2026-09-14",
+  "entries": [
+    { "category": "feat", "scope": "Route System", "summary": "Added a new Teleport route type: instantly jump between waypoints, waiting a set number of seconds at each stop before moving to the next." },
+    { "category": "feat", "scope": "Route System", "summary": "The speed profile picker on a route's edit screen is now a dropdown, fixing a layout that could overflow the screen on some devices." },
+    { "category": "feat", "scope": "Route System", "summary": "Waypoint wait times on a Teleport route can now be changed after the route is saved, not just when placing the point." },
+    { "category": "feat", "scope": "General", "summary": "Added a Discord community link to the app's menu and website." },
+    { "category": "fix", "scope": "Route System", "summary": "Tapping a search result while placing a route waypoint no longer accidentally adds an extra point." },
+    { "category": "fix", "scope": "Tap to Walk", "summary": "Enabling compass tracking now shows a clear disclosure about the screenshot it takes before opening the accessibility settings screen." },
+    { "category": "fix", "scope": "Roaming Mode", "summary": "Roaming's reported movement speed and direction are now accurate to other apps instead of always showing as stopped." },
+    { "category": "fix", "scope": "Route System", "summary": "Route replay could occasionally lag one tick behind when waypoints were placed close together; movement now stays on schedule." },
+    { "category": "fix", "scope": "Export / Import", "summary": "Importing from GPS Joystick is now more reliable, fixing cases where favorites or routes could be parsed incorrectly or lost." },
+    { "category": "fix", "scope": "Onboarding", "summary": "Returning users no longer need to grant the overlay permission again just to reach the main app." },
+    { "category": "fix", "scope": "General", "summary": "Screen content no longer overlaps the status bar or navigation bar on some devices." }
+  ]
+}

@@ -41,7 +41,7 @@ docs/wiki/changelog/<version>.json    →  {
 }
 ```
 
-served statically by GitHub Pages at `https://shortcuts.github.io/locationjoystick/changelog/<version>.json`.
+served statically by GitHub Pages at `https://locationjoystick.shrtcts.fr/changelog/<version>.json`.
 `WhatsNewRepository.fetchEntries(version)` fetches exactly that file for the running app's own
 version (plain `OkHttpClient` + `org.json`, mirroring `ElevationRepository`) — never a list or an
 index, so there's no client-side filtering to keep correct. `category` is `"feat"` or `"fix"`
