@@ -13,6 +13,9 @@ android {
     defaultConfig {
         testInstrumentationRunner = "com.locationjoystick.app.HiltTestRunner"
     }
+    androidResources {
+        generateLocaleConfig = true
+    }
     bundle {
         language {
             enableSplit = false
