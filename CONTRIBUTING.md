@@ -21,6 +21,17 @@ Releases are automated via [release-please](https://github.com/googleapis/releas
 2. One feature/fix per PR.
 3. New feature: open issue first.
 
+## Translations
+
+- Resource layout and conventions: see [docs/features/localization.md](docs/features/localization.md).
+- A translation is a sibling `values-<qualifier>/strings.xml` next to each module's
+  `res/values/strings.xml`, with the exact same keys.
+- Never translate the app name/brand ("locationjoystick") or units/symbols embedded in format
+  strings.
+- If a translation is AI-assisted, get a native speaker of the target language to review it
+  before opening the PR — AI translation tools reliably produce plausible-but-wrong phrasing that
+  a non-speaker reviewer won't catch.
+
 ## Required Checks
 
 All 3 must pass:
