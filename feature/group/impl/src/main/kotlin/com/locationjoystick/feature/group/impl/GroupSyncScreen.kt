@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
@@ -157,7 +158,7 @@ internal fun GroupSyncScreen(
     cooldownState: CooldownState = CooldownState.Ready,
 ) {
     LjScaffold(
-        title = "Group Sync",
+        title = stringResource(R.string.group_sync_group_sync),
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -357,7 +358,7 @@ private fun LeaderContent(
             style = MaterialTheme.typography.titleMedium,
         )
 
-        val code = groupState.groupId ?: "Unknown"
+        val code = groupState.groupId ?: stringResource(R.string.group_sync_unknown)
         Card(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
             modifier = Modifier.fillMaxWidth(),
@@ -386,7 +387,7 @@ private fun LeaderContent(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = if (followerCount == 1) "1 follower connected" else "$followerCount followers connected",
+                    text = pluralStringResource(R.plurals.group_sync_followers_connected, followerCount, followerCount),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
@@ -428,8 +429,8 @@ private fun LeaderContent(
         }
 
         SwitchRow(
-            label = "Sharing",
-            description = "Sends your location to followers.",
+            label = stringResource(R.string.group_sync_sharing),
+            description = stringResource(R.string.group_sync_sends_your_location_to_followers),
             checked = groupState.sharingEnabled,
             onCheckedChange = onSetSharingEnabled,
         )
@@ -472,22 +473,26 @@ private fun FollowerContent(
         )
 
         Text(
-            text = "Connected to group ${groupState.groupId ?: "Unknown"}",
+            text =
+                stringResource(
+                    R.string.group_sync_connected_to_group,
+                    groupState.groupId ?: stringResource(R.string.group_sync_unknown),
+                ),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         if (followerCount > 0) {
             Text(
-                text = if (followerCount == 1) "1 follower in this group" else "$followerCount followers in this group",
+                text = pluralStringResource(R.plurals.group_sync_followers_in_group, followerCount, followerCount),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
         SwitchRow(
-            label = "Follow leader",
-            description = "Walks toward the leader's location.",
+            label = stringResource(R.string.group_sync_follow_leader),
+            description = stringResource(R.string.group_sync_walks_toward_the_leaders_location),
             checked = groupState.followerModeEnabled,
             onCheckedChange = onSetFollowerModeEnabled,
         )

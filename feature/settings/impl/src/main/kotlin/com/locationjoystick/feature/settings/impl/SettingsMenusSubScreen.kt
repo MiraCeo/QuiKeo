@@ -97,7 +97,7 @@ internal fun SettingsMenusSubScreen(
     }
 
     LjScaffold(
-        title = "Menus",
+        title = stringResource(R.string.settings_menus_menus),
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -211,8 +211,7 @@ private fun TapToWalkSection(
     if (enabled) {
         Spacer(Modifier.height(12.dp))
         Text(
-            "Map scale (%.2f m/px) — the default works for most players; zoom the game fully out and adjust here only if it's off"
-                .format(uiState.tapToWalkScaleMpx),
+            stringResource(R.string.settings_menus_map_scale_mpx, uiState.tapToWalkScaleMpx),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -270,50 +269,43 @@ private fun PrivacySection(
     LjCheckboxRow(
         checked = uiState.hideTeleportFeatures,
         onCheckedChange = { onAction(SettingsAction.SetHideTeleportFeatures(it)) },
-        title = "Hide teleport features",
-        description =
-            "Removes every teleport option across the app — map, favorites, " +
-                "routes, group sync, and the widget. Only walking and route replay remain available.",
+        title = stringResource(R.string.settings_menus_hide_teleport_features),
+        description = stringResource(R.string.settings_menus_hide_teleport_features_desc),
     )
     Spacer(Modifier.height(8.dp))
     LjCheckboxRow(
         checked = uiState.floatingMapQuickWalk,
         onCheckedChange = { onAction(SettingsAction.SetFloatingMapQuickWalk(it)) },
-        title = "Floating map quick walk",
-        description = "Skips the confirmation sheet on floating-map taps and walks there directly.",
+        title = stringResource(R.string.settings_menus_floating_map_quick_walk),
+        description = stringResource(R.string.settings_menus_floating_map_quick_walk_desc),
     )
     Spacer(Modifier.height(8.dp))
     LjCheckboxRow(
         checked = uiState.hideWidgetOverlay,
         onCheckedChange = { onAction(SettingsAction.SetHideWidgetOverlay(it)) },
-        title = "Hide floating widget",
-        description = "Keeps the floating widget button from appearing while spoofing is active.",
+        title = stringResource(R.string.settings_menus_hide_floating_widget),
+        description = stringResource(R.string.settings_menus_hide_floating_widget_desc),
     )
     Spacer(Modifier.height(8.dp))
     LjCheckboxRow(
         checked = uiState.hideForegroundNotification,
         onCheckedChange = { onAction(SettingsAction.SetHideForegroundNotification(it)) },
-        title = "Hide notification icon",
-        description =
-            "Removes the status bar icon for the spoofing notification. Android requires the " +
-                "notification to keep existing — it's tucked into the notification shade instead.",
+        title = stringResource(R.string.settings_menus_hide_notification_icon),
+        description = stringResource(R.string.settings_menus_hide_notification_icon_desc),
     )
     Spacer(Modifier.height(8.dp))
     LjCheckboxRow(
         checked = uiState.showRouteJumpButtons,
         onCheckedChange = { onAction(SettingsAction.SetShowRouteJumpButtons(it)) },
-        title = "Show route jump buttons",
-        description =
-            "Adds Previous waypoint / Next waypoint buttons to route replay controls, " +
-                "for instantly teleporting between waypoints. Off by default.",
+        title = stringResource(R.string.settings_menus_show_route_jump_buttons),
+        description = stringResource(R.string.settings_menus_show_route_jump_buttons_desc),
     )
     Spacer(Modifier.height(8.dp))
     LjCheckboxRow(
         checked = uiState.altitudeOverrideButtonEnabled,
         onCheckedChange = { onAction(SettingsAction.SetAltitudeOverrideButtonEnabled(it)) },
-        title = "Show altitude override button",
-        description =
-            "Adds a button to the floating widget for typing in a fixed altitude from anywhere. Off by default.",
+        title = stringResource(R.string.settings_menus_show_altitude_override_button),
+        description = stringResource(R.string.settings_menus_show_altitude_override_button_desc),
     )
 }
 
@@ -327,10 +319,8 @@ private fun DebugSection(
     LjCheckboxRow(
         checked = uiState.debugStatsEnabled,
         onCheckedChange = { onAction(SettingsAction.SetDebugStatsEnabled(it)) },
-        title = "Debug stats",
-        description =
-            "Shows live speed, altitude, coordinates, and tick rate in the floating " +
-                "widget panel while spoofing is active.",
+        title = stringResource(R.string.settings_menus_debug_stats),
+        description = stringResource(R.string.settings_menus_debug_stats_desc),
     )
 }
 
@@ -381,7 +371,8 @@ private fun CompassOrientationSection(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var testResult by remember { mutableStateOf<String?>(null) }
+    var hasTested by remember { mutableStateOf(false) }
+    var testAngle by remember { mutableStateOf<Float?>(null) }
     var isTesting by remember { mutableStateOf(false) }
     var appPickerExpanded by remember { mutableStateOf(false) }
     var showDisclosure by rememberSaveable { mutableStateOf(false) }
@@ -403,7 +394,11 @@ private fun CompassOrientationSection(
         Column(modifier = Modifier.weight(1f)) {
             Text(stringResource(R.string.settings_menus_accessibility_service), style = MaterialTheme.typography.bodyLarge)
             Text(
-                if (uiState.isCompassServiceGranted) "Enabled" else "Not enabled — tap to open Android Settings",
+                if (uiState.isCompassServiceGranted) {
+                    stringResource(R.string.settings_menus_compass_service_enabled)
+                } else {
+                    stringResource(R.string.settings_menus_compass_service_not_enabled)
+                },
                 style = MaterialTheme.typography.bodySmall,
                 color =
                     if (uiState.isCompassServiceGranted) {
@@ -442,7 +437,7 @@ private fun CompassOrientationSection(
             )
             LjOutlinedButton(onClick = { appPickerExpanded = true }, modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    selectedApp?.label ?: "Select app…",
+                    selectedApp?.label ?: stringResource(R.string.settings_menus_select_app),
                     modifier = Modifier.weight(1f),
                     color =
                         if (selectedApp != null) {
@@ -472,10 +467,9 @@ private fun CompassOrientationSection(
         Spacer(Modifier.height(8.dp))
         Text(
             if (selectedApp != null) {
-                "Tap Test to switch to ${selectedApp.label}, capture its compass, and return here."
+                stringResource(R.string.settings_menus_tap_test_to_switch_to, selectedApp.label)
             } else {
-                "Select the game above, or switch to it yourself first — then tap Test. " +
-                    "The app briefly minimizes itself to capture whatever's on screen, then returns."
+                stringResource(R.string.settings_menus_select_the_game_above)
             },
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -485,7 +479,7 @@ private fun CompassOrientationSection(
             LjOutlinedButton(
                 onClick = {
                     isTesting = true
-                    testResult = null
+                    hasTested = false
                     scope.launch {
                         // Detection reads whatever is CURRENTLY on screen. With a selected app we launch
                         // it directly; otherwise fall back to the old behavior — send ourselves to the
@@ -502,24 +496,35 @@ private fun CompassOrientationSection(
                             it.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_NEW_TASK)
                             context.startActivity(it)
                         }
-                        testResult =
-                            if (angle != null) {
-                                "Detected — north is ${Math.toDegrees(angle.toDouble()).roundToInt()}° from up"
-                            } else {
-                                "Not detected — make sure your game's compass is visible top-right"
-                            }
+                        testAngle = angle
+                        hasTested = true
                         isTesting = false
                     }
                 },
                 enabled = !isTesting,
-            ) { Text(if (isTesting) "Testing…" else "Test") }
-            if (testResult != null) {
+            ) {
+                Text(
+                    if (isTesting) {
+                        stringResource(R.string.settings_menus_testing)
+                    } else {
+                        stringResource(R.string.settings_menus_test)
+                    },
+                )
+            }
+            if (hasTested) {
                 Spacer(Modifier.width(12.dp))
                 Text(
-                    testResult!!,
+                    if (testAngle != null) {
+                        stringResource(
+                            R.string.settings_menus_compass_detected,
+                            Math.toDegrees(testAngle!!.toDouble()).roundToInt(),
+                        )
+                    } else {
+                        stringResource(R.string.settings_menus_compass_not_detected)
+                    },
                     style = MaterialTheme.typography.bodySmall,
                     color =
-                        if (testResult!!.startsWith("Detected")) {
+                        if (testAngle != null) {
                             MaterialTheme.colorScheme.primary
                         } else {
                             MaterialTheme.colorScheme.error
@@ -537,42 +542,71 @@ private data class FeatureMeta(
     val isRootGated: Boolean = false,
 )
 
+@Composable
 private fun featureMeta(feature: AppFeature): FeatureMeta =
     when (feature) {
         AppFeature.MAP_FLOATING -> {
-            FeatureMeta("Map shortcut", "Opens a compact map view without switching to the main app.", LjIcons.LocationOn)
+            FeatureMeta(
+                stringResource(R.string.settings_menus_feature_map_shortcut),
+                stringResource(R.string.settings_menus_feature_map_shortcut_desc),
+                LjIcons.LocationOn,
+            )
         }
 
         AppFeature.JOYSTICK_TOGGLE -> {
-            FeatureMeta("Show/hide joystick", "Toggles the floating joystick overlay on or off.", LjIcons.Visibility)
+            FeatureMeta(
+                stringResource(R.string.settings_menus_feature_show_hide_joystick),
+                stringResource(R.string.settings_menus_feature_show_hide_joystick_desc),
+                LjIcons.Visibility,
+            )
         }
 
         AppFeature.JOYSTICK_LOCK -> {
             FeatureMeta(
-                "Lock joystick",
-                "Keeps the joystick moving in the last held direction after you release.",
+                stringResource(R.string.settings_menus_feature_lock_joystick),
+                stringResource(R.string.settings_menus_feature_lock_joystick_desc),
                 LjIcons.Lock,
             )
         }
 
         AppFeature.FAVORITES -> {
-            FeatureMeta("Favorites", "Teleport or walk to a saved location.", LjIcons.Favorite)
+            FeatureMeta(
+                stringResource(R.string.settings_menus_feature_favorites),
+                stringResource(R.string.settings_menus_feature_favorites_desc),
+                LjIcons.Favorite,
+            )
         }
 
         AppFeature.ROUTES -> {
-            FeatureMeta("Routes", "Lists saved routes and starts replay.", LjIcons.Route)
+            FeatureMeta(
+                stringResource(R.string.settings_menus_feature_routes),
+                stringResource(R.string.settings_menus_feature_routes_desc),
+                LjIcons.Route,
+            )
         }
 
         AppFeature.ROAMING -> {
-            FeatureMeta("Roaming", "Configure and start random walking within a radius.", LjIcons.Explore)
+            FeatureMeta(
+                stringResource(R.string.settings_menus_feature_roaming),
+                stringResource(R.string.settings_menus_feature_roaming_desc),
+                LjIcons.Explore,
+            )
         }
 
         AppFeature.SEARCH -> {
-            FeatureMeta("Search", "Find and jump to a place by name.", LjIcons.Search)
+            FeatureMeta(
+                stringResource(R.string.settings_menus_feature_search),
+                stringResource(R.string.settings_menus_feature_search_desc),
+                LjIcons.Search,
+            )
         }
 
         AppFeature.SPEED_CYCLE -> {
-            FeatureMeta("Speed cycle", "Cycles through all speed profiles with a single tap.", LjIcons.Speed)
+            FeatureMeta(
+                stringResource(R.string.settings_menus_feature_speed_cycle),
+                stringResource(R.string.settings_menus_feature_speed_cycle_desc),
+                LjIcons.Speed,
+            )
         }
     }
 
@@ -718,7 +752,7 @@ private fun FeatureRow(
     ) {
         Icon(
             imageVector = LjIcons.DragHandle,
-            contentDescription = "Drag to reorder ${meta.label}",
+            contentDescription = stringResource(R.string.settings_menus_drag_to_reorder_cd, meta.label),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = dragModifier.size(24.dp),
         )
@@ -742,10 +776,11 @@ private fun FeatureRow(
             )
         }
         if (FeatureSurface.WIDGET in feature.surfaces) {
+            val widgetCd = stringResource(R.string.settings_menus_feature_on_widget_cd, meta.label)
             Checkbox(
                 checked = feature in uiState.enabledWidgetFeatures,
                 enabled = rowEnabled,
-                modifier = Modifier.width(56.dp).semantics { contentDescription = "${meta.label} on widget" },
+                modifier = Modifier.width(56.dp).semantics { contentDescription = widgetCd },
                 onCheckedChange = { checked ->
                     val updated = uiState.enabledWidgetFeatures.toMutableSet()
                     if (checked) {
@@ -765,9 +800,10 @@ private fun FeatureRow(
             )
         }
         if (FeatureSurface.MAP in feature.surfaces) {
+            val mapCd = stringResource(R.string.settings_menus_feature_on_map_cd, meta.label)
             Checkbox(
                 checked = feature in uiState.enabledMapFeatures,
-                modifier = Modifier.width(56.dp).semantics { contentDescription = "${meta.label} on map" },
+                modifier = Modifier.width(56.dp).semantics { contentDescription = mapCd },
                 onCheckedChange = { checked ->
                     val updated = uiState.enabledMapFeatures.toMutableSet()
                     if (checked) updated.add(feature) else updated.remove(feature)

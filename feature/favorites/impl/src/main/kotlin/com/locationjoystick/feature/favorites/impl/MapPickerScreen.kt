@@ -179,7 +179,7 @@ internal fun MapPickerScreen(
     }
 
     LjScaffold(
-        title = "Pick Location",
+        title = stringResource(R.string.map_picker_pick_location),
         isSpoofing = spoofToggle.isSpoofing,
         onToggleSpoofing = spoofToggle.onToggle,
         locationLabel = spoofToggle.locationLabel,

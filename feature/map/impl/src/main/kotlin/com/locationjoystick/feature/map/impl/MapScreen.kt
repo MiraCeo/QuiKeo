@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -53,6 +54,7 @@ import com.locationjoystick.core.map.maplibre.addEphemeralRouteLayers
 import com.locationjoystick.core.map.maplibre.addLocationLayers
 import com.locationjoystick.core.model.RecentSearch
 import com.locationjoystick.feature.map.api.MAP_ROUTE
+import com.locationjoystick.feature.map.impl.R
 import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
@@ -215,7 +217,7 @@ internal fun MapScreen(
     }
 
     LjScaffold(
-        title = "Map",
+        title = stringResource(R.string.map_screen_title),
         isSpoofing = spoofToggle.isSpoofing,
         onToggleSpoofing = spoofToggle.onToggle,
         locationLabel = spoofToggle.locationLabel,

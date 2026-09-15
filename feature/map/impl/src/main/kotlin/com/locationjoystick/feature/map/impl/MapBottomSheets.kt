@@ -96,7 +96,7 @@ internal fun RoutesPickerSheet(
             RoutesPickerList(
                 routes = uiState.routes,
                 onSelect = { selectedRouteId = it.id },
-                title = "Routes",
+                title = stringResource(R.string.map_bottom_sheets_routes),
             )
         }
     }
@@ -117,7 +117,7 @@ internal fun FavoritesPickerSheet(
         val target = uiState.favoriteTarget
         if (target == null) {
             FavoritesList(
-                title = "Favorites",
+                title = stringResource(R.string.map_bottom_sheets_favorites),
                 favorites = uiState.favorites,
                 onSelect = { onAction(MapAction.SelectFavorite(it)) },
                 onSaveCurrentLocation =

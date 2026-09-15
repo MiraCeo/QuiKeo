@@ -23,6 +23,15 @@
     <string name="route_detail_set_all_wait_title">"Set wait time for all waypoints"</string>
     <string name="route_detail_randomize_order">"Randomize order"</string>
     <string name="route_detail_randomize_order_description">"Jump to waypoints in random order. Reshuffled at each loop restart."</string>
+    <string name="routes_screen_title">"Routes"</string>
+    <string name="route_detail_route_details">"Route Details"</string>
+    <string name="route_creator_create_route">"Create Route"</string>
+    <string name="route_creator_jump_to_favorite">"Jump to Favorite"</string>
+    <string name="routes_screen_no_routes_yet">"No routes yet"</string>
+    <string name="routes_screen_draw_on_map">"Draw on map"</string>
+    <string name="routes_screen_draw_on_map_follow_roads">"Draw on map (follow roads)"</string>
+    <string name="routes_screen_draw_on_map_teleport">"Draw on map (teleport)"</string>
+    <string name="routes_screen_import_gpx_file">"Import GPX file"</string>
     <string name="routes_screen_sort">"Sort"</string>
     <string name="routes_screen_add_route_cd">"Add route"</string>
     <string name="routes_screen_draw_a_route">"Draw a route"</string>

@@ -46,7 +46,7 @@ internal fun SettingsRoamingSubScreen(
     snackbarHost: @Composable () -> Unit,
 ) {
     LjScaffold(
-        title = "Roaming",
+        title = stringResource(R.string.settings_roaming_roaming),
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -113,7 +113,15 @@ private fun RoamingSection(
                 onAction(SettingsAction.UpdateRoamingDefaults(roamingDefaults.copy(radiusMeters = meters.coerceIn(1_000.0, 100_000.0))))
             }
         },
-        label = { Text(if (isMph) "Radius (mi)" else "Radius (m)") },
+        label = {
+            Text(
+                if (isMph) {
+                    stringResource(R.string.settings_roaming_radius_mi)
+                } else {
+                    stringResource(R.string.settings_roaming_radius_m)
+                },
+            )
+        },
         keyboardOptions = KeyboardOptions(keyboardType = if (isMph) KeyboardType.Decimal else KeyboardType.Number),
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
@@ -139,7 +147,15 @@ private fun RoamingSection(
                 onAction(SettingsAction.UpdateRoamingDefaults(roamingDefaults.copy(distanceMeters = meters.coerceIn(50.0, 50_000.0))))
             }
         },
-        label = { Text(if (isMph) "Route distance (mi)" else "Route distance (m)") },
+        label = {
+            Text(
+                if (isMph) {
+                    stringResource(R.string.settings_roaming_route_distance_mi)
+                } else {
+                    stringResource(R.string.settings_roaming_route_distance_m)
+                },
+            )
+        },
         keyboardOptions = KeyboardOptions(keyboardType = if (isMph) KeyboardType.Decimal else KeyboardType.Number),
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
@@ -152,11 +168,11 @@ private fun RoamingSection(
     LjSegmentedControl(
         options =
             listOf(
-                "slow_walk" to "Slow Walk",
-                "walk" to "Walk",
-                "run" to "Run",
-                "bike" to "Bike",
-                "drive" to "Drive",
+                "slow_walk" to stringResource(R.string.settings_roaming_profile_slow_walk),
+                "walk" to stringResource(R.string.settings_roaming_profile_walk),
+                "run" to stringResource(R.string.settings_roaming_profile_run),
+                "bike" to stringResource(R.string.settings_roaming_profile_bike),
+                "drive" to stringResource(R.string.settings_roaming_profile_drive),
             ),
         selected = roamingDefaults.speedProfileId,
         onSelect = { onAction(SettingsAction.UpdateRoamingDefaults(roamingDefaults.copy(speedProfileId = it))) },
@@ -166,13 +182,13 @@ private fun RoamingSection(
     LjCheckboxRow(
         checked = roamingDefaults.followRoads,
         onCheckedChange = { onAction(SettingsAction.UpdateRoamingDefaults(roamingDefaults.copy(followRoads = it))) },
-        title = "Follow roads",
-        description = "Follows actual roads and paths instead of cutting straight across. May not be available in all areas.",
+        title = stringResource(R.string.settings_roaming_follow_roads),
+        description = stringResource(R.string.settings_roaming_follow_roads_desc),
     )
     LjCheckboxRow(
         checked = roamingDefaults.returnToInitialLocation,
         onCheckedChange = { onAction(SettingsAction.UpdateRoamingDefaults(roamingDefaults.copy(returnToInitialLocation = it))) },
-        title = "Return to start",
-        description = "Walks back to the starting position after the roaming session completes.",
+        title = stringResource(R.string.settings_roaming_return_to_start),
+        description = stringResource(R.string.settings_roaming_return_to_start_desc),
     )
 }

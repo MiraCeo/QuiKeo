@@ -39,20 +39,20 @@ fun LjRouteStartOptions(
 ) {
     Column {
         LjCheckboxRow(
-            title = "Loop",
+            title = stringResource(R.string.route_start_options_loop),
             checked = loop,
             enabled = !returnToLocation,
             onCheckedChange = onLoopChange,
             textColor = textColor,
         )
         LjCheckboxRow(
-            title = "Reverse",
+            title = stringResource(R.string.route_start_options_reverse),
             checked = reverse,
             onCheckedChange = onReverseChange,
             textColor = textColor,
         )
         LjCheckboxRow(
-            title = "Return to location",
+            title = stringResource(R.string.route_start_options_return_to_location),
             checked = returnToLocation,
             enabled = !loop,
             onCheckedChange = onReturnToLocationChange,
@@ -60,7 +60,7 @@ fun LjRouteStartOptions(
         )
         if (!isTeleportRoute) {
             LjCheckboxRow(
-                title = "Follow roads",
+                title = stringResource(R.string.route_start_options_follow_roads),
                 checked = followRoads,
                 onCheckedChange = onFollowRoadsChange,
                 textColor = textColor,

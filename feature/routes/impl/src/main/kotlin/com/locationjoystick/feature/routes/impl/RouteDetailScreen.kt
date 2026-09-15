@@ -223,7 +223,7 @@ fun RouteDetailScreen(
     }
 
     LjScaffold(
-        title = "Route Details",
+        title = stringResource(R.string.route_detail_route_details),
         isSpoofing = spoofToggle.isSpoofing,
         onToggleSpoofing = spoofToggle.onToggle,
         locationLabel = spoofToggle.locationLabel,

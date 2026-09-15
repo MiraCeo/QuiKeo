@@ -180,7 +180,7 @@ internal fun RouteCreatorScreen(
     }
 
     LjScaffold(
-        title = "Create Route",
+        title = stringResource(R.string.route_creator_create_route),
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -386,7 +386,7 @@ private fun CreatorFavoritesSheet(
 ) {
     ModalBottomSheet(onDismissRequest = onDismiss) {
         FavoritesList(
-            title = "Jump to Favorite",
+            title = stringResource(R.string.route_creator_jump_to_favorite),
             favorites = favorites,
             onSelect = { onSelect(it.position) },
         )

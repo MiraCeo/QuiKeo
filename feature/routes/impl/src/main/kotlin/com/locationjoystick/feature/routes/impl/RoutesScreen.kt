@@ -153,7 +153,7 @@ internal fun RoutesScreen(
     var showAddOptionsSheet by remember { mutableStateOf(false) }
 
     LjScaffold(
-        title = "Routes",
+        title = stringResource(R.string.routes_screen_title),
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -192,7 +192,7 @@ internal fun RoutesScreen(
                 uiState.routes.isEmpty() -> {
                     EmptyState(
                         icon = LjIcons.PlayArrow,
-                        message = "No routes yet",
+                        message = stringResource(R.string.routes_screen_no_routes_yet),
                         modifier = Modifier.align(Alignment.Center),
                         action = {
                             LjButton(onClick = { showAddOptionsSheet = true }) {
@@ -256,7 +256,7 @@ internal fun RoutesScreen(
                 Spacer(Modifier.height(12.dp))
                 LjActionSheetRow(
                     icon = LjIcons.Map,
-                    title = "Draw on map",
+                    title = stringResource(R.string.routes_screen_draw_on_map),
                     onClick = {
                         showAddOptionsSheet = false
                         onNavigateToCreate(RouteType.STRAIGHT)
@@ -264,7 +264,7 @@ internal fun RoutesScreen(
                 )
                 LjActionSheetRow(
                     icon = LjIcons.Map,
-                    title = "Draw on map (follow roads)",
+                    title = stringResource(R.string.routes_screen_draw_on_map_follow_roads),
                     onClick = {
                         showAddOptionsSheet = false
                         onNavigateToCreate(RouteType.GUIDED)
@@ -272,7 +272,7 @@ internal fun RoutesScreen(
                 )
                 LjActionSheetRow(
                     icon = LjIcons.Map,
-                    title = "Draw on map (teleport)",
+                    title = stringResource(R.string.routes_screen_draw_on_map_teleport),
                     onClick = {
                         showAddOptionsSheet = false
                         onNavigateToCreate(RouteType.TELEPORT)
@@ -280,7 +280,7 @@ internal fun RoutesScreen(
                 )
                 LjActionSheetRow(
                     icon = LjIcons.FileDownload,
-                    title = "Import GPX file",
+                    title = stringResource(R.string.routes_screen_import_gpx_file),
                     onClick = {
                         showAddOptionsSheet = false
                         onImportGpx()

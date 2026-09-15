@@ -176,7 +176,11 @@ private fun WhatsNewDialog(
                     ) {
                         loadState.groups.forEach { categoryGroup ->
                             Text(
-                                categoryGroup.label,
+                                when (categoryGroup.category) {
+                                    "feat" -> stringResource(R.string.whats_new_new_and_improved)
+                                    "fix" -> stringResource(R.string.whats_new_fixes)
+                                    else -> categoryGroup.category
+                                },
                                 style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.primary,
                             )

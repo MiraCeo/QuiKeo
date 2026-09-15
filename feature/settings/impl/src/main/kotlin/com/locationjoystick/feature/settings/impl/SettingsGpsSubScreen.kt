@@ -49,7 +49,7 @@ internal fun SettingsGpsSubScreen(
     snackbarHost: @Composable () -> Unit,
 ) {
     LjScaffold(
-        title = "Movement & GPS",
+        title = stringResource(R.string.settings_gps_movement_and_gps),
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -91,8 +91,8 @@ internal fun SettingsGpsSubScreen(
                         LjCheckboxRow(
                             checked = uiState.rememberLastLocation,
                             onCheckedChange = { onAction(SettingsAction.SetRememberLastLocation(it)) },
-                            title = "Remember last location",
-                            description = "Restores your last set position when the app restarts.",
+                            title = stringResource(R.string.settings_gps_remember_last_location),
+                            description = stringResource(R.string.settings_gps_remember_last_location_desc),
                         )
                     }
                 }
@@ -121,7 +121,11 @@ private fun SpeedProfilesSection(
     ) {
         Text(stringResource(R.string.settings_gps_unit), modifier = Modifier.weight(0.3f))
         LjSegmentedControl(
-            options = listOf(SpeedUnit.KMH to "km/h", SpeedUnit.MPH to "mph"),
+            options =
+                listOf(
+                    SpeedUnit.KMH to stringResource(R.string.settings_gps_unit_kmh),
+                    SpeedUnit.MPH to stringResource(R.string.settings_gps_unit_mph),
+                ),
             selected = uiState.speedUnit,
             onSelect = { onAction(SettingsAction.SetSpeedUnit(it)) },
             modifier = Modifier.weight(0.7f),
@@ -137,7 +141,12 @@ private fun SpeedProfilesSection(
             label = profile.name,
             displaySpeed = convertMsToDisplay(speedMs, uiState.speedUnit),
             onSpeedChange = { onAction(SettingsAction.SetSpeed(profile.id, it)) },
-            unit = if (uiState.speedUnit == SpeedUnit.KMH) "km/h" else "mph",
+            unit =
+                if (uiState.speedUnit == SpeedUnit.KMH) {
+                    stringResource(R.string.settings_gps_unit_kmh)
+                } else {
+                    stringResource(R.string.settings_gps_unit_mph)
+                },
         )
         if (speedMs > AppConstants.ProfileConstants.ANTI_CHEAT_WARNING_THRESHOLD_MS) AntiCheatWarning()
         if (index != profiles.lastIndex) Spacer(modifier = Modifier.height(8.dp))

@@ -2,6 +2,8 @@ package com.locationjoystick.app
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.locationjoystick.app.R
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.component.DestinationCardSpec
 import com.locationjoystick.core.designsystem.component.DestinationHub
@@ -23,7 +25,7 @@ internal fun IdleScreen(
     val spoofToggle = rememberSpoofToggleState()
 
     LjScaffold(
-        title = "Home",
+        title = stringResource(R.string.drawer_home),
         isSpoofing = spoofToggle.isSpoofing,
         onToggleSpoofing = spoofToggle.onToggle,
         locationLabel = spoofToggle.locationLabel,
@@ -37,27 +39,32 @@ internal fun IdleScreen(
                 listOf(
                     DestinationCardSpec(
                         LjIcons.Map,
-                        "Map",
-                        "Spoof your GPS location and control movement on the map.",
+                        stringResource(R.string.drawer_map),
+                        stringResource(R.string.idle_map_description),
                         onNavigateToMap,
                     ),
-                    DestinationCardSpec(LjIcons.Route, "Routes", "Replay saved routes.", onNavigateToRoutes),
+                    DestinationCardSpec(
+                        LjIcons.Route,
+                        stringResource(R.string.drawer_routes),
+                        stringResource(R.string.idle_routes_description),
+                        onNavigateToRoutes,
+                    ),
                     DestinationCardSpec(
                         LjIcons.Favorite,
-                        "Favorites",
-                        "Teleport or walk to saved locations.",
+                        stringResource(R.string.drawer_favorites),
+                        stringResource(R.string.idle_favorites_description),
                         onNavigateToFavorites,
                     ),
                     DestinationCardSpec(
                         LjIcons.Share,
-                        "Group Sync",
-                        "Mirror your location to other devices on the same Wi-Fi.",
+                        stringResource(R.string.drawer_group_sync),
+                        stringResource(R.string.idle_group_sync_description),
                         onNavigateToGroup,
                     ),
                     DestinationCardSpec(
                         LjIcons.Settings,
-                        "Settings",
-                        "Configure locationjoystick and spoof preferences.",
+                        stringResource(R.string.drawer_settings),
+                        stringResource(R.string.idle_settings_description),
                         onNavigateToSettings,
                     ),
                 ),

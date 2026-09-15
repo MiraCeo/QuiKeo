@@ -32,20 +32,20 @@ data class WhatsNewScopeGroup(
 )
 
 data class WhatsNewCategoryGroup(
-    val label: String,
+    val category: String,
     val scopeGroups: List<WhatsNewScopeGroup>,
 )
 
 /** feat before fix, empty categories omitted; scopes alphabetical within a category. */
 fun groupWhatsNewEntries(entries: List<WhatsNewEntry>): List<WhatsNewCategoryGroup> {
     val byCategory = entries.groupBy { it.category }
-    return listOf("feat" to "New & Improved", "fix" to "Fixes").mapNotNull { (category, label) ->
+    return listOf("feat", "fix").mapNotNull { category ->
         val inCategory = byCategory[category].orEmpty()
         if (inCategory.isEmpty()) {
             null
         } else {
             WhatsNewCategoryGroup(
-                label = label,
+                category = category,
                 scopeGroups =
                     inCategory
                         .groupBy { it.scope }

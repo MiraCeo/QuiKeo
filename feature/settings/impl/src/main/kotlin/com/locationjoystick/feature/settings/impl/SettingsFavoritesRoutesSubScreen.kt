@@ -38,7 +38,7 @@ internal fun SettingsFavoritesRoutesSubScreen(
     snackbarHost: @Composable () -> Unit,
 ) {
     LjScaffold(
-        title = "Favorites & Routes",
+        title = stringResource(R.string.settings_favorites_routes_title),
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -91,13 +91,13 @@ private fun FavoritesSection(
     LjCheckboxRow(
         checked = uiState.hotLocationsEnabled,
         onCheckedChange = { onAction(SettingsAction.SetHotLocationsEnabled(it)) },
-        title = "Show hot locations",
-        description = "Adds a curated list of popular locations to your favorites. Select which ones to include below.",
+        title = stringResource(R.string.settings_favorites_routes_show_hot_locations),
+        description = stringResource(R.string.settings_favorites_routes_show_hot_locations_desc),
     )
     if (uiState.hotLocationsEnabled && hotLocationTree.allIds.isNotEmpty()) {
         Spacer(modifier = Modifier.height(8.dp))
         HotItemTreeSection(
-            headerLabel = "Locations",
+            headerLabel = stringResource(R.string.settings_favorites_routes_locations),
             tree = hotLocationTree,
             selectedIds = uiState.selectedHotLocationIds,
             onSelectionChange = { onAction(SettingsAction.SetSelectedHotLocationIds(it)) },
@@ -122,13 +122,13 @@ private fun RoutesSection(
     LjCheckboxRow(
         checked = uiState.hotRoutesEnabled,
         onCheckedChange = { onAction(SettingsAction.SetHotRoutesEnabled(it)) },
-        title = "Show hot routes",
-        description = "Adds a curated set of pre-built routes to your routes list. Select which ones to include below.",
+        title = stringResource(R.string.settings_favorites_routes_show_hot_routes),
+        description = stringResource(R.string.settings_favorites_routes_show_hot_routes_desc),
     )
     if (uiState.hotRoutesEnabled && hotRouteTree.allIds.isNotEmpty()) {
         Spacer(modifier = Modifier.height(8.dp))
         HotItemTreeSection(
-            headerLabel = "Routes",
+            headerLabel = stringResource(R.string.settings_favorites_routes_routes),
             tree = hotRouteTree,
             selectedIds = uiState.selectedHotRouteIds,
             onSelectionChange = { onAction(SettingsAction.SetSelectedHotRouteIds(it)) },

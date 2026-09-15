@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="onboarding_set_up_locationjoystick">"Set up locationjoystick"</string>
-    <string name="onboarding_complete_the_steps_below_to_start">"Complete the steps below to start simulating your GPS location."</string>
-    <string name="onboarding_no_account_or_login_needed_everything">"No account or login needed — everything stays on your device."</string>
+    <string name="onboarding_complete_the_steps_below_to_start">"Complete the steps below to get started."</string>
     <string name="onboarding_trouble_setting_up">"Trouble setting up?"</string>
     <string name="onboarding_getting_started">"Getting Started"</string>
     <string name="onboarding_separator_dot">"·"</string>
@@ -13,4 +12,16 @@
     <string name="onboarding_version">"v%1$s"</string>
     <string name="onboarding_skip_anyway">"Skip anyway"</string>
     <string name="onboarding_cancel">"Cancel"</string>
+    <string name="onboarding_step_x_of_3">"Step %1$d of 3"</string>
+    <string name="onboarding_location_permission">"Location permission"</string>
+    <string name="onboarding_location_permission_desc">"Required to read your real position for map centering and route recording."</string>
+    <string name="onboarding_grant_permission">"Grant Permission"</string>
+    <string name="onboarding_display_over_other_apps">"Display over other apps"</string>
+    <string name="onboarding_display_over_other_apps_desc">"Required for the floating joystick and quick-access widget while other apps are open."</string>
+    <string name="onboarding_open_settings">"Open Settings"</string>
+    <string name="onboarding_set_as_fake_gps_app">"Set as fake GPS app"</string>
+    <string name="onboarding_set_as_fake_gps_app_desc">"In Developer Options, find 'Select mock location app' and choose locationjoystick. This lets the app replace your real GPS. If you installed the app inside a work profile (e.g. via Shelter), pick it from Developer Options in that same profile — Android won't let a different profile select it."</string>
+    <string name="onboarding_open_developer_options">"Open Developer Options"</string>
+    <string name="onboarding_skip">"Skip"</string>
+    <string name="onboarding_start_using_locationjoystick">"Start using locationjoystick"</string>
 </resources>

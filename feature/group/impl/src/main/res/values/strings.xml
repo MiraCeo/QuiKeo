@@ -30,4 +30,18 @@
     <string name="group_sync_code_must_be_characters">"Code must be %1$d characters"</string>
     <string name="group_sync_no_group_found_for_code">"No group found for code %1$s"</string>
     <string name="group_sync_invalid_group_qr_code">"Invalid group QR code"</string>
+    <string name="group_sync_unknown">"Unknown"</string>
+    <string name="group_sync_sharing">"Sharing"</string>
+    <string name="group_sync_sends_your_location_to_followers">"Sends your location to followers."</string>
+    <string name="group_sync_follow_leader">"Follow leader"</string>
+    <string name="group_sync_walks_toward_the_leaders_location">"Walks toward the leader's location."</string>
+    <string name="group_sync_connected_to_group">"Connected to group %1$s"</string>
+    <plurals name="group_sync_followers_connected">
+        <item quantity="one">"%1$d follower connected"</item>
+        <item quantity="other">"%1$d followers connected"</item>
+    </plurals>
+    <plurals name="group_sync_followers_in_group">
+        <item quantity="one">"%1$d follower in this group"</item>
+        <item quantity="other">"%1$d followers in this group"</item>
+    </plurals>
 </resources>

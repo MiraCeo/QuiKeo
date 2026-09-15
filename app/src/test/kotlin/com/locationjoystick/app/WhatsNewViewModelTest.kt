@@ -13,14 +13,14 @@ class WhatsNewViewModelTest {
                 WhatsNewEntry("feat", "General", "a feature"),
             )
         val groups = groupWhatsNewEntries(entries)
-        assertEquals(listOf("New & Improved", "Fixes"), groups.map { it.label })
+        assertEquals(listOf("feat", "fix"), groups.map { it.category })
     }
 
     @Test
     fun `category with zero entries is omitted entirely`() {
         val entries = listOf(WhatsNewEntry("feat", "General", "a feature"))
         val groups = groupWhatsNewEntries(entries)
-        assertEquals(listOf("New & Improved"), groups.map { it.label })
+        assertEquals(listOf("feat"), groups.map { it.category })
     }
 
     @Test

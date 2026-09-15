@@ -119,13 +119,23 @@ internal fun GpsJitterSection(
         JitterInput(
             value = if (isMph) uiState.jitterIdleRadiusMeters * 3.28084 else uiState.jitterIdleRadiusMeters,
             onValueChange = { onAction(SettingsAction.SetJitterIdleRadius(if (isMph) it / 3.28084 else it)) },
-            label = if (isMph) "Wobble when still (ft)" else "Wobble when still (m)",
+            label =
+                if (isMph) {
+                    stringResource(R.string.settings_gps_section_wobble_when_still_ft)
+                } else {
+                    stringResource(R.string.settings_gps_section_wobble_when_still_m)
+                },
             modifier = Modifier.weight(1f),
         )
         JitterInput(
             value = if (isMph) uiState.jitterMovingRadiusMeters * 3.28084 else uiState.jitterMovingRadiusMeters,
             onValueChange = { onAction(SettingsAction.SetJitterMovingRadius(if (isMph) it / 3.28084 else it)) },
-            label = if (isMph) "Wobble while moving (ft)" else "Wobble while moving (m)",
+            label =
+                if (isMph) {
+                    stringResource(R.string.settings_gps_section_wobble_while_moving_ft)
+                } else {
+                    stringResource(R.string.settings_gps_section_wobble_while_moving_m)
+                },
             modifier = Modifier.weight(1f),
         )
     }
@@ -133,7 +143,7 @@ internal fun GpsJitterSection(
     JitterInput(
         value = uiState.jitterMaxStepMeters,
         onValueChange = { onAction(SettingsAction.SetJitterMaxStepMeters(it)) },
-        label = "Max step per tick (m)",
+        label = stringResource(R.string.settings_gps_section_max_step_per_tick_m),
         modifier = Modifier.fillMaxWidth(),
     )
     Spacer(modifier = Modifier.height(8.dp))
@@ -143,13 +153,13 @@ internal fun GpsJitterSection(
         JitterInput(
             value = uiState.jitterSpeedIdleVariationPct.toDouble(),
             onValueChange = { onAction(SettingsAction.SetJitterSpeedIdleVariationPct(it.toInt())) },
-            label = "Speed wobble when still (%)",
+            label = stringResource(R.string.settings_gps_section_speed_wobble_when_still_pct),
             modifier = Modifier.weight(1f),
         )
         JitterInput(
             value = uiState.jitterSpeedMovingVariationPct.toDouble(),
             onValueChange = { onAction(SettingsAction.SetJitterSpeedMovingVariationPct(it.toInt())) },
-            label = "Speed wobble while moving (%)",
+            label = stringResource(R.string.settings_gps_section_speed_wobble_while_moving_pct),
             modifier = Modifier.weight(1f),
         )
     }
@@ -157,7 +167,7 @@ internal fun GpsJitterSection(
     JitterInput(
         value = uiState.jitterSpeedIdleWobbleProbabilityPct,
         onValueChange = { onAction(SettingsAction.SetJitterSpeedIdleWobbleProbabilityPct(it)) },
-        label = "Idle wobble frequency (%)",
+        label = stringResource(R.string.settings_gps_section_idle_wobble_frequency_pct),
         modifier = Modifier.fillMaxWidth(),
     )
 }
@@ -179,24 +189,25 @@ internal fun GpsRealismSection(
     LjCheckboxRow(
         checked = uiState.realismBearingHoldIdle,
         onCheckedChange = { onAction(SettingsAction.SetRealismBearingHoldIdle(it)) },
-        title = "Hold bearing when stationary",
-        description =
-            "Keeps the last known direction when you stop moving instead of snapping to 0° (north). " +
-                "Real GPS chips do the same — a sudden reset to north is a common mock-location tell.",
+        title = stringResource(R.string.settings_gps_section_hold_bearing_when_stationary),
+        description = stringResource(R.string.settings_gps_section_hold_bearing_when_stationary_desc),
     )
     LjCheckboxRow(
         checked = uiState.realismAltitudeEnabled,
         onCheckedChange = { onAction(SettingsAction.SetRealismAltitudeEnabled(it)) },
-        title = "Vary altitude",
-        description =
-            "Simulates a plausible altitude with small random drift instead of always reporting 0 m. " +
-                "A flat zero altitude is an obvious signal that the location is synthetic.",
+        title = stringResource(R.string.settings_gps_section_vary_altitude),
+        description = stringResource(R.string.settings_gps_section_vary_altitude_desc),
     )
     if (uiState.realismAltitudeEnabled) {
         JitterInput(
             value = if (isMph) uiState.altitudeJitterRadiusMeters * 3.28084 else uiState.altitudeJitterRadiusMeters,
             onValueChange = { onAction(SettingsAction.SetAltitudeJitterRadius(if (isMph) it / 3.28084 else it)) },
-            label = if (isMph) "Vary altitude (ft)" else "Vary altitude (m)",
+            label =
+                if (isMph) {
+                    stringResource(R.string.settings_gps_section_vary_altitude_ft)
+                } else {
+                    stringResource(R.string.settings_gps_section_vary_altitude_m)
+                },
             modifier = Modifier.fillMaxWidth().padding(start = 40.dp),
         )
         Spacer(modifier = Modifier.height(4.dp))
@@ -204,11 +215,8 @@ internal fun GpsRealismSection(
     LjCheckboxRow(
         checked = uiState.realismRealElevationEnabled,
         onCheckedChange = { onAction(SettingsAction.SetRealismRealElevationEnabled(it)) },
-        title = "Use real-world elevation",
-        description =
-            "Looks up the actual ground elevation at your spoofed location every minute while spoofing, " +
-                "instead of a fixed ~35 m. Requires an internet connection; pauses automatically while an " +
-                "altitude override is active (floating widget), and falls back to the fixed value if the lookup fails.",
+        title = stringResource(R.string.settings_gps_section_use_real_world_elevation),
+        description = stringResource(R.string.settings_gps_section_use_real_world_elevation_desc),
     )
     Spacer(modifier = Modifier.height(4.dp))
     LjButton(
@@ -226,27 +234,19 @@ internal fun GpsRealismSection(
     LjCheckboxRow(
         checked = uiState.realismWarmupEnabled,
         onCheckedChange = { onAction(SettingsAction.SetRealismWarmupEnabled(it)) },
-        title = "GPS warm-up simulation",
-        description =
-            "Starts each session with slightly inaccurate readings that improve over ~30 seconds, " +
-                "like a real GPS that takes time to lock on. " +
-                "Off by default because it temporarily reduces location precision at session start.",
+        title = stringResource(R.string.settings_gps_section_gps_warm_up_simulation),
+        description = stringResource(R.string.settings_gps_section_gps_warm_up_simulation_desc),
     )
     LjCheckboxRow(
         checked = uiState.realismSatelliteExtrasEnabled,
         onCheckedChange = { onAction(SettingsAction.SetRealismSatelliteExtrasEnabled(it)) },
-        title = "Realistic satellite count",
-        description =
-            "Attaches satellite metadata to each update (7–14 satellites visible, 6–12 in fix) instead of zero. " +
-                "Some apps check for zero satellites as a spoofing signal.",
+        title = stringResource(R.string.settings_gps_section_realistic_satellite_count),
+        description = stringResource(R.string.settings_gps_section_realistic_satellite_count_desc),
     )
     LjCheckboxRow(
         checked = uiState.realismSuspendedMockingEnabled,
         onCheckedChange = { onAction(SettingsAction.SetRealismSuspendedMockingEnabled(it)) },
-        title = "Simulate signal dropouts",
-        description =
-            "Briefly pauses the fake location signal every ~10 seconds, like a real GPS dropping signal momentarily. " +
-                "Off by default — the pauses cause visible freezes in most apps. " +
-                "Skipped automatically during route replay.",
+        title = stringResource(R.string.settings_gps_section_simulate_signal_dropouts),
+        description = stringResource(R.string.settings_gps_section_simulate_signal_dropouts_desc),
     )
 }

@@ -39,7 +39,6 @@ import com.locationjoystick.core.model.SpeedUnit
 import kotlin.math.roundToInt
 
 private val SPEED_PROFILES = listOf("walk", "run", "bike")
-private val SPEED_PROFILE_LABELS = mapOf("walk" to "Walk", "run" to "Run", "bike" to "Bike")
 
 private const val RADIUS_MIN_METERS = 1_000.0
 private const val RADIUS_MAX_METERS = 100_000.0
@@ -127,7 +126,15 @@ fun RoamingSheetContent(
                         )
                     }
                 },
-                label = { Text(if (isMph) "Radius (mi)" else "Radius (m)") },
+                label = {
+                    Text(
+                        if (isMph) {
+                            stringResource(R.string.roaming_sheet_radius_mi)
+                        } else {
+                            stringResource(R.string.roaming_sheet_radius_m)
+                        },
+                    )
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 modifier = Modifier.weight(1f).padding(end = LjSpacing.xs),
@@ -149,7 +156,15 @@ fun RoamingSheetContent(
                         )
                     }
                 },
-                label = { Text(if (isMph) "Distance (mi)" else "Distance (m)") },
+                label = {
+                    Text(
+                        if (isMph) {
+                            stringResource(R.string.roaming_sheet_distance_mi)
+                        } else {
+                            stringResource(R.string.roaming_sheet_distance_m)
+                        },
+                    )
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 modifier = Modifier.weight(1f).padding(start = LjSpacing.xs),
@@ -168,7 +183,14 @@ fun RoamingSheetContent(
                     onClick = { onDraftChange(draft.copy(speedProfileId = id)) },
                     shape = SegmentedButtonDefaults.itemShape(index = index, count = SPEED_PROFILES.size),
                 ) {
-                    Text(SPEED_PROFILE_LABELS[id] ?: id)
+                    Text(
+                        when (id) {
+                            "walk" -> stringResource(R.string.roaming_sheet_profile_walk)
+                            "run" -> stringResource(R.string.roaming_sheet_profile_run)
+                            "bike" -> stringResource(R.string.roaming_sheet_profile_bike)
+                            else -> id
+                        },
+                    )
                 }
             }
         }

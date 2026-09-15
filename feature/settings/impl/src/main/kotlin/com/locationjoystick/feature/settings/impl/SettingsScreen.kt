@@ -92,13 +92,14 @@ fun SettingsRoute(
     var showResetConfirm by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val reportActionLabel = stringResource(R.string.settings_hub_report)
     LaunchedEffect(Unit) {
         viewModel.userFeedback.collect { feedback ->
             if (feedback.isError) {
                 val result =
                     snackbarHostState.showSnackbar(
                         message = feedback.message,
-                        actionLabel = "Report",
+                        actionLabel = reportActionLabel,
                         duration = androidx.compose.material3.SnackbarDuration.Long,
                     )
                 if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
@@ -629,7 +630,7 @@ private fun SettingsHubScreen(
     snackbarHost: @Composable () -> Unit,
 ) {
     LjScaffold(
-        title = "Settings",
+        title = stringResource(R.string.settings_hub_settings),
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -638,7 +639,7 @@ private fun SettingsHubScreen(
         snackbarHost = snackbarHost,
         actions = {
             LjOverflowMenu { dismiss ->
-                LjOverflowMenuSectionLabel("Export", showDivider = false)
+                LjOverflowMenuSectionLabel(stringResource(R.string.settings_hub_export), showDivider = false)
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.settings_export_via_qr_code)) },
                     onClick = {
@@ -653,7 +654,7 @@ private fun SettingsHubScreen(
                         onAction(SettingsAction.Export)
                     },
                 )
-                LjOverflowMenuSectionLabel("Import")
+                LjOverflowMenuSectionLabel(stringResource(R.string.settings_hub_import))
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.settings_import_from_qr_code)) },
                     onClick = {
@@ -689,7 +690,7 @@ private fun SettingsHubScreen(
                         onAction(SettingsAction.ImportYamla)
                     },
                 )
-                LjOverflowMenuSectionLabel("Danger")
+                LjOverflowMenuSectionLabel(stringResource(R.string.settings_hub_danger))
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.settings_reset_all_data), color = MaterialTheme.colorScheme.error) },
                     leadingIcon = { Icon(LjIcons.Delete, null, tint = MaterialTheme.colorScheme.error) },
@@ -708,28 +709,26 @@ private fun SettingsHubScreen(
                 listOf(
                     DestinationCardSpec(
                         icon = LjIcons.Speed,
-                        title = "Movement & GPS",
-                        description = "Speed presets, signal realism, and location randomness for all movement modes.",
+                        title = stringResource(R.string.settings_hub_movement_and_gps),
+                        description = stringResource(R.string.settings_hub_movement_and_gps_desc),
                         onClick = { onNavigate(SettingsSection.GPS) },
                     ),
                     DestinationCardSpec(
                         icon = LjIcons.Joystick,
-                        title = "Menus",
-                        description =
-                            "Which features appear in the floating widget and map buttons, " +
-                                "and how to trigger walks by tapping.",
+                        title = stringResource(R.string.settings_hub_menus),
+                        description = stringResource(R.string.settings_hub_menus_desc),
                         onClick = { onNavigate(SettingsSection.MENUS) },
                     ),
                     DestinationCardSpec(
                         icon = LjIcons.Favorite,
-                        title = "Favorites & Routes",
-                        description = "Curated hot locations and pre-built routes to populate your library.",
+                        title = stringResource(R.string.settings_hub_favorites_and_routes),
+                        description = stringResource(R.string.settings_hub_favorites_and_routes_desc),
                         onClick = { onNavigate(SettingsSection.FAVORITES_ROUTES) },
                     ),
                     DestinationCardSpec(
                         icon = LjIcons.Explore,
-                        title = "Roaming",
-                        description = "Default area, distance, speed, and routing style for random walks.",
+                        title = stringResource(R.string.settings_hub_roaming),
+                        description = stringResource(R.string.settings_hub_roaming_desc),
                         onClick = { onNavigate(SettingsSection.ROAMING) },
                     ),
                 ),

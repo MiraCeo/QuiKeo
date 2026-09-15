@@ -149,7 +149,7 @@ internal fun FavoritesScreen(
     var searchQuery by remember { mutableStateOf("") }
 
     LjScaffold(
-        title = "Favorites",
+        title = stringResource(R.string.favorites_screen_title),
         isSpoofing = isSpoofing,
         onToggleSpoofing = onToggleSpoofing,
         locationLabel = locationLabel,
@@ -208,7 +208,7 @@ internal fun FavoritesScreen(
                     uiState.favorites.isEmpty() -> {
                         EmptyState(
                             icon = LjIcons.LocationOn,
-                            message = "No saved favorites yet",
+                            message = stringResource(R.string.favorites_screen_no_saved_favorites_yet),
                             modifier = Modifier.align(Alignment.Center),
                             action = {
                                 LjButton(onClick = { showAddOptionsSheet = true }) {
@@ -221,7 +221,7 @@ internal fun FavoritesScreen(
                     filteredFavorites.isEmpty() -> {
                         EmptyState(
                             icon = LjIcons.Search,
-                            message = "No favorites match your search",
+                            message = stringResource(R.string.favorites_screen_no_favorites_match_search),
                             modifier = Modifier.align(Alignment.Center),
                         )
                     }
@@ -296,7 +296,7 @@ internal fun FavoritesScreen(
                 Spacer(Modifier.height(12.dp))
                 LjActionSheetRow(
                     icon = LjIcons.Map,
-                    title = "From map",
+                    title = stringResource(R.string.favorites_screen_from_map),
                     onClick = {
                         showAddOptionsSheet = false
                         onNavigateToMapPicker()
@@ -304,7 +304,7 @@ internal fun FavoritesScreen(
                 )
                 LjActionSheetRow(
                     icon = LjIcons.Add,
-                    title = "From coordinates",
+                    title = stringResource(R.string.favorites_screen_from_coordinates),
                     onClick = {
                         showAddOptionsSheet = false
                         prefillLat = ""
@@ -314,7 +314,7 @@ internal fun FavoritesScreen(
                 )
                 LjActionSheetRow(
                     icon = LjIcons.LocationOn,
-                    title = "Use current location",
+                    title = stringResource(R.string.favorites_screen_use_current_location),
                     onClick = {
                         showAddOptionsSheet = false
                         val pos = getCurrentPosition()

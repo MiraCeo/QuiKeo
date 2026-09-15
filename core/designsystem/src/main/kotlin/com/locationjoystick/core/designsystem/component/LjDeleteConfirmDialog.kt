@@ -20,8 +20,8 @@ fun LjDeleteConfirmDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Delete \"$name\"?") },
-        text = { Text("This $itemType will be permanently deleted and cannot be undone.") },
+        title = { Text(stringResource(R.string.delete_confirm_dialog_title, name)) },
+        text = { Text(stringResource(R.string.delete_confirm_dialog_message, itemType)) },
         confirmButton = {
             LjTextButton(onClick = onConfirm) {
                 Text(stringResource(R.string.delete_confirm_dialog_delete), color = MaterialTheme.colorScheme.error)

@@ -175,15 +175,6 @@ internal fun OnboardingScreen(
                 textAlign = TextAlign.Center,
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = stringResource(R.string.onboarding_no_account_or_login_needed_everything),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
-
             Spacer(modifier = Modifier.height(8.dp))
 
             Row(
@@ -236,7 +227,7 @@ internal fun OnboardingScreen(
                 ).count { it }
 
             Text(
-                text = "Step ${grantedStepCount.coerceAtMost(2) + 1} of 3",
+                text = stringResource(R.string.onboarding_step_x_of_3, grantedStepCount.coerceAtMost(2) + 1),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -254,22 +245,22 @@ internal fun OnboardingScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             OnboardingStepCard(
-                title = "Location permission",
-                description = "Required to read your real position for map centering and route recording.",
+                title = stringResource(R.string.onboarding_location_permission),
+                description = stringResource(R.string.onboarding_location_permission_desc),
                 isGranted = uiState.locationPermissionGranted,
                 icon = LjIcons.LocationOn,
-                actionLabel = "Grant Permission",
+                actionLabel = stringResource(R.string.onboarding_grant_permission),
                 onAction = { locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION) },
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
             OnboardingStepCard(
-                title = "Display over other apps",
-                description = "Required for the floating joystick and quick-access widget while other apps are open.",
+                title = stringResource(R.string.onboarding_display_over_other_apps),
+                description = stringResource(R.string.onboarding_display_over_other_apps_desc),
                 isGranted = uiState.overlayPermissionGranted,
                 icon = LjIcons.Layers,
-                actionLabel = "Open Settings",
+                actionLabel = stringResource(R.string.onboarding_open_settings),
                 onAction = {
                     context.startActivity(
                         Intent(
@@ -283,29 +274,25 @@ internal fun OnboardingScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             OnboardingStepCard(
-                title = "Set as fake GPS app",
-                description =
-                    "In Developer Options, find 'Select mock location app' and choose locationjoystick. " +
-                        "This lets the app replace your real GPS. If you installed the app inside a " +
-                        "work profile (e.g. via Shelter), pick it from Developer Options in that same " +
-                        "profile — Android won't let a different profile select it.",
+                title = stringResource(R.string.onboarding_set_as_fake_gps_app),
+                description = stringResource(R.string.onboarding_set_as_fake_gps_app_desc),
                 isGranted = uiState.mockLocationEnabled,
                 icon = LjIcons.DeveloperMode,
-                actionLabel = "Open Developer Options",
+                actionLabel = stringResource(R.string.onboarding_open_developer_options),
                 onAction = {
                     context.startActivity(
                         Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS)
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
                     )
                 },
-                extraActionLabel = "Skip",
+                extraActionLabel = stringResource(R.string.onboarding_skip),
                 onExtraAction = { showSkipMockLocationDialog = true },
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
             LjPrimaryButton(
-                text = "Start using locationjoystick",
+                text = stringResource(R.string.onboarding_start_using_locationjoystick),
                 onClick = onSetupComplete,
                 enabled = uiState.canProceed || uiState.isDebugBuild,
                 modifier = Modifier.fillMaxWidth(),
