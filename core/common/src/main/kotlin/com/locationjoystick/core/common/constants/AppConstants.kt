@@ -415,4 +415,11 @@ object AppConstants {
         /** Random jitter range in milliseconds (±) to avoid thundering herd */
         const val RETRY_JITTER_MS = 100L
     }
+
+    object LocaleConstants {
+        // Deliberately a plain SharedPreferences file, not DataStore: attachBaseContext()
+        // must return synchronously on the main thread, and DataStore reads are Flow-based/async.
+        const val PREFS_NAME = "locale_prefs"
+        const val KEY_LANGUAGE_TAG = "language_tag"
+    }
 }
