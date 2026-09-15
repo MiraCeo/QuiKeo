@@ -41,6 +41,7 @@
     <string name="routes_screen_edit">"Edit"</string>
     <string name="routes_screen_export">"Export"</string>
     <string name="routes_screen_delete">"Delete"</string>
+    <string name="routes_screen_danger">"Danger"</string>
     <string name="routes_screen_start_route">"Start route"</string>
     <string name="route_creator_route_imported">"Route imported: %1$s"</string>
     <string name="route_creator_routes_imported">"%1$d routes imported"</string>

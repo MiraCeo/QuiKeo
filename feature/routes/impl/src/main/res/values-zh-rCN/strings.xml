@@ -41,6 +41,7 @@
     <string name="routes_screen_edit">"编辑"</string>
     <string name="routes_screen_export">"导出"</string>
     <string name="routes_screen_delete">"删除"</string>
+    <string name="routes_screen_danger">"危险操作"</string>
     <string name="routes_screen_start_route">"开始路线"</string>
     <string name="route_creator_route_imported">"已导入路线：%1$s"</string>
     <string name="route_creator_routes_imported">"已导入 %1$d 条路线"</string>

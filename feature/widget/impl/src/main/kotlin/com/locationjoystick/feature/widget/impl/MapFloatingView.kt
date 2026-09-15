@@ -707,7 +707,8 @@ private fun BoxScope.TapActionPanel(
             }.collectAsStateWithLifecycle(initialValue = CooldownState.Ready)
             Spacer(Modifier.height(8.dp))
             CooldownAdvisoryBadge(
-                (cooldownState as? CooldownState.Cooling)?.toAdvisoryLabel() ?: "No wait needed",
+                (cooldownState as? CooldownState.Cooling)?.toAdvisoryLabel()
+                    ?: stringResource(R.string.map_floating_no_wait_needed),
             )
             Spacer(Modifier.height(16.dp))
             if (!hideTeleportFeatures) {

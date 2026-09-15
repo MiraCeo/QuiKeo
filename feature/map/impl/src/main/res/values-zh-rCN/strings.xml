@@ -10,6 +10,7 @@
     <string name="map_sheet_stop_route_and_walk_here">"停止路线并走向此处"</string>
     <string name="map_sheet_finish_route_and_walk_here">"结束路线并走向此处"</string>
     <string name="map_sheet_move_to_this_location">"要移动到该位置吗？"</string>
+    <string name="map_sheet_no_wait_needed">"无需等待"</string>
     <string name="map_sheet_teleport_here">"瞬移到这里"</string>
     <string name="map_sheet_walk_here">"走向这里"</string>
     <string name="map_sheet_walk_via_roads">"沿道路行走"</string>

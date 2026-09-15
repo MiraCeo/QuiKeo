@@ -397,7 +397,7 @@ private fun FavoriteCard(
                         },
                         leadingIcon = { Icon(LjIcons.Share, null) },
                     )
-                    LjOverflowMenuSectionLabel("Danger")
+                    LjOverflowMenuSectionLabel(stringResource(R.string.favorites_screen_danger))
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.favorites_screen_delete), color = MaterialTheme.colorScheme.error) },
                         onClick = {

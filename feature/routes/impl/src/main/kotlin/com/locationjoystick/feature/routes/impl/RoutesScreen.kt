@@ -389,7 +389,7 @@ private fun RouteCard(
                         },
                         leadingIcon = { Icon(LjIcons.FileDownload, contentDescription = null) },
                     )
-                    LjOverflowMenuSectionLabel("Danger")
+                    LjOverflowMenuSectionLabel(stringResource(R.string.routes_screen_danger))
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.routes_screen_delete), color = MaterialTheme.colorScheme.error) },
                         onClick = {

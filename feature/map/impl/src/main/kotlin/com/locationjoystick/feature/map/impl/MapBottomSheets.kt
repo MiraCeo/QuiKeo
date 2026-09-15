@@ -210,7 +210,8 @@ internal fun PendingTapSheet(
                 Text(stringResource(R.string.map_sheet_move_to_this_location), style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(12.dp))
                 CooldownAdvisoryBadge(
-                    (cooldownState as? CooldownState.Cooling)?.toAdvisoryLabel() ?: "No wait needed",
+                    (cooldownState as? CooldownState.Cooling)?.toAdvisoryLabel()
+                        ?: stringResource(R.string.map_sheet_no_wait_needed),
                 )
                 Spacer(Modifier.height(16.dp))
                 if (!hideTeleportFeatures) {
