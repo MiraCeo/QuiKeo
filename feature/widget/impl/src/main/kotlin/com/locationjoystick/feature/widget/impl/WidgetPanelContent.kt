@@ -505,7 +505,7 @@ internal fun FavoritesFloatingView(
     var selectedFavorite by remember { mutableStateOf<FavoriteLocation?>(null) }
 
     FloatingPickerShell(
-        title = selectedFavorite?.name ?: "Favorites",
+        title = selectedFavorite?.name ?: stringResource(R.string.widget_panel_favorites_title),
         onDismiss = onDismiss,
         hasBack = selectedFavorite != null,
         onBack = { selectedFavorite = null },

@@ -51,6 +51,7 @@
     <string name="widget_panel_teleport_to_leader_cd">"Teleport to leader now"</string>
     <string name="widget_panel_altitude_override_cd">"Altitude override"</string>
     <string name="widget_panel_routes_title">"Routes"</string>
+    <string name="widget_panel_favorites_title">"Favorites"</string>
     <string name="widget_feature_show_hide_joystick_cd">"Show/hide joystick"</string>
     <string name="widget_feature_lock_joystick_cd">"Lock joystick position"</string>
     <string name="widget_feature_routes_cd">"Routes picker"</string>

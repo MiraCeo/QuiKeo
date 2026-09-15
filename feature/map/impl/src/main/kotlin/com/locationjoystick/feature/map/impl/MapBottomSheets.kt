@@ -69,7 +69,7 @@ internal fun RoutesPickerSheet(
                         Icon(LjIcons.ArrowBack, contentDescription = stringResource(R.string.map_sheet_back_cd))
                     }
                     Text(
-                        text = route?.name ?: "Start route",
+                        text = route?.name ?: stringResource(R.string.map_bottom_sheets_start_route),
                         style = MaterialTheme.typography.headlineSmall,
                     )
                 }

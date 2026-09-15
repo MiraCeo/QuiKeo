@@ -2,6 +2,7 @@
 <resources>
     <string name="map_screen_title">"地图"</string>
     <string name="map_bottom_sheets_routes">"路线"</string>
+    <string name="map_bottom_sheets_start_route">"开始路线"</string>
     <string name="map_bottom_sheets_favorites">"收藏"</string>
     <string name="map_sheet_back_cd">"返回"</string>
     <string name="map_sheet_route_in_progress">"路线进行中"</string>
