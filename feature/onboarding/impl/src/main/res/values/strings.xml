@@ -8,7 +8,7 @@
     <string name="onboarding_troubleshooting">"Troubleshooting"</string>
     <string name="onboarding_debug_build_permissions_optional">"Debug build — permissions optional"</string>
     <string name="onboarding_skip_this_check">"Skip this check?"</string>
-    <string name="onboarding_most_devices_need_locationjoystick_set_a">"Most devices need locationjoystick set as the mock location app for spoofing to work. Only skip this if you've confirmed mock location works another way — for example, a modified setup that Android doesn't report through this check."</string>
+    <string name="onboarding_most_devices_need_locationjoystick_set_a">"Most devices need locationjoystick set as the mock location app for spoofing to work. Skip only if you've confirmed mock location works another way — for example, a modified setup Android doesn't detect."</string>
     <string name="onboarding_version">"v%1$s"</string>
     <string name="onboarding_skip_anyway">"Skip anyway"</string>
     <string name="onboarding_cancel">"Cancel"</string>
@@ -20,7 +20,7 @@
     <string name="onboarding_display_over_other_apps_desc">"Required for the floating joystick and quick-access widget while other apps are open."</string>
     <string name="onboarding_open_settings">"Open Settings"</string>
     <string name="onboarding_set_as_fake_gps_app">"Set as fake GPS app"</string>
-    <string name="onboarding_set_as_fake_gps_app_desc">"In Developer Options, find 'Select mock location app' and choose locationjoystick. This lets the app replace your real GPS. If you installed the app inside a work profile (e.g. via Shelter), pick it from Developer Options in that same profile — Android won't let a different profile select it."</string>
+    <string name="onboarding_set_as_fake_gps_app_desc">"In Developer Options, find 'Select mock location app' and choose locationjoystick. If you installed the app in a work profile (e.g. via Shelter), open Developer Options in that same profile — Android won't let a different profile select it."</string>
     <string name="onboarding_open_developer_options">"Open Developer Options"</string>
     <string name="onboarding_skip">"Skip"</string>
     <string name="onboarding_start_using_locationjoystick">"Start using locationjoystick"</string>
