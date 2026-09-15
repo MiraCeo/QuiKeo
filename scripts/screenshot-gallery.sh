@@ -266,7 +266,7 @@ clear_field() {
 
 # Wait N seconds with a visible countdown.
 wait_s() {
-  local n="$1" msg="${2:-Waiting}"
+  local n="$1" msg="${2:-Waiting}" i
   for (( i=n; i>0; i-- )); do
     printf "\r  %s… %ds " "$msg" "$i"
     sleep 1
@@ -361,7 +361,7 @@ seed_route_if_needed() {
     wait_s 2 "Placing waypoint 3"
     tap_text "Save route"
     wait_s 1 "Save dialog opening"
-    $ADB shell input text "$name"
+    $ADB shell input text "${name// /%s}"
     wait_s 1
     tap_text_exact "Save"
     wait_s 2 "Saving route"
