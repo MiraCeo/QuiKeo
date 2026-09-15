@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="route_creator_save_route">"Save Route"</string>
+    <string name="route_creator_save_route">"Save route"</string>
     <string name="route_creator_route_name">"Route name"</string>
     <string name="route_creator_save">"Save"</string>
     <string name="route_creator_cancel">"Cancel"</string>
@@ -25,8 +25,8 @@
     <string name="route_detail_randomize_order_description">"Jump to waypoints in random order. Reshuffled at each loop restart."</string>
     <string name="routes_screen_title">"Routes"</string>
     <string name="route_detail_route_details">"Route Details"</string>
-    <string name="route_creator_create_route">"Create Route"</string>
-    <string name="route_creator_jump_to_favorite">"Jump to Favorite"</string>
+    <string name="route_creator_create_route">"Create route"</string>
+    <string name="route_creator_jump_to_favorite">"Jump to favorite"</string>
     <string name="routes_screen_no_routes_yet">"No routes yet"</string>
     <string name="routes_screen_draw_on_map">"Draw on map"</string>
     <string name="routes_screen_draw_on_map_follow_roads">"Draw on map (follow roads)"</string>

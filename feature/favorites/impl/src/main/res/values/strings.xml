@@ -15,15 +15,15 @@
     <string name="favorites_screen_edit">"Edit"</string>
     <string name="favorites_screen_share">"Share"</string>
     <string name="favorites_screen_delete">"Delete"</string>
-    <string name="favorites_screen_add_favorite_location">"Add Favorite Location"</string>
+    <string name="favorites_screen_add_favorite_location">"Add favorite location"</string>
     <string name="common_name">"Name"</string>
     <string name="favorites_screen_latitude">"Latitude"</string>
     <string name="favorites_screen_longitude">"Longitude"</string>
     <string name="common_cancel">"Cancel"</string>
     <string name="common_save">"Save"</string>
-    <string name="favorites_screen_edit_favorite">"Edit Favorite"</string>
+    <string name="favorites_screen_edit_favorite">"Edit favorite"</string>
     <string name="favorites_screen_latitude_2">"Latitude"</string>
     <string name="favorites_screen_longitude_2">"Longitude"</string>
     <string name="map_picker_pick_location">"Pick Location"</string>
-    <string name="map_picker_save_location">"Save Location"</string>
+    <string name="map_picker_save_location">"Save location"</string>
 </resources>
