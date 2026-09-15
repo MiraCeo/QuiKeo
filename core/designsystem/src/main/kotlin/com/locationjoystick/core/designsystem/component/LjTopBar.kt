@@ -104,11 +104,13 @@ fun LjTopBar(
                     val interactionSource = remember { MutableInteractionSource() }
                     val tint = if (isSpoofing) LjError else LjSuccess
                     val spoofToggleCd =
-                        if (isSpoofing) {
-                            stringResource(R.string.top_bar_stop_simulation_cd)
-                        } else {
-                            stringResource(R.string.top_bar_start_simulation_cd)
-                        }
+                        stringResource(
+                            if (isSpoofing) {
+                                R.string.top_bar_stop_simulation_cd
+                            } else {
+                                R.string.top_bar_start_simulation_cd
+                            },
+                        )
                     val spoofToggleLabel =
                         when {
                             isSpoofing -> stringResource(R.string.top_bar_stop)

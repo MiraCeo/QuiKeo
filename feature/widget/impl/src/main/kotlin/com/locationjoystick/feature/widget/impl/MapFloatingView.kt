@@ -402,11 +402,13 @@ internal fun MapFloatingView(
                             LjMapIconButton(
                                 icon = if (isRoutePaused) LjIcons.PlayArrow else LjIcons.Pause,
                                 contentDescription =
-                                    if (isRoutePaused) {
-                                        stringResource(R.string.overlay_resume_route_cd)
-                                    } else {
-                                        stringResource(R.string.overlay_pause_route_cd)
-                                    },
+                                    stringResource(
+                                        if (isRoutePaused) {
+                                            R.string.overlay_resume_route_cd
+                                        } else {
+                                            R.string.overlay_pause_route_cd
+                                        },
+                                    ),
                                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                 onClick = { if (isRoutePaused) onResumeRouteReplay() else onPauseRouteReplay() },
@@ -432,11 +434,13 @@ internal fun MapFloatingView(
                     LjMapIconButton(
                         icon = LjIcons.Route,
                         contentDescription =
-                            if (isRouteReplay) {
-                                stringResource(R.string.overlay_route_active_cd)
-                            } else {
-                                stringResource(R.string.overlay_open_routes_cd)
-                            },
+                            stringResource(
+                                if (isRouteReplay) {
+                                    R.string.overlay_route_active_cd
+                                } else {
+                                    R.string.overlay_open_routes_cd
+                                },
+                            ),
                         containerColor = if (isRouteReplay) LjSuccess else MaterialTheme.colorScheme.primaryContainer,
                         contentColor = if (isRouteReplay) LjBg else MaterialTheme.colorScheme.onPrimaryContainer,
                         onClick = {
@@ -462,11 +466,13 @@ internal fun MapFloatingView(
                         LjMapIconButton(
                             icon = if (isRoamingPaused) LjIcons.PlayArrow else LjIcons.Pause,
                             contentDescription =
-                                if (isRoamingPaused) {
-                                    stringResource(R.string.overlay_resume_roaming_cd)
-                                } else {
-                                    stringResource(R.string.overlay_pause_roaming_cd)
-                                },
+                                stringResource(
+                                    if (isRoamingPaused) {
+                                        R.string.overlay_resume_roaming_cd
+                                    } else {
+                                        R.string.overlay_pause_roaming_cd
+                                    },
+                                ),
                             containerColor = MaterialTheme.colorScheme.surfaceVariant,
                             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             onClick = { if (isRoamingPaused) onResumeRoaming() else onPauseRoaming() },
@@ -476,11 +482,13 @@ internal fun MapFloatingView(
                 LjMapIconButton(
                     icon = LjIcons.Explore,
                     contentDescription =
-                        if (isRoaming) {
-                            stringResource(R.string.overlay_roaming_active_cd)
-                        } else {
-                            stringResource(R.string.overlay_start_roaming_cd)
-                        },
+                        stringResource(
+                            if (isRoaming) {
+                                R.string.overlay_roaming_active_cd
+                            } else {
+                                R.string.overlay_start_roaming_cd
+                            },
+                        ),
                     containerColor = if (isRoaming) LjSuccess else MaterialTheme.colorScheme.tertiaryContainer,
                     contentColor = if (isRoaming) LjBg else MaterialTheme.colorScheme.onTertiaryContainer,
                     onClick = { if (!isRoaming) showRoamingSheet = true },

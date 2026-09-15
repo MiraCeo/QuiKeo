@@ -380,11 +380,13 @@ internal fun MapScreen(
             if (uiState.walkTarget == null && !uiState.isRouteReplay && !uiState.isRoaming) {
                 Text(
                     text =
-                        if (uiState.hideTeleportFeatures) {
-                            stringResource(R.string.map_hint_long_press_to_walk)
-                        } else {
-                            stringResource(R.string.map_hint_tap_to_teleport_long_press)
-                        },
+                        stringResource(
+                            if (uiState.hideTeleportFeatures) {
+                                R.string.map_hint_long_press_to_walk
+                            } else {
+                                R.string.map_hint_tap_to_teleport_long_press
+                            },
+                        ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier =

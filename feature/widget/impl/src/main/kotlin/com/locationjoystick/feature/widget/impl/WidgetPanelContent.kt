@@ -209,11 +209,9 @@ internal fun WidgetPanel(
                 Image(
                     painter = painterResource(id = R.drawable.ic_app_launcher),
                     contentDescription =
-                        if (isPanelExpanded) {
-                            stringResource(R.string.widget_panel_collapse_cd)
-                        } else {
-                            stringResource(R.string.widget_panel_expand_cd)
-                        },
+                        stringResource(
+                            if (isPanelExpanded) R.string.widget_panel_collapse_cd else R.string.widget_panel_expand_cd,
+                        ),
                     modifier = Modifier.fillMaxSize().clip(CircleShape),
                 )
             }
@@ -259,11 +257,13 @@ internal fun WidgetPanel(
                                     WidgetIconButton(
                                         icon = pauseResumeIcon,
                                         contentDescription =
-                                            if (routeControls.isPaused) {
-                                                stringResource(R.string.widget_panel_resume_cd)
-                                            } else {
-                                                stringResource(R.string.widget_panel_pause_cd)
-                                            },
+                                            stringResource(
+                                                if (routeControls.isPaused) {
+                                                    R.string.widget_panel_resume_cd
+                                                } else {
+                                                    R.string.widget_panel_pause_cd
+                                                },
+                                            ),
                                         tint = pauseResumeTint,
                                         onClick = routeControls.onPauseResume,
                                     )
@@ -318,11 +318,13 @@ internal fun WidgetPanel(
                         WidgetIconButton(
                             icon = LjIcons.MyLocation,
                             contentDescription =
-                                if (section.active) {
-                                    stringResource(R.string.widget_panel_cancel_tap_to_walk_cd)
-                                } else {
-                                    stringResource(R.string.widget_panel_tap_to_walk_cd)
-                                },
+                                stringResource(
+                                    if (section.active) {
+                                        R.string.widget_panel_cancel_tap_to_walk_cd
+                                    } else {
+                                        R.string.widget_panel_tap_to_walk_cd
+                                    },
+                                ),
                             tint = crosshairTint,
                             onClick = section.onClick,
                         )
@@ -627,11 +629,8 @@ internal fun RoutesFloatingView(
 
     FloatingPickerShell(
         title =
-            if (selectedRouteId != null) {
-                routes.find { it.id == selectedRouteId }?.name ?: stringResource(R.string.widget_panel_routes_title)
-            } else {
-                stringResource(R.string.widget_panel_routes_title)
-            },
+            selectedRouteId?.let { id -> routes.find { it.id == id }?.name }
+                ?: stringResource(R.string.widget_panel_routes_title),
         onDismiss = onDismiss,
         hasBack = selectedRouteId != null,
         onBack = { selectedRouteId = null },
