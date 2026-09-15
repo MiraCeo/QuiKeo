@@ -41,16 +41,15 @@
 #   13_joystick_overlay, 14_widget_overlay,
 #   15_routes_add_button, 16_favorites_add_button,
 #   17_group_sync, 18_debug_stats,
+#   19_onboarding_mock_location,
 #   20_tap_to_walk_settings, 21_compass_orientation
 #
-# 19_onboarding_mock_location is NOT captured by this script — it's the
-# "Set as fake GPS app" onboarding step, only reachable on a fresh install
-# before onboarding completes, which conflicts with this script's own
-# "app installed and past onboarding" prerequisite above. Recapture manually:
-# reinstall the debug build, launch the app, dismiss the "What's new" badge,
-# then `adb exec-out screencap -p > docs/wiki/screenshots/19_onboarding_mock_location.png`
-# while the "Set as fake GPS app" step (with its Open Developer Options / Skip
-# buttons) is on screen.
+# 19_onboarding_mock_location ("Set as fake GPS app" onboarding step) is only
+# captured on a genuinely fresh install — it's taken mid-onboarding, before
+# mock_location is granted, inside the onboarding auto-complete branch above.
+# If the app is already past onboarding when the script runs, that branch
+# never executes and step 19 is silently skipped, no matter --steps. Run
+# `make reinstall-on-phone` right before `make screenshot` to guarantee it.
 
 set -euo pipefail
 
@@ -795,11 +794,13 @@ if grep -qi "onboarding\|Welcome\|grant\|permission" "$dump" 2>/dev/null; then
   rm -f "$dump"
   if $AUTO; then
     log "App appears to be on onboarding screen — completing via adb..."
+    # Grant location + overlay only — mock_location stays ungranted for now so
+    # the app lands on the "Set as fake GPS app" step below, letting step 19
+    # capture it before the flow completes.
     $ADB shell pm grant "$PACKAGE" android.permission.ACCESS_FINE_LOCATION 2>/dev/null || true
     $ADB shell pm grant "$PACKAGE" android.permission.ACCESS_COARSE_LOCATION 2>/dev/null || true
     $ADB shell appops set "$PACKAGE" SYSTEM_ALERT_WINDOW allow 2>/dev/null || true
-    $ADB shell appops set "$PACKAGE" android:mock_location allow 2>/dev/null || true
-    log "Permissions granted. Restarting app..."
+    log "Location + overlay granted. Restarting app..."
     $ADB shell am force-stop "$PACKAGE"
     sleep 1
     $ADB shell am start -n "${PACKAGE}/${ACTIVITY}" >/dev/null
@@ -812,6 +813,18 @@ if grep -qi "onboarding\|Welcome\|grant\|permission" "$dump" 2>/dev/null; then
       $ADB shell input tap "$allow_x" "$allow_y"
     fi
     wait_s 2 "Dialog dismissing"
+
+    if should_run_step "19"; then
+      log "=== 19 ONBOARDING MOCK LOCATION ==="
+      screenshot "19_onboarding_mock_location"
+    fi
+
+    $ADB shell appops set "$PACKAGE" android:mock_location allow 2>/dev/null || true
+    log "Mock location granted. Restarting app..."
+    $ADB shell am force-stop "$PACKAGE"
+    sleep 1
+    $ADB shell am start -n "${PACKAGE}/${ACTIVITY}" >/dev/null
+    wait_s 3 "App starting"
     # Verify onboarding is past
     dump=$(ui_dump)
     if grep -qi "onboarding\|Welcome\|grant\|permission" "$dump" 2>/dev/null; then
