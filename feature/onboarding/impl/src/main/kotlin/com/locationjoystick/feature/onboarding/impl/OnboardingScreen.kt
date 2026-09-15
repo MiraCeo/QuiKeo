@@ -63,7 +63,7 @@ import com.locationjoystick.core.designsystem.LjTheme
 import com.locationjoystick.core.designsystem.LjWarning
 import com.locationjoystick.core.designsystem.LjWarningContainer
 import com.locationjoystick.core.designsystem.component.AppIcon
-import com.locationjoystick.core.designsystem.component.LjLanguageRow
+import com.locationjoystick.core.designsystem.component.LjLanguageDropdown
 import com.locationjoystick.core.designsystem.component.LjPrimaryButton
 import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.designsystem.component.WideContentClamp
@@ -152,6 +152,12 @@ internal fun OnboardingScreen(
         bottomBar = bottomBar,
         containerColor = MaterialTheme.colorScheme.background,
         showSpoofToggle = false,
+        actions = {
+            LjLanguageDropdown(
+                selected = AppLanguage.fromTag(languageTag),
+                onSelect = { language -> onSetLanguage(language.languageTag) },
+            )
+        },
     ) { paddingValues ->
         WideContentClamp(
             modifier = Modifier.fillMaxSize().padding(paddingValues),
@@ -228,13 +234,6 @@ internal fun OnboardingScreen(
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            LjLanguageRow(
-                selected = AppLanguage.fromTag(languageTag),
-                onSelect = { language -> onSetLanguage(language.languageTag) },
-            )
 
             Spacer(modifier = Modifier.height(16.dp))
 

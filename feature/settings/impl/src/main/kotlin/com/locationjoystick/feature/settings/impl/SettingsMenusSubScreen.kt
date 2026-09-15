@@ -59,7 +59,7 @@ import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.component.LjButton
 import com.locationjoystick.core.designsystem.component.LjCheckboxRow
-import com.locationjoystick.core.designsystem.component.LjLanguageRow
+import com.locationjoystick.core.designsystem.component.LjLanguageDropdown
 import com.locationjoystick.core.designsystem.component.LjOutlinedButton
 import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.designsystem.component.LjTextButton
@@ -110,6 +110,12 @@ internal fun SettingsMenusSubScreen(
         bottomBar = bottomBar,
         snackbarHost = snackbarHost,
         floatingActionButton = { SettingsSaveDiscardFab(uiState.isDirty, onAction) },
+        actions = {
+            LjLanguageDropdown(
+                selected = AppLanguage.fromTag(languageTag),
+                onSelect = { language -> onAction(SettingsAction.SetLanguage(language.languageTag)) },
+            )
+        },
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             when {
@@ -125,7 +131,7 @@ internal fun SettingsMenusSubScreen(
                                 .verticalScroll(remember { ScrollState(0) })
                                 .padding(16.dp),
                     ) {
-                        ThemeSection(uiState, languageTag, onAction)
+                        ThemeSection(uiState, onAction)
                         Spacer(Modifier.height(24.dp))
                         AppFeaturesSection(uiState, isRooted, onAction)
                         Spacer(Modifier.height(24.dp))
@@ -146,7 +152,6 @@ internal fun SettingsMenusSubScreen(
 @Composable
 private fun ThemeSection(
     uiState: SettingsUiState,
-    languageTag: String?,
     onAction: (SettingsAction) -> Unit,
 ) {
     Text(stringResource(R.string.settings_menus_appearance), style = MaterialTheme.typography.headlineSmall)
@@ -173,11 +178,6 @@ private fun ThemeSection(
             },
         )
     }
-    Spacer(Modifier.height(12.dp))
-    LjLanguageRow(
-        selected = AppLanguage.fromTag(languageTag),
-        onSelect = { language -> onAction(SettingsAction.SetLanguage(language.languageTag)) },
-    )
 }
 
 @Composable

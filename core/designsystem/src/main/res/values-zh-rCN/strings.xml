@@ -52,8 +52,8 @@
     <string name="top_bar_start_with_location">"开始 · %1$s"</string>
     <string name="top_bar_stop_simulation_cd">"停止模拟定位"</string>
     <string name="top_bar_start_simulation_cd">"开始模拟定位"</string>
-    <string name="language_row_label">"语言"</string>
     <string name="language_system_default">"系统默认"</string>
-    <string name="language_english">"English"</string>
-    <string name="language_simplified_chinese">"简体中文"</string>
+    <string name="language_short_english">"EN"</string>
+    <string name="language_short_chinese">"CN"</string>
+    <string name="language_dropdown_cd">"更改语言"</string>
 </resources>
