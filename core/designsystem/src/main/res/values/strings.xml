@@ -9,11 +9,10 @@
     <string name="favorites_list_save_current_location_cd">"Save current location"</string>
     <string name="favorites_list_no_saved_favorites_yet">"No saved favorites yet"</string>
     <string name="delete_confirm_dialog_title">"Delete \"%1$s\"?"</string>
-    <string name="delete_confirm_dialog_message">"This %1$s will be permanently deleted and cannot be undone."</string>
+    <string name="delete_confirm_dialog_message_favorite">"This favorite will be permanently deleted and cannot be undone."</string>
+    <string name="delete_confirm_dialog_message_route">"This route will be permanently deleted and cannot be undone."</string>
     <string name="delete_confirm_dialog_delete">"Delete"</string>
     <string name="delete_confirm_dialog_cancel">"Cancel"</string>
-    <string name="delete_confirm_dialog_item_favorite">"favorite"</string>
-    <string name="delete_confirm_dialog_item_route">"route"</string>
     <string name="route_start_options_loop">"Loop"</string>
     <string name="route_start_options_reverse">"Reverse"</string>
     <string name="route_start_options_return_to_location">"Return to location"</string>

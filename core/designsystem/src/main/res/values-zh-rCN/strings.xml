@@ -9,11 +9,10 @@
     <string name="favorites_list_save_current_location_cd">"保存当前位置"</string>
     <string name="favorites_list_no_saved_favorites_yet">"暂无收藏"</string>
     <string name="delete_confirm_dialog_title">"删除“%1$s”？"</string>
-    <string name="delete_confirm_dialog_message">"此%1$s将被永久删除，且无法恢复。"</string>
+    <string name="delete_confirm_dialog_message_favorite">"此收藏将被永久删除，且无法恢复。"</string>
+    <string name="delete_confirm_dialog_message_route">"此路线将被永久删除，且无法恢复。"</string>
     <string name="delete_confirm_dialog_delete">"删除"</string>
     <string name="delete_confirm_dialog_cancel">"取消"</string>
-    <string name="delete_confirm_dialog_item_favorite">"收藏"</string>
-    <string name="delete_confirm_dialog_item_route">"路线"</string>
     <string name="route_start_options_loop">"循环"</string>
     <string name="route_start_options_reverse">"反向"</string>
     <string name="route_start_options_return_to_location">"返回原位置"</string>
