@@ -50,7 +50,6 @@
     <string name="theme_preview_48_8566_n_2_3522_e">"48.8566° N, 2.3522° E"</string>
     <string name="theme_preview_stop">"Stop"</string>
     <string name="top_bar_stop">"Stop"</string>
-    <string name="top_bar_start">"Start"</string>
     <string name="top_bar_start_with_location">"Start · %1$s"</string>
     <string name="top_bar_stop_simulation_cd">"Stop location simulation"</string>
     <string name="top_bar_start_simulation_cd">"Start location simulation"</string>

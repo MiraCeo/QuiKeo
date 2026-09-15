@@ -53,5 +53,4 @@
     <string name="route_creator_center_on_location_cd">"定位到当前位置"</string>
     <string name="route_creator_pick_from_favorites_cd">"从收藏中选取"</string>
     <string name="route_creator_undo_last_waypoint_cd">"撤销上一个途经点"</string>
-    <string name="route_creator_save_route_cd">"保存路线"</string>
 </resources>

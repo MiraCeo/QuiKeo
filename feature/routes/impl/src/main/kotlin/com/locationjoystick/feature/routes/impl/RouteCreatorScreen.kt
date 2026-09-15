@@ -244,7 +244,7 @@ internal fun RouteCreatorScreen(
                 if (state.waypoints.size >= 2) {
                     LjMapIconButton(
                         icon = LjIcons.Save,
-                        contentDescription = stringResource(R.string.route_creator_save_route_cd),
+                        contentDescription = stringResource(R.string.route_creator_save_route),
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         onClick = { showSaveDialog = true },

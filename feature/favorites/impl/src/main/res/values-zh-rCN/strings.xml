@@ -27,5 +27,4 @@
     <string name="map_picker_pick_location">"选取位置"</string>
     <string name="map_picker_save_location">"保存位置"</string>
     <string name="map_picker_search_location_cd">"搜索位置"</string>
-    <string name="map_picker_save_location_cd">"保存位置"</string>
 </resources>

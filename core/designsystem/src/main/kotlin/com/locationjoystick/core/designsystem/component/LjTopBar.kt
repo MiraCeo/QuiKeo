@@ -115,7 +115,7 @@ fun LjTopBar(
                         when {
                             isSpoofing -> stringResource(R.string.top_bar_stop)
                             locationLabel != null -> stringResource(R.string.top_bar_start_with_location, locationLabel)
-                            else -> stringResource(R.string.top_bar_start)
+                            else -> stringResource(R.string.common_start)
                         }
                     Row(
                         modifier =

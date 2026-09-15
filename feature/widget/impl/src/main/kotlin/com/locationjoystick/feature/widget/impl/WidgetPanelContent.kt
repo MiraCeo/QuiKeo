@@ -320,7 +320,7 @@ internal fun WidgetPanel(
                             contentDescription =
                                 stringResource(
                                     if (section.active) {
-                                        R.string.widget_panel_cancel_tap_to_walk_cd
+                                        R.string.tap_to_walk_overlay_cancel_tap_to_walk_cd
                                     } else {
                                         R.string.widget_panel_tap_to_walk_cd
                                     },
@@ -735,7 +735,7 @@ private fun AppFeature.toContentDescription(): String =
     when (this) {
         AppFeature.JOYSTICK_TOGGLE -> stringResource(R.string.widget_feature_show_hide_joystick_cd)
         AppFeature.JOYSTICK_LOCK -> stringResource(R.string.widget_feature_lock_joystick_cd)
-        AppFeature.ROUTES -> stringResource(R.string.widget_feature_routes_cd)
+        AppFeature.ROUTES -> stringResource(R.string.widget_panel_routes_picker_cd)
         AppFeature.FAVORITES -> stringResource(R.string.widget_feature_favorites_cd)
         AppFeature.SPEED_CYCLE -> stringResource(R.string.widget_feature_speed_cycle_cd)
         AppFeature.MAP_FLOATING -> stringResource(R.string.widget_feature_open_map_cd)

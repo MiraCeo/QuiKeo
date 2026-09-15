@@ -203,7 +203,7 @@ internal fun MapPickerScreen(
                 if (effectivePosition() != null) {
                     LjMapIconButton(
                         icon = LjIcons.Save,
-                        contentDescription = stringResource(R.string.map_picker_save_location_cd),
+                        contentDescription = stringResource(R.string.map_picker_save_location),
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         onClick = { showNameDialog = true },

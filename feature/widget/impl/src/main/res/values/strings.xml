@@ -45,7 +45,6 @@
     <string name="overlay_pause_roaming_cd">"Pause roaming"</string>
     <string name="overlay_start_roaming_cd">"Start roaming"</string>
     <string name="overlay_roaming_active_cd">"Roaming active"</string>
-    <string name="widget_panel_cancel_tap_to_walk_cd">"Cancel tap-to-walk"</string>
     <string name="widget_panel_tap_to_walk_cd">"Tap to walk"</string>
     <string name="widget_panel_group_sync_cd">"Group sync"</string>
     <string name="widget_panel_teleport_to_leader_cd">"Teleport to leader now"</string>
@@ -54,7 +53,6 @@
     <string name="widget_panel_favorites_title">"Favorites"</string>
     <string name="widget_feature_show_hide_joystick_cd">"Show/hide joystick"</string>
     <string name="widget_feature_lock_joystick_cd">"Lock joystick position"</string>
-    <string name="widget_feature_routes_cd">"Routes picker"</string>
     <string name="widget_feature_favorites_cd">"Favorites picker"</string>
     <string name="widget_feature_speed_cycle_cd">"Speed cycle"</string>
     <string name="widget_feature_open_map_cd">"Open map"</string>

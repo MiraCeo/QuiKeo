@@ -50,7 +50,6 @@
     <string name="theme_preview_48_8566_n_2_3522_e">"48.8566° N, 2.3522° E"</string>
     <string name="theme_preview_stop">"停止"</string>
     <string name="top_bar_stop">"停止"</string>
-    <string name="top_bar_start">"开始"</string>
     <string name="top_bar_start_with_location">"开始 · %1$s"</string>
     <string name="top_bar_stop_simulation_cd">"停止模拟定位"</string>
     <string name="top_bar_start_simulation_cd">"开始模拟定位"</string>
