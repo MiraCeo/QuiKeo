@@ -13,6 +13,11 @@ android {
     defaultConfig {
         testInstrumentationRunner = "com.locationjoystick.app.HiltTestRunner"
     }
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
 }
 
 dependencies {
