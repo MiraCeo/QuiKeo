@@ -4,7 +4,8 @@ The app's interface can be shown in a language other than English. English is th
 language; translations are added as additional resource sets alongside it.
 
 Key files: `core/common/util/LocaleContextWrapper.kt`, `core/common/constants/AppConstants.kt`
-(`LocaleConstants`), `lint/checks/HardcodedComposeStringDetector.kt`
+(`LocaleConstants`), `core/model/AppLanguage.kt`, `core/designsystem/component/LjLanguageRow.kt`,
+`lint/checks/HardcodedComposeStringDetector.kt`
 
 ## Supported Locales
 
@@ -29,15 +30,24 @@ its own `res/values/strings.xml` (English, source of truth) plus a sibling
   = true }` — AGP generates the locale-config XML and the manifest's `android:localeConfig`
   attribute automatically from whichever `values-*` folders exist at build time. No hand-maintained
   locale-config file.
-- **Android 9-12 (API 28-32)**: the OS has no per-app-language UI at this API level, so the app
-  follows the device's system-wide language. `LocaleContextWrapper.wrap()` (`:core:common`)
-  additionally supports an app-chosen override on this range via `attachBaseContext()` in
-  `MainActivity`, `OverlayService` (the joystick and widget overlay base class), and
-  `MockLocationService` (the foreground service and its notification) — but **nothing in the app
-  currently writes that preference**, so on API 28-32 today the app strictly follows the system
-  language. This wrapper is plumbing for an in-app language picker
-  (Settings/onboarding — a separate, not-yet-built feature); it has no effect until that picker
-  ships and starts writing `LocaleConstants.KEY_LANGUAGE_TAG`.
+- **Android 9-12 (API 28-32)**: the OS has no per-app-language UI at this API level, so
+  `LocaleContextWrapper.wrap()` (`:core:common`) supports an app-chosen override on this range via
+  `attachBaseContext()` in `MainActivity`, `OverlayService` (the joystick and widget overlay base
+  class), and `MockLocationService` (the foreground service and its notification).
+- **In-app language picker**: a "Language" row (System default / English / 简体中文) appears in
+  two places — onboarding's header (optional, skippable, does not count toward "Step X of 3")
+  and Settings → Menus → Appearance, below "Light mode". Selecting a language calls
+  `LocaleContextWrapper.setLanguage()` (`:core:common`) — on API 33+, the platform's own
+  `LocaleManager.setApplicationLocales`; on API 28-32, writes `LocaleConstants.KEY_LANGUAGE_TAG`
+  to the same SharedPreferences file `LocaleContextWrapper.wrap()` reads — then calls
+  `Activity.recreate()` so `MainActivity` picks it up immediately. Persisted per-device, not part
+  of `AppSettings`/`ExportData` (like `ThemeMode`).
+- **Android 9-12 (API 28-32) limitation**: the SharedPreferences override above only takes effect
+  for a component the next time it's created (`attachBaseContext()` runs once per instance). A
+  language change made while a spoofing session is actively running won't retroactively relabel
+  that session's already-running foreground-service notification or overlays — only the next
+  session (or `MainActivity`, which is force-recreated immediately) picks it up. Android 13+ has
+  no such gap: the framework applies the per-app override process-wide the moment it's set.
 - **Play Store installs**: `app/build.gradle.kts`'s `bundle { language { enableSplit = false } }`
   disables Play's per-device language-APK splitting, so every install carries every supported
   locale's resources regardless of the installing device's system language at install time.

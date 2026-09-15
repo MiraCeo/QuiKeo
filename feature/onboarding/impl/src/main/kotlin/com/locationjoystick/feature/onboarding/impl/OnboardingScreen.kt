@@ -1,6 +1,7 @@
 package com.locationjoystick.feature.onboarding.impl
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
@@ -62,10 +63,12 @@ import com.locationjoystick.core.designsystem.LjTheme
 import com.locationjoystick.core.designsystem.LjWarning
 import com.locationjoystick.core.designsystem.LjWarningContainer
 import com.locationjoystick.core.designsystem.component.AppIcon
+import com.locationjoystick.core.designsystem.component.LjLanguageRow
 import com.locationjoystick.core.designsystem.component.LjPrimaryButton
 import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.designsystem.component.WideContentClamp
 import com.locationjoystick.core.location.rememberSpoofToggleState
+import com.locationjoystick.core.model.AppLanguage
 import com.locationjoystick.feature.onboarding.api.ONBOARDING_ROUTE
 import com.locationjoystick.feature.onboarding.impl.R
 
@@ -82,6 +85,8 @@ fun OnboardingRoute(
     viewModel: OnboardingViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val languageTag by viewModel.languageTag.collectAsStateWithLifecycle()
     val spoofToggle = rememberSpoofToggleState()
 
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -108,6 +113,11 @@ fun OnboardingRoute(
         onToggleSpoofing = spoofToggle.onToggle,
         locationLabel = spoofToggle.locationLabel,
         bottomBar = bottomBar,
+        languageTag = languageTag,
+        onSetLanguage = { tag ->
+            viewModel.setLanguage(tag)
+            (context as? Activity)?.recreate()
+        },
     )
 }
 
@@ -121,6 +131,8 @@ internal fun OnboardingScreen(
     onToggleSpoofing: () -> Unit = {},
     locationLabel: String? = null,
     bottomBar: @Composable () -> Unit = {},
+    languageTag: String? = null,
+    onSetLanguage: (String?) -> Unit = {},
 ) {
     val context = LocalContext.current
     var showSkipMockLocationDialog by remember { mutableStateOf(false) }
@@ -217,7 +229,14 @@ internal fun OnboardingScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LjLanguageRow(
+                selected = AppLanguage.fromTag(languageTag),
+                onSelect = { language -> onSetLanguage(language.languageTag) },
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             val grantedStepCount =
                 listOf(

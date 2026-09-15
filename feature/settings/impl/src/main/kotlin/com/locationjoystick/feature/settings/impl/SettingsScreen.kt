@@ -1,5 +1,6 @@
 package com.locationjoystick.feature.settings.impl
 
+import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -82,6 +83,7 @@ fun SettingsRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val roamingDefaults by viewModel.roamingDefaults.collectAsStateWithLifecycle()
     val isRooted by viewModel.isRooted.collectAsStateWithLifecycle()
+    val languageTag by viewModel.languageTag.collectAsStateWithLifecycle()
     val spoofToggle = rememberSpoofToggleState()
     val context = LocalContext.current
     var pendingImport by remember { mutableStateOf<PendingImport?>(null) }
@@ -237,6 +239,7 @@ fun SettingsRoute(
         uiState = uiState,
         roamingDefaults = roamingDefaults,
         isRooted = isRooted,
+        languageTag = languageTag,
         hotLocationTree = viewModel.hotLocationTree,
         hotRouteTree = viewModel.hotRouteTree,
         onOpenDrawer = onOpenDrawer,
@@ -401,6 +404,11 @@ fun SettingsRoute(
                     viewModel.setThemeMode(action.mode)
                 }
 
+                is SettingsAction.SetLanguage -> {
+                    viewModel.setLanguage(action.tag)
+                    (context as? Activity)?.recreate()
+                }
+
                 SettingsAction.Export -> {
                     exportLauncher.launch(
                         "${AppConstants.ExportConstants.FILENAME_PREFIX}-${System.currentTimeMillis()}.json",
@@ -473,6 +481,7 @@ internal fun SettingsScreen(
     uiState: SettingsUiState,
     roamingDefaults: RoamingDefaults = RoamingDefaults(),
     isRooted: Boolean = false,
+    languageTag: String? = null,
     hotLocationTree: HotItemTree = HotItemTree.Empty,
     hotRouteTree: HotItemTree = HotItemTree.Empty,
     onOpenDrawer: () -> Unit = {},
@@ -573,6 +582,7 @@ internal fun SettingsScreen(
             SettingsMenusSubScreen(
                 uiState = uiState,
                 isRooted = isRooted,
+                languageTag = languageTag,
                 onNavigateBack = guardedBack,
                 isSpoofing = isSpoofing,
                 onToggleSpoofing = guardedToggleSpoofing,

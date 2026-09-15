@@ -171,6 +171,10 @@ internal sealed class SettingsAction {
         val mode: ThemeMode,
     ) : SettingsAction()
 
+    data class SetLanguage(
+        val tag: String?,
+    ) : SettingsAction()
+
     data object SaveChanges : SettingsAction()
 
     data object DiscardChanges : SettingsAction()
