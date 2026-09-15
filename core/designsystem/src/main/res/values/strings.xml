@@ -33,9 +33,11 @@
     <string name="roaming_sheet_distance_mi">"Distance (mi)"</string>
     <string name="roaming_sheet_distance_m">"Distance (m)"</string>
     <string name="roaming_sheet_speed_profile">"Speed profile"</string>
-    <string name="roaming_sheet_profile_walk">"Walk"</string>
-    <string name="roaming_sheet_profile_run">"Run"</string>
-    <string name="roaming_sheet_profile_bike">"Bike"</string>
+    <string name="speed_profile_slow_walk">"Slow Walk"</string>
+    <string name="speed_profile_walk">"Walk"</string>
+    <string name="speed_profile_run">"Run"</string>
+    <string name="speed_profile_bike">"Bike"</string>
+    <string name="speed_profile_drive">"Drive"</string>
     <string name="roaming_sheet_follow_roads">"Follow roads"</string>
     <string name="roaming_sheet_return_to_start">"Return to start"</string>
     <string name="roaming_sheet_generate">"Generate"</string>

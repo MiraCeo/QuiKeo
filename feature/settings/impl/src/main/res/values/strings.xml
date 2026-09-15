@@ -159,11 +159,6 @@
     <string name="settings_roaming_route_distance_mi">"Route distance (mi)"</string>
     <string name="settings_roaming_route_distance_m">"Route distance (m)"</string>
     <string name="settings_roaming_speed_profile">"Speed profile"</string>
-    <string name="settings_roaming_profile_slow_walk">"Slow Walk"</string>
-    <string name="settings_roaming_profile_walk">"Walk"</string>
-    <string name="settings_roaming_profile_run">"Run"</string>
-    <string name="settings_roaming_profile_bike">"Bike"</string>
-    <string name="settings_roaming_profile_drive">"Drive"</string>
     <string name="settings_roaming_follow_roads">"Follow roads"</string>
     <string name="settings_roaming_follow_roads_desc">"Follows actual roads and paths instead of cutting straight across. May not be available in all areas."</string>
     <string name="settings_roaming_return_to_start">"Return to start"</string>
@@ -199,9 +194,4 @@
     <string name="qr_share_or_enter_code">"Or enter code: %1$s"</string>
     <string name="hot_item_tree_collapse_cd">"Collapse"</string>
     <string name="hot_item_tree_expand_cd">"Expand"</string>
-    <string name="speed_profile_slow_walk">"Slow Walk"</string>
-    <string name="speed_profile_walk">"Walk"</string>
-    <string name="speed_profile_run">"Run"</string>
-    <string name="speed_profile_bike">"Bike"</string>
-    <string name="speed_profile_drive">"Drive"</string>
 </resources>

@@ -33,9 +33,11 @@
     <string name="roaming_sheet_distance_mi">"距离（英里）"</string>
     <string name="roaming_sheet_distance_m">"距离（米）"</string>
     <string name="roaming_sheet_speed_profile">"速度预设"</string>
-    <string name="roaming_sheet_profile_walk">"步行"</string>
-    <string name="roaming_sheet_profile_run">"跑步"</string>
-    <string name="roaming_sheet_profile_bike">"骑行"</string>
+    <string name="speed_profile_slow_walk">"慢走"</string>
+    <string name="speed_profile_walk">"步行"</string>
+    <string name="speed_profile_run">"跑步"</string>
+    <string name="speed_profile_bike">"骑行"</string>
+    <string name="speed_profile_drive">"驾车"</string>
     <string name="roaming_sheet_follow_roads">"沿道路行走"</string>
     <string name="roaming_sheet_return_to_start">"返回起点"</string>
     <string name="roaming_sheet_generate">"生成"</string>

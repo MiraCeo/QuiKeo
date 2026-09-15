@@ -183,14 +183,7 @@ fun RoamingSheetContent(
                     onClick = { onDraftChange(draft.copy(speedProfileId = id)) },
                     shape = SegmentedButtonDefaults.itemShape(index = index, count = SPEED_PROFILES.size),
                 ) {
-                    Text(
-                        when (id) {
-                            "walk" -> stringResource(R.string.roaming_sheet_profile_walk)
-                            "run" -> stringResource(R.string.roaming_sheet_profile_run)
-                            "bike" -> stringResource(R.string.roaming_sheet_profile_bike)
-                            else -> id
-                        },
-                    )
+                    Text(speedProfileLabel(id))
                 }
             }
         }

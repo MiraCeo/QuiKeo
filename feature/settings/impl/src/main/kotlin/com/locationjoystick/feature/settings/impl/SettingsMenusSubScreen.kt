@@ -62,6 +62,7 @@ import com.locationjoystick.core.designsystem.component.LjCheckboxRow
 import com.locationjoystick.core.designsystem.component.LjOutlinedButton
 import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.designsystem.component.LjTextButton
+import com.locationjoystick.core.designsystem.component.speedProfileLabel
 import com.locationjoystick.core.model.AppFeature
 import com.locationjoystick.core.model.FeatureSurface
 import com.locationjoystick.core.model.SpeedProfile
@@ -725,7 +726,7 @@ private fun SpeedCycleSection(
             val checked = profile.id in uiState.enabledSpeedProfileIds
             LjCheckboxRow(
                 checked = checked,
-                title = speedProfileLabel(profile),
+                title = speedProfileLabel(profile.id),
                 onCheckedChange = { isChecked ->
                     val updated = uiState.enabledSpeedProfileIds.toMutableSet()
                     if (isChecked) updated.add(profile.id) else updated.remove(profile.id)
