@@ -11,8 +11,9 @@
 #   ./scripts/screenshot-gallery.sh --steps 16,17
 #   ./scripts/screenshot-gallery.sh --steps 14-17
 #   ./scripts/screenshot-gallery.sh --auto --steps 16-17
-#   ./scripts/screenshot-gallery.sh --playstore-only   (no device needed — regenerates
-#                                                        *_playstore.png from existing screenshots)
+#   ./scripts/screenshot-gallery.sh --marketing-only   (no device needed — regenerates
+#                                                        docs/wiki/screenshots/marketing/
+#                                                        from existing screenshots)
 #
 # Prerequisites:
 #   - adb in PATH, device connected with USB debugging on
@@ -62,7 +63,7 @@ ADB_DEVICE=""
 AUTO=false
 STEPS_FILTER=""  # Comma-separated or range, e.g. "16,17" or "14-17"
 ENABLED_STEPS=" "  # Space-separated list of enabled step numbers (01 02 03 etc)
-PLAYSTORE_ONLY=false
+MARKETING_ONLY=false
 
 # ── Arg parsing ──────────────────────────────────────────────────────────────
 
@@ -72,7 +73,7 @@ while [[ $# -gt 0 ]]; do
     --device)          ADB_DEVICE="-s $2"; shift 2 ;;
     --auto)            AUTO=true; shift ;;
     --steps)           STEPS_FILTER="$2"; shift 2 ;;
-    --playstore-only)  PLAYSTORE_ONLY=true; shift ;;
+    --marketing-only)  MARKETING_ONLY=true; shift ;;
     *) echo "Unknown arg: $1"; exit 1 ;;
   esac
 done
@@ -227,6 +228,33 @@ tap_text_below() {
 # Press the hardware back button.
 back() { $ADB shell input keyevent KEYCODE_BACK; }
 
+# Tap the Nth (0-indexed) EditText on screen by top-to-bottom order. Used
+# instead of tap_text on a field's hint label, since the hint disappears once
+# a dialog field already holds a value from a prior seeding iteration.
+tap_edit_field() {
+  local index="$1"
+  local dump centre x y
+  dump=$(ui_dump)
+  centre=$(perl -lne '
+    push @b, [$1,$2,$3,$4] while /class="android\.widget\.EditText"[^>]*bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"/g;
+    END {
+      @b = sort { $a->[1] <=> $b->[1] } @b;
+      my $n = '"${index}"';
+      if (defined $b[$n]) {
+        printf "%d %d\n", int(($b[$n][0]+$b[$n][2])/2), int(($b[$n][1]+$b[$n][3])/2);
+      }
+    }
+  ' "$dump" 2>/dev/null)
+  rm -f "$dump"
+  if [[ -z "$centre" ]]; then
+    warn "Could not find EditText #$index — skipping tap."
+    return 1
+  fi
+  read -r x y <<< "$centre"
+  log "Tapping EditText #$index at ($x, $y)"
+  $ADB shell input tap "$x" "$y"
+}
+
 # Clear the focused text field by sending 80 backspace keypresses in one adb call.
 # Needed when a dialog reopens with a field that retains its previous value
 # (hint text disappears, so tap_text on the hint label fails to find the element).
@@ -307,11 +335,16 @@ seed_route_if_needed() {
   rm -f "$dump"
   log "No routes — creating seed routes..."
   local cx=$(( SCREEN_W / 2 ))
-  local y1=$(( SCREEN_H * 35 / 100 ))
-  local y2=$(( SCREEN_H * 55 / 100 ))
-  local y3=$(( SCREEN_H * 45 / 100 ))
+  # Distinct waypoint layouts per route so seeded routes don't look identical.
   local -a route_names=("Morning Walk" "City Loop")
-  for name in "${route_names[@]}"; do
+  local -a route_wp1_dx=(0 -80)
+  local -a route_wp1_y=(35 30)
+  local -a route_wp2_dx=(60 100)
+  local -a route_wp2_y=(55 50)
+  local -a route_wp3_dx=(0 -40)
+  local -a route_wp3_y=(45 65)
+  for i in "${!route_names[@]}"; do
+    local name="${route_names[$i]}"
     go_idle
     tap_text_below "Routes" "$CARD_Y_MIN"
     wait_s 2 "Routes loading"
@@ -320,11 +353,11 @@ seed_route_if_needed() {
     tap_text "Draw on map"
     wait_s 4 "Route creator loading"
     # Need ≥2 waypoints before Save FAB appears.
-    $ADB shell input tap "$cx" "$y1"
+    $ADB shell input tap "$(( cx + route_wp1_dx[i] ))" "$(( SCREEN_H * route_wp1_y[i] / 100 ))"
     wait_s 2 "Placing waypoint 1"
-    $ADB shell input tap "$(( cx + 60 ))" "$y2"
+    $ADB shell input tap "$(( cx + route_wp2_dx[i] ))" "$(( SCREEN_H * route_wp2_y[i] / 100 ))"
     wait_s 2 "Placing waypoint 2"
-    $ADB shell input tap "$cx" "$y3"
+    $ADB shell input tap "$(( cx + route_wp3_dx[i] ))" "$(( SCREEN_H * route_wp3_y[i] / 100 ))"
     wait_s 2 "Placing waypoint 3"
     tap_text "Save route"
     wait_s 1 "Save dialog opening"
@@ -365,17 +398,17 @@ seed_favorites_if_needed() {
     wait_s 1 "Add menu opening"
     tap_text "from coordinates"
     wait_s 1 "Dialog opening"
-    tap_text "Name"
+    tap_edit_field 0
     wait_s 1
     clear_field
     $ADB shell input text "${fav_names[$i]}"
     wait_s 1
-    tap_text "Latitude"
+    tap_edit_field 1
     wait_s 1
     clear_field
     $ADB shell input text "${fav_lats[$i]}"
     wait_s 1
-    tap_text "Longitude"
+    tap_edit_field 2
     wait_s 1
     clear_field
     $ADB shell input text "${fav_lons[$i]}"
@@ -473,46 +506,199 @@ collapse_widget_panel() {
   wait_s 1 "Panel collapsing"
 }
 
-# Generate 1024×500 Play Store variants for all captured screenshots.
-# Each source screenshot is scaled to fit within 500 px height and centered
-# on a 1024×500 canvas with Material dark surface background (#1C1B1F).
-generate_playstore_variants() {
-  log "Generating Play Store variants..."
+# Generate the two distinct Play Store marketing assets from the current
+# docs/wiki/screenshots/*.png:
+#
+#   1. Feature graphic — exactly 1024x500, ONE image (the idle/hero screen),
+#      full uncropped screenshot + catch-phrase. This is a small promotional
+#      banner, not meant to show fine detail, so the screenshot is scaled
+#      down to fit — some softness here is normal and expected for this
+#      asset (real Play feature graphics never show readable screenshot text).
+#
+#   2. Gallery — 8 portrait images, one per feature, fixed at exactly
+#      1080x1920 (= 9:16, satisfies Play Store's exact-ratio requirement and
+#      clears the 1080x1080 floor for promotion eligibility on all 8). The
+#      screenshot is CROPPED to fit, never resized, so every gallery pixel is
+#      a 1:1 source pixel — no downscale blur/moire. This is what actually
+#      fixes "pixelated screenshots" (squeezing a 1080-wide screenshot into
+#      the 1024x500 feature graphic's ~200px-wide photo column was the real
+#      bug in an earlier version).
+generate_marketing_variants() {
+  log "Generating Play Store marketing assets..."
   if ! python3 -c "import PIL" >/dev/null 2>&1; then
-    warn "Pillow not installed — skipping Play Store variants."
+    warn "Pillow not installed — skipping marketing assets."
     warn "Install with: python3 -m pip install --user --break-system-packages Pillow"
     return 0
   fi
   python3 << 'PYTHON_EOF'
-from PIL import Image
 import os
 import sys
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 src_dir = "docs/wiki/screenshots"
-canvas_w, canvas_h = 1024, 500
-bg_color = (28, 27, 31)
+out_dir = os.path.join(src_dir, "marketing")
+gallery_dir = os.path.join(out_dir, "gallery")
+os.makedirs(gallery_dir, exist_ok=True)
 
 if not os.path.isdir(src_dir):
   print(f"  Error: {src_dir} not found", file=sys.stderr)
   sys.exit(1)
 
-files = sorted(f for f in os.listdir(src_dir) if f.endswith(".png") and "_playstore" not in f)
-if not files:
-  print(f"  No source PNG files found in {src_dir}", file=sys.stderr)
-  sys.exit(1)
+FONT_PATH = "/System/Library/Fonts/HelveticaNeue.ttc"
+BOLD_INDEX = 1
+ACCENT = (178, 83, 26)      # LjLightAccent 0xFFB2531A
+TEXT_COLOR = (35, 30, 27)   # LjLightText 0xFF231E1B
+MASK_SS = 4  # supersample factor for rounded-corner masks only (cheap, localized)
 
-for fname in files:
-  src_path = os.path.join(src_dir, fname)
-  name, ext = os.path.splitext(fname)
-  dst_path = os.path.join(src_dir, f"{name}_playstore{ext}")
-  img = Image.open(src_path)
-  img.thumbnail((canvas_w, canvas_h), Image.LANCZOS)
-  canvas = Image.new("RGB", (canvas_w, canvas_h), bg_color)
-  x = (canvas_w - img.width) // 2
-  y = (canvas_h - img.height) // 2
-  canvas.paste(img, (x, y), img if img.mode == "RGBA" else None)
+# (source screenshot, caption lines) — one entry per feature. Reused for both
+# the feature graphic (first entry only) and the gallery (all entries).
+SHOTS = [
+  ("01_idle.png", [[("Take control of", False)], [("your ", False), ("GPS", True)]]),
+  ("02_map.png", [[("Fake your ", False), ("GPS", True)], [("anywhere", False)]]),
+  ("16_routes_add_button.png", [[("Create routes", False)], [("your ", False), ("way", True)]]),
+  ("17_favorites_add_button.png", [[("Save your ", False), ("favorite", True)], [("spots", False)]]),
+  ("05_settings.png", [[("Fine-tune every", False)], [("setting", True)]]),
+  ("15_widget_overlay.png", [[("Control it all from", False)], [("one quick ", False), ("widget", True)]]),
+  ("08_map_roaming_sheet.png", [[("Roam ", False), ("naturally", True)], [("hands-free", False)]]),
+  ("17_group_sync.png", [[("Sync location", False)], [("across ", False), ("devices", True)]]),
+]
+
+
+def rounded_mask(size, radius, corners=(True, True, True, True)):
+  big = (size[0] * MASK_SS, size[1] * MASK_SS)
+  mask = Image.new("L", big, 0)
+  ImageDraw.Draw(mask).rounded_rectangle(
+    [0, 0, big[0], big[1]], radius=radius * MASK_SS, fill=255, corners=corners
+  )
+  return mask.resize(size, Image.LANCZOS)
+
+
+def line_width(draw, segments, font):
+  return sum(draw.textbbox((0, 0), text, font=font)[2] for text, _ in segments)
+
+
+def fit_font(draw, lines, max_width, max_height, start_size, min_size):
+  size = start_size
+  while size > min_size:
+    font = ImageFont.truetype(FONT_PATH, size, index=BOLD_INDEX)
+    widest = max(line_width(draw, line, font) for line in lines)
+    total_h = int(size * 1.2) * len(lines)
+    if widest <= max_width and total_h <= max_height:
+      return font, size
+    size -= 1
+  return ImageFont.truetype(FONT_PATH, min_size, index=BOLD_INDEX), min_size
+
+
+def draw_caption(draw, caption_lines, font, line_height, top_y, area_x, area_w):
+  y = top_y
+  for line in caption_lines:
+    total_w = line_width(draw, line, font)
+    x = area_x + (area_w - total_w) // 2
+    for text, is_accent in line:
+      color = ACCENT if is_accent else TEXT_COLOR
+      draw.text((x, y), text, font=font, fill=color)
+      x += draw.textbbox((0, 0), text, font=font)[2]
+    y += line_height
+
+
+# ── 1. Feature graphic: 1024x500, idle screen, full uncropped screenshot ──
+
+FEATURE_W, FEATURE_H = 1024, 500
+MARGIN = 40
+LEFT_W = 440
+CORNER_RADIUS = 28
+
+feat_fname, feat_caption = SHOTS[0]
+feat_src = os.path.join(src_dir, feat_fname)
+if os.path.exists(feat_src):
+  canvas = Image.new("RGB", (FEATURE_W, FEATURE_H), (255, 255, 255))
+  draw = ImageDraw.Draw(canvas)
+
+  text_max_w = LEFT_W - 2 * MARGIN
+  text_max_h = FEATURE_H - 2 * MARGIN
+  font, font_size = fit_font(draw, feat_caption, text_max_w, text_max_h, 48, 20)
+  line_height = int(font_size * 1.2)
+  text_block_h = line_height * len(feat_caption)
+  draw_caption(draw, feat_caption, font, line_height, (FEATURE_H - text_block_h) // 2, MARGIN, text_max_w)
+
+  img = Image.open(feat_src).convert("RGB")  # full screenshot, no crop
+  avail_w = FEATURE_W - LEFT_W - MARGIN
+  avail_h = FEATURE_H - 2 * MARGIN
+  scale = min(avail_w / img.width, avail_h / img.height)
+  new_w, new_h = int(img.width * scale), int(img.height * scale)
+  img_resized = img.resize((new_w, new_h), Image.LANCZOS)
+  mask = rounded_mask((new_w, new_h), CORNER_RADIUS)
+
+  px = LEFT_W + (avail_w - new_w) // 2
+  py = (FEATURE_H - new_h) // 2
+
+  shadow = Image.new("RGBA", (FEATURE_W, FEATURE_H), (0, 0, 0, 0))
+  ImageDraw.Draw(shadow).rounded_rectangle(
+    [px + 2, py + 4, px + new_w + 2, py + new_h + 4], radius=CORNER_RADIUS, fill=(0, 0, 0, 45)
+  )
+  shadow = shadow.filter(ImageFilter.GaussianBlur(5))
+  canvas.paste(shadow, (0, 0), shadow)
+  canvas.paste(img_resized, (px, py), mask)
+
+  dst_path = os.path.join(out_dir, "feature_graphic.png")
   canvas.save(dst_path, "PNG", optimize=True)
-  print(f"  {fname} → {os.path.basename(dst_path)}")
+  print(f"  {feat_fname} → marketing/feature_graphic.png (1024x500)")
+else:
+  print(f"  skip feature graphic (missing): {feat_fname}", file=sys.stderr)
+
+# ── 2. Gallery: 8 portrait images, exact 9:16, FULL uncropped screenshot ──
+#
+# Play Store requires an exact 16:9/9:16 ratio (not just "portrait-ish"),
+# plus >=4 shots at >=1080x1080 to qualify for promotion. Canvas is fixed at
+# 1080x1920 (= 9:16 exactly, and well past the 1080x1080 floor). The full
+# screenshot (1080x2340, nothing cropped off) is scaled down ONE time to fit
+# the space left after the caption band, then centered (pillarboxed) — a
+# single, modest-ratio (~0.65x) resize stays sharp; it's chained resizes and
+# extreme (5x+) downscale ratios that caused the earlier pixelation, not
+# resizing itself.
+GALLERY_W, GALLERY_H = 1080, 1920
+GALLERY_CORNER_RADIUS = 48
+GALLERY_BAND_H = 400  # caption band height, leaves 1520px for the screenshot
+
+for fname, caption_lines in SHOTS:
+  src_path = os.path.join(src_dir, fname)
+  if not os.path.exists(src_path):
+    print(f"  skip gallery (missing): {fname}", file=sys.stderr)
+    continue
+
+  photo_full = Image.open(src_path).convert("RGB")
+  avail_w = GALLERY_W
+  avail_h = GALLERY_H - GALLERY_BAND_H
+  scale = min(avail_w / photo_full.width, avail_h / photo_full.height)
+  new_w, new_h = round(photo_full.width * scale), round(photo_full.height * scale)
+  photo = photo_full.resize((new_w, new_h), Image.LANCZOS)
+
+  canvas = Image.new("RGB", (GALLERY_W, GALLERY_H), (255, 255, 255))
+  draw = ImageDraw.Draw(canvas)
+
+  margin = round(GALLERY_W * 0.08)
+  text_max_w = GALLERY_W - 2 * margin
+  font, font_size = fit_font(draw, caption_lines, text_max_w, GALLERY_BAND_H, round(GALLERY_W * 0.11), round(GALLERY_W * 0.045))
+  line_height = int(font_size * 1.2)
+  text_block_h = line_height * len(caption_lines)
+  draw_caption(draw, caption_lines, font, line_height, (GALLERY_BAND_H - text_block_h) // 2, margin, text_max_w)
+
+  mask = rounded_mask((new_w, new_h), GALLERY_CORNER_RADIUS)
+  px = (GALLERY_W - new_w) // 2
+  py = GALLERY_BAND_H + (avail_h - new_h) // 2
+
+  shadow = Image.new("RGBA", (GALLERY_W, GALLERY_H), (0, 0, 0, 0))
+  ImageDraw.Draw(shadow).rounded_rectangle(
+    [px + 2, py + 6, px + new_w + 2, py + new_h + 6], radius=GALLERY_CORNER_RADIUS, fill=(0, 0, 0, 40)
+  )
+  shadow = shadow.filter(ImageFilter.GaussianBlur(8))
+  canvas.paste(shadow, (0, 0), shadow)
+  canvas.paste(photo, (px, py), mask)
+
+  name, _ = os.path.splitext(fname)
+  dst_path = os.path.join(gallery_dir, f"{name}.png")
+  canvas.save(dst_path, "PNG", optimize=True)
+  print(f"  {fname} → marketing/gallery/{os.path.basename(dst_path)} ({GALLERY_W}x{GALLERY_H})")
 PYTHON_EOF
 }
 
@@ -555,11 +741,11 @@ go_idle() {
   wait_s 4 "App starting"
 }
 
-# ── Playstore-only mode: skip device entirely ─────────────────────────────────
+# ── Marketing-only mode: skip device entirely ─────────────────────────────────
 
-if [[ "$PLAYSTORE_ONLY" == true ]]; then
+if [[ "$MARKETING_ONLY" == true ]]; then
   mkdir -p "$OUTPUT_DIR"
-  generate_playstore_variants
+  generate_marketing_variants
   exit 0
 fi
 
@@ -1056,8 +1242,8 @@ fi
 demo_mode_exit
 trap - EXIT
 
-# Generate Play Store variants for all captured screenshots
-generate_playstore_variants
+# Generate the Play Store marketing gallery
+generate_marketing_variants
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
