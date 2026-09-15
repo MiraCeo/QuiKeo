@@ -24,8 +24,9 @@ Thumbs.db
 .sisyphus
 .opencode
 .omc
-# Added by code-review-graph
-.code-review-graph/
 .agents
 .shortcuts
 .claude/.radin
+
+# Python
+**__pycache__
