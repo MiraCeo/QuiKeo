@@ -1,6 +1,5 @@
 package com.locationjoystick.feature.widget.impl
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -499,77 +498,21 @@ internal fun MapFloatingView(
                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                 onClick = { showFavoritesPicker = true },
             )
-            if (AppFeature.ROUTES in enabledMapFabFeatures || isRouteReplay) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    AnimatedVisibility(visible = isRouteReplay && isRouteControlsExpanded) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            LjMapIconButton(
-                                icon = LjIcons.Stop,
-                                contentDescription = stringResource(R.string.overlay_stop_route_cd),
-                                containerColor = MaterialTheme.colorScheme.error,
-                                contentColor = MaterialTheme.colorScheme.onError,
-                                onClick = {
-                                    onRouteControlsExpandedChange(false)
-                                    onStopRouteReplay()
-                                },
-                            )
-                            LjMapIconButton(
-                                icon = if (isRoutePaused) LjIcons.PlayArrow else LjIcons.Pause,
-                                contentDescription =
-                                    stringResource(
-                                        if (isRoutePaused) {
-                                            R.string.overlay_resume_route_cd
-                                        } else {
-                                            R.string.overlay_pause_route_cd
-                                        },
-                                    ),
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                onClick = { if (isRoutePaused) onResumeRouteReplay() else onPauseRouteReplay() },
-                            )
-                            if (!hideTeleportFeatures && showRouteJumpButtons) {
-                                LjMapIconButton(
-                                    icon = LjIcons.SkipPrevious,
-                                    contentDescription = stringResource(R.string.overlay_previous_waypoint_cd),
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                    contentColor = LjSuccess,
-                                    onClick = onJumpToPreviousWaypoint,
-                                )
-                                LjMapIconButton(
-                                    icon = LjIcons.SkipNext,
-                                    contentDescription = stringResource(R.string.overlay_next_waypoint_cd),
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                    contentColor = LjSuccess,
-                                    onClick = onJumpToNextWaypoint,
-                                )
-                            }
-                        }
-                    }
-                    LjMapIconButton(
-                        icon = LjIcons.Route,
-                        contentDescription =
-                            stringResource(
-                                if (isRouteReplay) {
-                                    R.string.overlay_route_active_cd
-                                } else {
-                                    R.string.overlay_open_routes_cd
-                                },
-                            ),
-                        containerColor = if (isRouteReplay) LjSuccess else MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = if (isRouteReplay) LjBg else MaterialTheme.colorScheme.onPrimaryContainer,
-                        onClick = {
-                            if (isRouteReplay) {
-                                onRouteControlsExpandedChange(!isRouteControlsExpanded)
-                            } else {
-                                onOpenRoutes()
-                            }
-                        },
-                    )
-                }
-            }
+            MapFloatingRouteControlsRow(
+                enabledMapFabFeatures = enabledMapFabFeatures,
+                isRouteReplay = isRouteReplay,
+                isRouteControlsExpanded = isRouteControlsExpanded,
+                isRoutePaused = isRoutePaused,
+                hideTeleportFeatures = hideTeleportFeatures,
+                showRouteJumpButtons = showRouteJumpButtons,
+                onRouteControlsExpandedChange = onRouteControlsExpandedChange,
+                onStopRouteReplay = onStopRouteReplay,
+                onPauseRouteReplay = onPauseRouteReplay,
+                onResumeRouteReplay = onResumeRouteReplay,
+                onJumpToPreviousWaypoint = onJumpToPreviousWaypoint,
+                onJumpToNextWaypoint = onJumpToNextWaypoint,
+                onOpenRoutes = onOpenRoutes,
+            )
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 androidx.compose.animation.AnimatedVisibility(visible = isRoaming) {
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
