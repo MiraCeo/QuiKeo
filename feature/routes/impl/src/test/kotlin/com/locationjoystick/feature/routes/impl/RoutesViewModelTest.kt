@@ -8,6 +8,7 @@ import com.locationjoystick.core.data.LocationRepository
 import com.locationjoystick.core.data.RouteRepository
 import com.locationjoystick.core.data.SettingsRepository
 import com.locationjoystick.core.data.TeleportUseCase
+import com.locationjoystick.core.location.RouteStartConfig
 import com.locationjoystick.core.location.StartRouteReplayUseCase
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.Route
@@ -177,13 +178,16 @@ class RoutesViewModelUiStateTest {
             coVerify {
                 startRouteReplayUseCase.execute(
                     routeId = "r1",
-                    isLooping = true,
-                    isReverse = true,
-                    isReturnToLocation = false,
-                    followRoadsToStart = true,
-                    isPlanting = true,
-                    teleportBetweenWaypoints = true,
-                    teleportBetweenDelaySeconds = AppConstants.RouteConstants.TELEPORT_BETWEEN_DEFAULT_DELAY_SECONDS,
+                    config =
+                        RouteStartConfig(
+                            isLooping = true,
+                            isReverse = true,
+                            isReturnToLocation = false,
+                            followRoadsToStart = true,
+                            isPlanting = true,
+                            teleportBetweenWaypoints = true,
+                            teleportBetweenDelaySeconds = AppConstants.RouteConstants.TELEPORT_BETWEEN_DEFAULT_DELAY_SECONDS,
+                        ),
                 )
             }
         }

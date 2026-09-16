@@ -15,6 +15,7 @@ import com.locationjoystick.core.data.TeleportUseCase
 import com.locationjoystick.core.data.WalkCoordinator
 import com.locationjoystick.core.location.EphemeralReplayController
 import com.locationjoystick.core.location.MapController
+import com.locationjoystick.core.location.RouteStartConfig
 import com.locationjoystick.core.location.StartRouteReplayUseCase
 import com.locationjoystick.core.model.FavoriteLocation
 import com.locationjoystick.core.model.LatLng
@@ -772,7 +773,12 @@ class MapViewModelTest {
             )
             testDispatcher.scheduler.advanceUntilIdle()
 
-            coVerify { startRouteReplayUseCase.execute("route-1", false, false, false, false) }
+            coVerify {
+                startRouteReplayUseCase.execute(
+                    "route-1",
+                    RouteStartConfig(isLooping = false, isReverse = false, isReturnToLocation = false, followRoadsToStart = false),
+                )
+            }
             assertEquals(false, viewModel.uiState.value.showRoutesSheet)
         }
 
@@ -793,7 +799,12 @@ class MapViewModelTest {
             )
             testDispatcher.scheduler.advanceUntilIdle()
 
-            coVerify { startRouteReplayUseCase.execute("route-1", false, false, false, true) }
+            coVerify {
+                startRouteReplayUseCase.execute(
+                    "route-1",
+                    RouteStartConfig(isLooping = false, isReverse = false, isReturnToLocation = false, followRoadsToStart = true),
+                )
+            }
             assertEquals(true, viewModel.uiState.value.showRoutesSheet)
         }
 
@@ -1306,13 +1317,16 @@ class MapViewModelTest {
             coVerify {
                 startRouteReplayUseCase.execute(
                     routeId = AppConstants.RouteConstants.PASTE_TEMP_ROUTE_ID,
-                    isLooping = true,
-                    isReverse = false,
-                    isReturnToLocation = false,
-                    followRoadsToStart = true,
-                    isPlanting = false,
-                    teleportBetweenWaypoints = true,
-                    teleportBetweenDelaySeconds = AppConstants.RouteConstants.TELEPORT_BETWEEN_DEFAULT_DELAY_SECONDS,
+                    config =
+                        RouteStartConfig(
+                            isLooping = true,
+                            isReverse = false,
+                            isReturnToLocation = false,
+                            followRoadsToStart = true,
+                            isPlanting = false,
+                            teleportBetweenWaypoints = true,
+                            teleportBetweenDelaySeconds = AppConstants.RouteConstants.TELEPORT_BETWEEN_DEFAULT_DELAY_SECONDS,
+                        ),
                 )
             }
         }
@@ -1331,7 +1345,7 @@ class MapViewModelTest {
             testDispatcher.scheduler.advanceUntilIdle()
 
             coVerify(exactly = 0) { routeRepository.upsertPasteTempRoute(any()) }
-            coVerify(exactly = 0) { startRouteReplayUseCase.execute(any(), any(), any(), any(), any(), any(), any()) }
+            coVerify(exactly = 0) { startRouteReplayUseCase.execute(any(), any()) }
         }
 
     @Test

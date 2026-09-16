@@ -15,6 +15,7 @@ import com.locationjoystick.core.data.RoamingRepository
 import com.locationjoystick.core.data.SettingsRepository
 import com.locationjoystick.core.data.TeleportUseCase
 import com.locationjoystick.core.location.MapController
+import com.locationjoystick.core.location.RouteStartConfig
 import com.locationjoystick.core.location.isRouteReplay
 import com.locationjoystick.core.location.isSpoofing
 import com.locationjoystick.core.location.nonPositionKey
@@ -391,13 +392,15 @@ class MapViewModel
                 is MapAction.StartRouteReplay -> {
                     mapController.startRouteReplay(
                         action.routeId,
-                        action.isLooping,
-                        action.isReverse,
-                        action.isReturnToLocation,
-                        action.followRoadsToStart,
-                        action.isPlanting,
-                        action.teleportBetweenWaypoints,
-                        action.teleportBetweenDelaySeconds,
+                        RouteStartConfig(
+                            isLooping = action.isLooping,
+                            isReverse = action.isReverse,
+                            isReturnToLocation = action.isReturnToLocation,
+                            followRoadsToStart = action.followRoadsToStart,
+                            isPlanting = action.isPlanting,
+                            teleportBetweenWaypoints = action.teleportBetweenWaypoints,
+                            teleportBetweenDelaySeconds = action.teleportBetweenDelaySeconds,
+                        ),
                     )
                     if (!action.followRoadsToStart) {
                         _uiState.update { it.copy(showRoutesSheet = false) }
@@ -638,13 +641,16 @@ class MapViewModel
             if (points.size < 2) return
             mapController.startPastedRouteReplay(
                 points = points,
-                isLooping = loop,
-                isReverse = reverse,
-                isReturnToLocation = returnToLocation,
-                followRoadsToStart = followRoads,
-                isPlanting = planting,
-                teleportBetweenWaypoints = teleportBetweenWaypoints,
-                teleportBetweenDelaySeconds = teleportBetweenDelaySeconds,
+                config =
+                    RouteStartConfig(
+                        isLooping = loop,
+                        isReverse = reverse,
+                        isReturnToLocation = returnToLocation,
+                        followRoadsToStart = followRoads,
+                        isPlanting = planting,
+                        teleportBetweenWaypoints = teleportBetweenWaypoints,
+                        teleportBetweenDelaySeconds = teleportBetweenDelaySeconds,
+                    ),
             )
             hidePasteCoordinatesSheet()
         }

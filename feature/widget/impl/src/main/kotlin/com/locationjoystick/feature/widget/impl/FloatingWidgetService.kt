@@ -31,6 +31,7 @@ import com.locationjoystick.core.designsystem.LjTheme
 import com.locationjoystick.core.location.CompassHeadingSource
 import com.locationjoystick.core.location.MapController
 import com.locationjoystick.core.location.MockLocationService
+import com.locationjoystick.core.location.RouteStartConfig
 import com.locationjoystick.core.model.AppFeature
 import com.locationjoystick.core.model.FavoriteLocation
 import com.locationjoystick.core.model.GroupRole
@@ -807,23 +808,8 @@ class FloatingWidgetService :
 
             override fun startRouteReplayWithMode(
                 routeId: String,
-                isLooping: Boolean,
-                isReverse: Boolean,
-                isReturnToLocation: Boolean,
-                followRoadsToStart: Boolean,
-                isPlanting: Boolean,
-                teleportBetweenWaypoints: Boolean,
-                teleportBetweenDelaySeconds: Int,
-            ) = mapController.startRouteReplay(
-                routeId,
-                isLooping,
-                isReverse,
-                isReturnToLocation,
-                followRoadsToStart,
-                isPlanting,
-                teleportBetweenWaypoints,
-                teleportBetweenDelaySeconds,
-            )
+                config: RouteStartConfig,
+            ) = mapController.startRouteReplay(routeId, config)
 
             override fun teleport(pos: LatLng) = mapController.teleportTo(pos)
 

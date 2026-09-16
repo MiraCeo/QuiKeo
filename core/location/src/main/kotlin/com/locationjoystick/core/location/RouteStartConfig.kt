@@ -1,4 +1,4 @@
-package com.locationjoystick.feature.routes.impl
+package com.locationjoystick.core.location
 
 import com.locationjoystick.core.common.constants.AppConstants
 

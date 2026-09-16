@@ -1,7 +1,6 @@
 package com.locationjoystick.core.location
 
 import android.content.Context
-import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.common.util.clampTeleportBetweenDelaySeconds
 import com.locationjoystick.core.data.LocationRepository
 import com.locationjoystick.core.data.RouteRepository
@@ -25,25 +24,19 @@ class StartRouteReplayUseCase
     ) {
         suspend fun execute(
             routeId: String,
-            isLooping: Boolean = false,
-            isReverse: Boolean = false,
-            isReturnToLocation: Boolean = false,
-            followRoadsToStart: Boolean = false,
-            isPlanting: Boolean = false,
-            teleportBetweenWaypoints: Boolean = false,
-            teleportBetweenDelaySeconds: Int = AppConstants.RouteConstants.TELEPORT_BETWEEN_DEFAULT_DELAY_SECONDS,
+            config: RouteStartConfig = RouteStartConfig(),
         ) {
             val route = routeRepository.getRouteWithWaypoints(routeId).first()
             val speedMs = settingsRepository.activateSessionSpeed(route?.speedProfileId)
-            val returnPosition = if (isReturnToLocation) locationRepository.currentPosition.value else null
+            val returnPosition = if (config.isReturnToLocation) locationRepository.currentPosition.value else null
             // Walking to the first waypoint is the default (docs/features/routes.md "Start Flow").
             // Teleport between waypoints requires teleporting to the start too, since MockLocationService
             // only honors the hop mode when teleportToStart is also set.
-            val teleportToStart = teleportBetweenWaypoints && !settingsRepository.getHideTeleportFeatures().first()
+            val teleportToStart = config.teleportBetweenWaypoints && !settingsRepository.getHideTeleportFeatures().first()
             val teleportBetween = teleportToStart
-            val hopDelaySeconds = clampTeleportBetweenDelaySeconds(teleportBetweenDelaySeconds)
+            val hopDelaySeconds = clampTeleportBetweenDelaySeconds(config.teleportBetweenDelaySeconds)
             if (teleportToStart) {
-                route?.startWaypoint(isReverse)?.let { teleportUseCase.execute(it.position, resetMovement = false) }
+                route?.startWaypoint(config.isReverse)?.let { teleportUseCase.execute(it.position, resetMovement = false) }
             }
             val intent =
                 MockLocationIntentBuilder
@@ -51,14 +44,14 @@ class StartRouteReplayUseCase
                         context,
                         routeId,
                         speedMs,
-                        isReverse,
-                        followRoadsToStart,
+                        config.isReverse,
+                        config.followRoadsToStart,
                         teleportToStart,
-                        isPlanting,
+                        config.isPlanting,
                         teleportBetween,
                         hopDelaySeconds,
                     ).apply {
-                        putExtra(MockLocationService.EXTRA_IS_LOOPING, isLooping)
+                        putExtra(MockLocationService.EXTRA_IS_LOOPING, config.isLooping)
                         if (returnPosition != null) {
                             putExtra(MockLocationService.EXTRA_RETURN_LAT, returnPosition.latitude)
                             putExtra(MockLocationService.EXTRA_RETURN_LON, returnPosition.longitude)

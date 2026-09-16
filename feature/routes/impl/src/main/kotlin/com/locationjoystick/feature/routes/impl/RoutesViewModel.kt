@@ -15,6 +15,7 @@ import com.locationjoystick.core.data.RouteRepository
 import com.locationjoystick.core.data.SettingsRepository
 import com.locationjoystick.core.data.TeleportUseCase
 import com.locationjoystick.core.location.MockLocationService
+import com.locationjoystick.core.location.RouteStartConfig
 import com.locationjoystick.core.location.StartRouteReplayUseCase
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.MockLocationState
@@ -126,16 +127,7 @@ class RoutesViewModel
             config: RouteStartConfig = RouteStartConfig(),
         ) {
             viewModelScope.launch {
-                startRouteReplayUseCase.execute(
-                    routeId = route.id,
-                    isLooping = config.isLooping,
-                    isReverse = config.isReverse,
-                    isReturnToLocation = config.isReturnToLocation,
-                    followRoadsToStart = config.followRoadsToStart,
-                    isPlanting = config.isPlanting,
-                    teleportBetweenWaypoints = config.teleportBetweenWaypoints,
-                    teleportBetweenDelaySeconds = config.teleportBetweenDelaySeconds,
-                )
+                startRouteReplayUseCase.execute(routeId = route.id, config = config)
             }
         }
 

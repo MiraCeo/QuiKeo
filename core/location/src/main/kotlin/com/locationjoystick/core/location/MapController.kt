@@ -477,25 +477,10 @@ class MapController
 
         fun startRouteReplay(
             routeId: String,
-            isLooping: Boolean = false,
-            isReverse: Boolean = false,
-            isReturnToLocation: Boolean = false,
-            followRoadsToStart: Boolean = false,
-            isPlanting: Boolean = false,
-            teleportBetweenWaypoints: Boolean = false,
-            teleportBetweenDelaySeconds: Int = AppConstants.RouteConstants.TELEPORT_BETWEEN_DEFAULT_DELAY_SECONDS,
+            config: RouteStartConfig = RouteStartConfig(),
         ) {
             appScope.launch {
-                startRouteReplayUseCase.execute(
-                    routeId = routeId,
-                    isLooping = isLooping,
-                    isReverse = isReverse,
-                    isReturnToLocation = isReturnToLocation,
-                    followRoadsToStart = followRoadsToStart,
-                    isPlanting = isPlanting,
-                    teleportBetweenWaypoints = teleportBetweenWaypoints,
-                    teleportBetweenDelaySeconds = teleportBetweenDelaySeconds,
-                )
+                startRouteReplayUseCase.execute(routeId = routeId, config = config)
             }
         }
 
@@ -512,13 +497,7 @@ class MapController
 
         fun startPastedRouteReplay(
             points: List<LatLng>,
-            isLooping: Boolean = false,
-            isReverse: Boolean = false,
-            isReturnToLocation: Boolean = false,
-            followRoadsToStart: Boolean = false,
-            isPlanting: Boolean = false,
-            teleportBetweenWaypoints: Boolean = false,
-            teleportBetweenDelaySeconds: Int = AppConstants.RouteConstants.TELEPORT_BETWEEN_DEFAULT_DELAY_SECONDS,
+            config: RouteStartConfig = RouteStartConfig(),
         ) {
             appScope.launch {
                 val result = routeRepository.upsertPasteTempRoute(points)
@@ -528,13 +507,7 @@ class MapController
                 }
                 startRouteReplayUseCase.execute(
                     routeId = AppConstants.RouteConstants.PASTE_TEMP_ROUTE_ID,
-                    isLooping = isLooping,
-                    isReverse = isReverse,
-                    isReturnToLocation = isReturnToLocation,
-                    followRoadsToStart = followRoadsToStart,
-                    isPlanting = isPlanting,
-                    teleportBetweenWaypoints = teleportBetweenWaypoints,
-                    teleportBetweenDelaySeconds = teleportBetweenDelaySeconds,
+                    config = config,
                 )
             }
         }

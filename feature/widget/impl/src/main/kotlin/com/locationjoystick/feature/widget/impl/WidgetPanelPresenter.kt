@@ -21,6 +21,7 @@ import com.locationjoystick.core.data.RouteRepository
 import com.locationjoystick.core.data.SettingsRepository
 import com.locationjoystick.core.designsystem.LjTheme
 import com.locationjoystick.core.location.MapController
+import com.locationjoystick.core.location.RouteStartConfig
 import com.locationjoystick.core.location.ephemeralWaypoints
 import com.locationjoystick.core.location.walkStart
 import com.locationjoystick.core.location.walkTarget
@@ -82,13 +83,7 @@ internal class WidgetPanelPresenter(
 
         fun startRouteReplayWithMode(
             routeId: String,
-            isLooping: Boolean,
-            isReverse: Boolean,
-            isReturnToLocation: Boolean,
-            followRoadsToStart: Boolean,
-            isPlanting: Boolean,
-            teleportBetweenWaypoints: Boolean,
-            teleportBetweenDelaySeconds: Int,
+            config: RouteStartConfig,
         )
 
         fun teleport(pos: LatLng)
@@ -372,13 +367,16 @@ internal class WidgetPanelPresenter(
                     ->
                     mapController.startPastedRouteReplay(
                         points = points,
-                        isLooping = loop,
-                        isReverse = reverse,
-                        isReturnToLocation = returnToLocation,
-                        followRoadsToStart = followRoads,
-                        isPlanting = planting,
-                        teleportBetweenWaypoints = teleportBetweenWaypoints,
-                        teleportBetweenDelaySeconds = delaySeconds,
+                        config =
+                            RouteStartConfig(
+                                isLooping = loop,
+                                isReverse = reverse,
+                                isReturnToLocation = returnToLocation,
+                                followRoadsToStart = followRoads,
+                                isPlanting = planting,
+                                teleportBetweenWaypoints = teleportBetweenWaypoints,
+                                teleportBetweenDelaySeconds = delaySeconds,
+                            ),
                     )
                     hidePanelView()
                 },
@@ -441,13 +439,15 @@ internal class WidgetPanelPresenter(
                     ->
                     callbacks.startRouteReplayWithMode(
                         routeId,
-                        isLooping,
-                        isReverse,
-                        isReturnToLocation,
-                        followRoadsToStart,
-                        isPlanting,
-                        teleportBetweenWaypoints,
-                        teleportBetweenDelaySeconds,
+                        RouteStartConfig(
+                            isLooping = isLooping,
+                            isReverse = isReverse,
+                            isReturnToLocation = isReturnToLocation,
+                            followRoadsToStart = followRoadsToStart,
+                            isPlanting = isPlanting,
+                            teleportBetweenWaypoints = teleportBetweenWaypoints,
+                            teleportBetweenDelaySeconds = teleportBetweenDelaySeconds,
+                        ),
                     )
                     callbacks.moveAppToBack()
                 },
@@ -563,13 +563,16 @@ internal class WidgetPanelPresenter(
                     ->
                     mapController.startPastedRouteReplay(
                         points = points,
-                        isLooping = loop,
-                        isReverse = reverse,
-                        isReturnToLocation = returnToLocation,
-                        followRoadsToStart = followRoads,
-                        isPlanting = planting,
-                        teleportBetweenWaypoints = teleportBetweenWaypoints,
-                        teleportBetweenDelaySeconds = delaySeconds,
+                        config =
+                            RouteStartConfig(
+                                isLooping = loop,
+                                isReverse = reverse,
+                                isReturnToLocation = returnToLocation,
+                                followRoadsToStart = followRoads,
+                                isPlanting = planting,
+                                teleportBetweenWaypoints = teleportBetweenWaypoints,
+                                teleportBetweenDelaySeconds = delaySeconds,
+                            ),
                     )
                 },
                 quickWalk = quickWalk,

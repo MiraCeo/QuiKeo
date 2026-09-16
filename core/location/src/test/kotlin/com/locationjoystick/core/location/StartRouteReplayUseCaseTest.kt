@@ -67,7 +67,7 @@ class StartRouteReplayUseCaseTest {
     @Test
     fun execute_planting_stillWalksToSavedStart() =
         runTest {
-            useCase.execute("route-1", isPlanting = true)
+            useCase.execute("route-1", RouteStartConfig(isPlanting = true))
 
             coVerify(exactly = 0) { teleportUseCase.execute(any(), any()) }
             verify { context.startService(any()) }
@@ -76,7 +76,7 @@ class StartRouteReplayUseCaseTest {
     @Test
     fun execute_teleportBetweenWaypoints_teleportsToFirstWaypoint() =
         runTest {
-            useCase.execute("route-1", teleportBetweenWaypoints = true)
+            useCase.execute("route-1", RouteStartConfig(teleportBetweenWaypoints = true))
 
             coVerify { teleportUseCase.execute(start, resetMovement = false) }
             verify { context.startService(any()) }
@@ -85,7 +85,7 @@ class StartRouteReplayUseCaseTest {
     @Test
     fun execute_teleportBetweenWaypoints_reverse_teleportsToLastWaypoint() =
         runTest {
-            useCase.execute("route-1", isReverse = true, teleportBetweenWaypoints = true)
+            useCase.execute("route-1", RouteStartConfig(isReverse = true, teleportBetweenWaypoints = true))
 
             coVerify { teleportUseCase.execute(end, resetMovement = false) }
         }
@@ -95,7 +95,7 @@ class StartRouteReplayUseCaseTest {
         runTest {
             every { settingsRepository.getHideTeleportFeatures() } returns flowOf(true)
 
-            useCase.execute("route-1", teleportBetweenWaypoints = true)
+            useCase.execute("route-1", RouteStartConfig(teleportBetweenWaypoints = true))
 
             coVerify(exactly = 0) { teleportUseCase.execute(any(), any()) }
             verify { context.startService(any()) }
