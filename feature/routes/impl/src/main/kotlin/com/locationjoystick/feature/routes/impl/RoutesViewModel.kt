@@ -237,13 +237,7 @@ class RoutesViewModel
                     val outcome = importRoutesFromGpx(uri)
                     outcome.routes.forEach { routeRepository.insertRoute(it) }
                     withContext(Dispatchers.Main) {
-                        val message =
-                            if (outcome.routes.size == 1) {
-                                context.getString(R.string.route_creator_route_imported, outcome.routes.first().name)
-                            } else {
-                                context.getString(R.string.route_creator_routes_imported, outcome.routes.size)
-                            }
-                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, buildGpxImportMessage(context, outcome), Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "GPX import failed", e)
@@ -312,7 +306,27 @@ class RoutesViewModel
             }
     }
 
-private data class GpxImportOutcome(
+internal data class GpxImportOutcome(
     val routes: List<Route>,
     val skippedOversized: Int,
 )
+
+internal fun buildGpxImportMessage(
+    context: Context,
+    outcome: GpxImportOutcome,
+): String {
+    val base =
+        if (outcome.routes.size == 1) {
+            context.getString(R.string.route_creator_route_imported, outcome.routes.first().name)
+        } else {
+            context.getString(R.string.route_creator_routes_imported, outcome.routes.size)
+        }
+    if (outcome.skippedOversized <= 0) return base
+    val skippedRes =
+        if (outcome.skippedOversized == 1) {
+            R.string.route_creator_skipped_oversized_one
+        } else {
+            R.string.route_creator_skipped_oversized_other
+        }
+    return "$base. ${context.getString(skippedRes, outcome.skippedOversized)}"
+}

@@ -235,6 +235,43 @@ class RoutesViewModelUiStateTest {
             }
         }
 
+    @Test
+    fun buildGpxImportMessage_noSkippedRoutes_returnsBaseMessageOnly() {
+        val outcome = GpxImportOutcome(listOf(route("id1", "Trail")), skippedOversized = 0)
+        every { context.getString(R.string.route_creator_route_imported, "Trail") } returns "Route imported: Trail"
+
+        val message = buildGpxImportMessage(context, outcome)
+
+        assertEquals("Route imported: Trail", message)
+    }
+
+    @Test
+    fun buildGpxImportMessage_oneSkippedRoute_appendsSingularSkippedCount() {
+        val outcome = GpxImportOutcome(listOf(route("id1", "Trail")), skippedOversized = 1)
+        every { context.getString(R.string.route_creator_route_imported, "Trail") } returns "Route imported: Trail"
+        every {
+            context.getString(R.string.route_creator_skipped_oversized_one, 1)
+        } returns "Skipped 1 route that was too large to import"
+
+        val message = buildGpxImportMessage(context, outcome)
+
+        assertEquals("Route imported: Trail. Skipped 1 route that was too large to import", message)
+    }
+
+    @Test
+    fun buildGpxImportMessage_multipleSkippedRoutes_appendsPluralSkippedCount() {
+        val routes = listOf(route("id1", "A"), route("id2", "B"))
+        val outcome = GpxImportOutcome(routes, skippedOversized = 3)
+        every { context.getString(R.string.route_creator_routes_imported, 2) } returns "2 routes imported"
+        every {
+            context.getString(R.string.route_creator_skipped_oversized_other, 3)
+        } returns "Skipped 3 routes that were too large to import"
+
+        val message = buildGpxImportMessage(context, outcome)
+
+        assertEquals("2 routes imported. Skipped 3 routes that were too large to import", message)
+    }
+
     private fun route(
         id: String,
         name: String,

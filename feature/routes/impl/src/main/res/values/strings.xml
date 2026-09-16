@@ -46,6 +46,8 @@
     <string name="route_creator_route_imported">"Route imported: %1$s"</string>
     <string name="route_creator_routes_imported">"%1$d routes imported"</string>
     <string name="route_creator_import_failed">"Import failed: %1$s"</string>
+    <string name="route_creator_skipped_oversized_one">"Skipped %1$d route that was too large to import"</string>
+    <string name="route_creator_skipped_oversized_other">"Skipped %1$d routes that were too large to import"</string>
     <string name="route_creator_share_gpx">"Share GPX"</string>
     <string name="route_creator_export_failed">"Export failed: %1$s"</string>
     <string name="routes_screen_pause">"Pause"</string>

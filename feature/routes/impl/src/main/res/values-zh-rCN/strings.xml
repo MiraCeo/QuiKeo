@@ -46,6 +46,8 @@
     <string name="route_creator_route_imported">"已导入路线：%1$s"</string>
     <string name="route_creator_routes_imported">"已导入 %1$d 条路线"</string>
     <string name="route_creator_import_failed">"导入失败：%1$s"</string>
+    <string name="route_creator_skipped_oversized_one">"已跳过 %1$d 条因过大而无法导入的路线"</string>
+    <string name="route_creator_skipped_oversized_other">"已跳过 %1$d 条因过大而无法导入的路线"</string>
     <string name="route_creator_share_gpx">"分享 GPX"</string>
     <string name="route_creator_export_failed">"导出失败：%1$s"</string>
     <string name="routes_screen_pause">"暂停"</string>
