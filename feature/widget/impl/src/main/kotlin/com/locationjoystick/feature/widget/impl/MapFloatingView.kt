@@ -60,6 +60,7 @@ import com.locationjoystick.core.designsystem.component.NominatimSearchBar
 import com.locationjoystick.core.designsystem.component.PasteCoordinatesForm
 import com.locationjoystick.core.designsystem.component.RoamingSheetContent
 import com.locationjoystick.core.designsystem.component.RouteProgressBadgeInMapFabSlot
+import com.locationjoystick.core.designsystem.component.routeProgressStopContentDescription
 import com.locationjoystick.core.map.geojson.buildLineGeoJson
 import com.locationjoystick.core.map.geojson.buildPointsGeoJson
 import com.locationjoystick.core.map.geojson.buildPositionGeoJson
@@ -583,7 +584,7 @@ internal fun MapFloatingView(
             if (isRouteReplay && progress != null) {
                 RouteProgressBadgeInMapFabSlot(
                     label = progress.label,
-                    contentDescription = "Stop ${progress.current} of ${progress.total}",
+                    contentDescription = routeProgressStopContentDescription(progress.current, progress.total),
                 )
             }
         }

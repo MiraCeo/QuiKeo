@@ -48,6 +48,7 @@ import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.LjSuccess
 import com.locationjoystick.core.designsystem.UiConstants
 import com.locationjoystick.core.designsystem.component.RouteProgressBadge
+import com.locationjoystick.core.designsystem.component.routeProgressStopContentDescription
 import com.locationjoystick.core.model.AppFeature
 import com.locationjoystick.core.model.RouteProgress
 import com.locationjoystick.feature.widget.impl.R
@@ -538,7 +539,7 @@ internal fun WidgetPanel(
             if (controlsEnabled && routeControls.isReplay && progress != null) {
                 RouteProgressBadge(
                     label = progress.label,
-                    contentDescription = "Stop ${progress.current} of ${progress.total}",
+                    contentDescription = routeProgressStopContentDescription(progress.current, progress.total),
                     // Same 4.dp inset as WidgetIconButton so the chip's left edge matches the icon column.
                     modifier = Modifier.padding(4.dp),
                 )

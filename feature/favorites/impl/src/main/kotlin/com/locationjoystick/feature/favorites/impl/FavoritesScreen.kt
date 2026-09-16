@@ -395,6 +395,7 @@ private fun FavoriteCard(
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
     val coordText = formatCapturedPoint(favorite.position)
+    val copiedCoordinatesMessage = stringResource(R.string.favorites_screen_copied_coordinates, coordText)
 
     LjListItemCard(
         modifier = modifier,
@@ -420,7 +421,7 @@ private fun FavoriteCard(
                         text = { Text(stringResource(R.string.favorites_screen_copy_coordinates)) },
                         onClick = {
                             clipboard.setText(AnnotatedString(coordText))
-                            Toast.makeText(context, "Copied $coordText", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, copiedCoordinatesMessage, Toast.LENGTH_SHORT).show()
                             menuExpanded = false
                         },
                         leadingIcon = { Icon(LjIcons.ContentCopy, null) },

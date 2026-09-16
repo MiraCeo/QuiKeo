@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.setViewTreeLifecycleOwner
@@ -36,6 +37,7 @@ import com.locationjoystick.core.model.ThemeMode
 import com.locationjoystick.core.model.Waypoint
 import com.locationjoystick.core.model.isRoutePlaying
 import com.locationjoystick.core.model.toConfig
+import com.locationjoystick.feature.widget.impl.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -488,6 +490,7 @@ internal class WidgetPanelPresenter(
             var captureSaved by remember { mutableStateOf(false) }
             var captureSaveError by remember { mutableStateOf<String?>(null) }
             var captureOptimizeProximity by remember { mutableStateOf(true) }
+            val captureInvalidRouteMessage = stringResource(R.string.widget_panel_presenter_capture_invalid_route)
             MapFloatingView(
                 compact = !mapExpanded,
                 onToggleExpanded = {
@@ -600,7 +603,7 @@ internal class WidgetPanelPresenter(
                 onSaveCapturedRoute = {
                     val name = captureRouteName.trim()
                     if (name.isEmpty() || capturedPoints.size < 2) {
-                        captureSaveError = "Need a name and at least 2 points."
+                        captureSaveError = captureInvalidRouteMessage
                     } else {
                         serviceScope.launch {
                             val now = System.currentTimeMillis()

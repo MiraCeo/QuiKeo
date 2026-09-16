@@ -10,6 +10,7 @@ import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import com.locationjoystick.core.common.R
 
 private const val TAG = "CaptureBrowserIntents"
 
@@ -103,6 +104,6 @@ private fun Context.startCaptureSetting(intent: Intent) {
         startActivity(intent)
     } catch (e: ActivityNotFoundException) {
         Log.e(TAG, "No settings activity for $intent", e)
-        Toast.makeText(this, "Couldn't open that Android setting", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.capture_browser_intents_couldnt_open_setting), Toast.LENGTH_SHORT).show()
     }
 }

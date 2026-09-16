@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import com.locationjoystick.core.common.R
 import com.locationjoystick.core.model.LatLng
 
 fun currentLocationShareText(position: LatLng?): String? = position?.let(::formatCapturedPoint)
@@ -18,7 +19,7 @@ fun shareCurrentLocationCoordinates(
 ): Boolean {
     val text = currentLocationShareText(position)
     if (text == null) {
-        Toast.makeText(context, "No current location", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.share_coordinates_no_current_location), Toast.LENGTH_SHORT).show()
         return false
     }
     val send =

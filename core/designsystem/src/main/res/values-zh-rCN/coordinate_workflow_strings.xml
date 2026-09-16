@@ -57,6 +57,7 @@
     <string name="roaming_sheet_content_speed_profile">"速度档位"</string>
     <string name="route_progress_badge_stop_1_of_60">"第 1 站，共 60 站"</string>
     <string name="route_progress_badge_stop_16_of_41">"第 16 站，共 41 站"</string>
+    <string name="route_progress_badge_content_description">"第 %1$d 站，共 %2$d 站"</string>
     <string name="routes_picker_list_search_routes">"搜索路线"</string>
     <string name="routes_picker_list_no_routes_match_your_search">"没有匹配的路线"</string>
     <string name="saved_item_sort_menu_sort">"排序"</string>

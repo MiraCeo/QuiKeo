@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
+import com.locationjoystick.app.R
 import com.locationjoystick.core.common.util.CaptureBrowserPackages
 import com.locationjoystick.core.common.util.CaptureLinkDecision
 import com.locationjoystick.core.common.util.captureBrowserPackages
@@ -65,18 +66,33 @@ class LinkInterceptorActivity : ComponentActivity() {
             CaptureLinkDecision.CAPTURE -> {
                 val point = LatLng(coords!!.first, coords.second)
                 captureRepository.appendPoint(point)
-                Toast.makeText(this, "Captured ${formatCapturedPoint(point)}", Toast.LENGTH_SHORT).show()
+                Toast
+                    .makeText(
+                        this,
+                        getString(R.string.link_interceptor_captured, formatCapturedPoint(point)),
+                        Toast.LENGTH_SHORT,
+                    ).show()
             }
             CaptureLinkDecision.JUMP -> {
                 val point = LatLng(coords!!.first, coords.second)
                 teleportUseCase.execute(point)
-                Toast.makeText(this, "Jumped to ${formatCapturedPoint(point)}", Toast.LENGTH_SHORT).show()
+                Toast
+                    .makeText(
+                        this,
+                        getString(R.string.link_interceptor_jumped_to, formatCapturedPoint(point)),
+                        Toast.LENGTH_SHORT,
+                    ).show()
             }
             CaptureLinkDecision.CAPTURE_AND_JUMP -> {
                 val point = LatLng(coords!!.first, coords.second)
                 captureRepository.appendPoint(point)
                 teleportUseCase.execute(point)
-                Toast.makeText(this, "Captured and jumped to ${formatCapturedPoint(point)}", Toast.LENGTH_SHORT).show()
+                Toast
+                    .makeText(
+                        this,
+                        getString(R.string.link_interceptor_captured_and_jumped_to, formatCapturedPoint(point)),
+                        Toast.LENGTH_SHORT,
+                    ).show()
             }
             CaptureLinkDecision.FORWARD -> forward(uri, preferGoogleMaps = !captureModeEnabled && isGoogleMapsWebLink(uri.toString()))
         }

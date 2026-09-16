@@ -70,6 +70,12 @@ fun RouteProgressBadgeInMapFabSlot(
     }
 }
 
+@Composable
+fun routeProgressStopContentDescription(
+    current: Int,
+    total: Int,
+): String = stringResource(R.string.route_progress_badge_content_description, current, total)
+
 @Preview
 @Composable
 private fun RouteProgressBadgePreview() {

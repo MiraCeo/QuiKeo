@@ -15,6 +15,7 @@ import com.locationjoystick.core.designsystem.LjSuccess
 import com.locationjoystick.core.designsystem.UiConstants
 import com.locationjoystick.core.designsystem.component.LjMapIconButton
 import com.locationjoystick.core.designsystem.component.RouteProgressBadgeInMapFabSlot
+import com.locationjoystick.core.designsystem.component.routeProgressStopContentDescription
 import com.locationjoystick.core.model.AppFeature
 import com.locationjoystick.core.model.MockLocationState
 import com.locationjoystick.feature.map.impl.R
@@ -316,7 +317,7 @@ internal fun MapFabColumn(
         if (uiState.isRouteReplay && progress != null) {
             RouteProgressBadgeInMapFabSlot(
                 label = progress.label,
-                contentDescription = "Stop ${progress.current} of ${progress.total}",
+                contentDescription = routeProgressStopContentDescription(progress.current, progress.total),
             )
         }
     }

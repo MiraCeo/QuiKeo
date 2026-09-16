@@ -57,6 +57,7 @@
     <string name="roaming_sheet_content_speed_profile">"Speed profile"</string>
     <string name="route_progress_badge_stop_1_of_60">"Stop 1 of 60"</string>
     <string name="route_progress_badge_stop_16_of_41">"Stop 16 of 41"</string>
+    <string name="route_progress_badge_content_description">"Stop %1$d of %2$d"</string>
     <string name="routes_picker_list_search_routes">"Search routes"</string>
     <string name="routes_picker_list_no_routes_match_your_search">"No routes match your search"</string>
     <string name="saved_item_sort_menu_sort">"Sort"</string>
