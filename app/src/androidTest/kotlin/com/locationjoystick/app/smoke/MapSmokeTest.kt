@@ -57,6 +57,14 @@ class MapSmokeTest : BaseSmokeTest() {
     }
 
     @Test
+    fun map_roaming_sheet_shows_planting_spiral_section() {
+        composeRule.onNodeWithContentDescription("Start roaming").performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithText("Walk around the block").assertIsDisplayed()
+        composeRule.onNodeWithText("Planting").assertIsDisplayed()
+    }
+
+    @Test
     fun map_search_location_fab_is_displayed() {
         composeRule.onNodeWithContentDescription("Search location").assertIsDisplayed()
     }
