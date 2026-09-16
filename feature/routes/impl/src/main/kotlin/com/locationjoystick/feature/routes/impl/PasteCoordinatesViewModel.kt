@@ -1,5 +1,6 @@
 package com.locationjoystick.feature.routes.impl
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.locationjoystick.core.common.constants.AppConstants
@@ -18,6 +19,7 @@ import com.locationjoystick.core.model.Waypoint
 import com.locationjoystick.core.routing.OsrmClient
 import com.locationjoystick.core.routing.RoutingErrorReporter
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -103,6 +105,7 @@ class PasteCoordinatesViewModel
         private val routeRepository: RouteRepository,
         private val osrmClient: OsrmClient,
         private val routingErrorReporter: RoutingErrorReporter,
+        @ApplicationContext private val context: Context,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(PasteCoordinatesUiState())
         val uiState: StateFlow<PasteCoordinatesUiState> = _uiState.asStateFlow()
@@ -151,7 +154,7 @@ class PasteCoordinatesViewModel
                     it.copy(
                         cleanedPoints = emptyList(),
                         previewWaypoints = emptyList(),
-                        loadError = "No valid coordinates found in that text.",
+                        loadError = context.getString(R.string.route_paste_no_valid_coordinates),
                     )
                 }
                 return
@@ -171,9 +174,9 @@ class PasteCoordinatesViewModel
             if (!state.canBuild) {
                 val message =
                     if (state.buildMode == PasteBuildMode.PLANTING) {
-                        "Need at least 1 point for Planting mode."
+                        context.getString(R.string.route_paste_need_one_point_planting)
                     } else {
-                        "Need at least 2 points for this mode."
+                        context.getString(R.string.route_paste_need_two_points)
                     }
                 _uiState.update { it.copy(buildError = message) }
                 return
@@ -191,7 +194,12 @@ class PasteCoordinatesViewModel
                     it.copy(
                         previewWaypoints = preview,
                         isBuilding = false,
-                        buildError = if (preview.size < 2) "Could not build a route from those points." else null,
+                        buildError =
+                            if (preview.size < 2) {
+                                context.getString(R.string.route_paste_could_not_build_route)
+                            } else {
+                                null
+                            },
                     )
                 }
             }

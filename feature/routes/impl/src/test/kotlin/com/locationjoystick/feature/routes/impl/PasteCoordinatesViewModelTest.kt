@@ -1,5 +1,6 @@
 package com.locationjoystick.feature.routes.impl
 
+import android.content.Context
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.data.RouteRepository
 import com.locationjoystick.core.model.LatLng
@@ -8,6 +9,7 @@ import com.locationjoystick.core.routing.OsrmClient
 import com.locationjoystick.core.routing.RoutingErrorReporter
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
@@ -31,12 +33,21 @@ class PasteCoordinatesViewModelTest {
     private val routeRepository: RouteRepository = mockk(relaxed = true)
     private val osrmClient: OsrmClient = mockk(relaxed = true)
     private val routingErrorReporter: RoutingErrorReporter = mockk(relaxed = true)
+    private val context: Context = mockk(relaxed = true)
     private lateinit var viewModel: PasteCoordinatesViewModel
 
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = PasteCoordinatesViewModel(routeRepository, osrmClient, routingErrorReporter)
+        every { context.getString(R.string.route_paste_no_valid_coordinates) } returns
+            "No valid coordinates found in that text."
+        every { context.getString(R.string.route_paste_need_one_point_planting) } returns
+            "Need at least 1 point for Planting mode."
+        every { context.getString(R.string.route_paste_need_two_points) } returns
+            "Need at least 2 points for this mode."
+        every { context.getString(R.string.route_paste_could_not_build_route) } returns
+            "Could not build a route from those points."
+        viewModel = PasteCoordinatesViewModel(routeRepository, osrmClient, routingErrorReporter, context)
     }
 
     @After
