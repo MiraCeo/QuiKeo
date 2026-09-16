@@ -60,4 +60,9 @@ class MapSmokeTest : BaseSmokeTest() {
     fun map_search_location_fab_is_displayed() {
         composeRule.onNodeWithContentDescription("Search location").assertIsDisplayed()
     }
+
+    @Test
+    fun map_paste_coordinates_fab_is_displayed() {
+        composeRule.onNodeWithContentDescription("Paste coordinates").assertIsDisplayed()
+    }
 }
