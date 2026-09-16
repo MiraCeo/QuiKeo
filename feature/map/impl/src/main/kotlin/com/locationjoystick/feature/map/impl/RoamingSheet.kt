@@ -1,10 +1,9 @@
 package com.locationjoystick.feature.map.impl
 
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.designsystem.LjTheme
@@ -31,7 +30,7 @@ fun RoamingSheet(
     ModalBottomSheet(
         onDismissRequest = { if (hasPreview) onMinimize() else onDismiss() },
         sheetState = rememberLjSheetState(),
-        modifier = Modifier.fillMaxHeight(0.8f),
+        containerColor = MaterialTheme.colorScheme.surface,
     ) {
         RoamingSheetContent(
             draft = draft,
