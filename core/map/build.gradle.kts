@@ -5,6 +5,10 @@ plugins {
 
 android {
     namespace = "com.locationjoystick.core.map"
+
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {

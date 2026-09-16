@@ -157,4 +157,19 @@ class MapTileUserAgentTest {
         assertFalse(isMapLibreCacheEntry("locationjoystick.db"))
         assertFalse(isMapLibreCacheEntry("datastore"))
     }
+
+    private object FakeStaticHolder {
+        @JvmField
+        var value: String = "initial"
+    }
+
+    @Test
+    fun `staticFieldEquals reads back the current reflection value, not a stale one`() {
+        val field = FakeStaticHolder.javaClass.getDeclaredField("value")
+        field.isAccessible = true
+        field.set(null, "updated")
+
+        assertTrue(staticFieldEquals(FakeStaticHolder.javaClass, "value", "updated"))
+        assertFalse(staticFieldEquals(FakeStaticHolder.javaClass, "value", "initial"))
+    }
 }

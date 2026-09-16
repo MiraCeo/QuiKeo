@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import com.locationjoystick.core.common.constants.AppConstants
+import com.locationjoystick.core.map.BuildConfig
 import okhttp3.Call
 import okhttp3.Dispatcher
 import okhttp3.Interceptor
@@ -135,12 +136,30 @@ internal fun overwriteMapLibreHttp(
     client: Call.Factory,
     userAgent: String,
 ) {
+    val clazz =
+        try {
+            Class.forName("org.maplibre.android.module.http.HttpRequestImpl")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to overwrite MapLibre HTTP User-Agent", e)
+            return
+        }
     try {
-        val clazz = Class.forName("org.maplibre.android.module.http.HttpRequestImpl")
         setStaticField(clazz, "client", client)
         setStaticField(clazz, "userAgentString", userAgent)
     } catch (e: Exception) {
         Log.e(TAG, "Failed to overwrite MapLibre HTTP User-Agent", e)
+        return
+    }
+    // Debug-only self-check: a MapLibre upgrade that renames/removes these fields would
+    // otherwise fail silently above (release just logs and ships blocked tiles). Read the
+    // fields straight back and crash loudly here so the break surfaces at dev/CI time instead.
+    if (BuildConfig.DEBUG) {
+        check(staticFieldEquals(clazz, "client", client)) {
+            "MapLibre HttpRequestImpl.client overwrite did not take effect — MapLibre upgrade?"
+        }
+        check(staticFieldEquals(clazz, "userAgentString", userAgent)) {
+            "MapLibre HttpRequestImpl.userAgentString overwrite did not take effect — MapLibre upgrade?"
+        }
     }
 }
 
@@ -152,6 +171,16 @@ private fun setStaticField(
     val field = clazz.getDeclaredField(name)
     field.isAccessible = true
     field.set(null, value)
+}
+
+internal fun staticFieldEquals(
+    clazz: Class<*>,
+    name: String,
+    expected: Any?,
+): Boolean {
+    val field = clazz.getDeclaredField(name)
+    field.isAccessible = true
+    return field.get(null) == expected
 }
 
 private const val TAG = "MapTileHttp"
