@@ -34,6 +34,23 @@ class CaptureCoordinatesRepository
             val HELPER_OPEN = booleanPreferencesKey(AppConstants.DataStoreConstants.KEY_CAPTURE_HELPER_OPEN)
         }
 
+        /** Shared read path: swallow [IOException] (e.g. disk failure) as empty preferences. */
+        private val safeData: Flow<Preferences> =
+            dataStore.data
+                .catch { e ->
+                    if (e is IOException) {
+                        Log.e(TAG, "Error reading capture coordinates preferences", e)
+                        emit(emptyPreferences())
+                    } else {
+                        throw e
+                    }
+                }
+
+        private fun <T> pref(
+            key: Preferences.Key<T>,
+            default: T,
+        ): Flow<T> = safeData.map { prefs -> prefs[key] ?: default }
+
         /** List action. The key predates the separate overall capture-mode switch. */
         val captureEnabled: Flow<Boolean> =
             pref(Keys.CAPTURE_ENABLED, false)
@@ -46,43 +63,19 @@ class CaptureCoordinatesRepository
          * Preserve that state until the user explicitly changes the new switch.
          */
         val captureModeEnabled: Flow<Boolean> =
-            dataStore.data
-                .catch { e ->
-                    if (e is IOException) {
-                        Log.e(TAG, "Error reading capture mode", e)
-                        emit(emptyPreferences())
-                    } else {
-                        throw e
-                    }
-                }.map { prefs ->
-                    prefs[Keys.CAPTURE_MODE_ENABLED]
-                        ?: ((prefs[Keys.CAPTURE_ENABLED] ?: false) || (prefs[Keys.JUMP_ENABLED] ?: false))
-                }
+            safeData.map { prefs ->
+                prefs[Keys.CAPTURE_MODE_ENABLED]
+                    ?: ((prefs[Keys.CAPTURE_ENABLED] ?: false) || (prefs[Keys.JUMP_ENABLED] ?: false))
+            }
 
         val points: Flow<List<LatLng>> =
-            dataStore.data
-                .catch { e ->
-                    if (e is IOException) {
-                        Log.e(TAG, "Error reading captured coordinates", e)
-                        emit(emptyPreferences())
-                    } else {
-                        throw e
-                    }
-                }.map { prefs -> decodePoints(prefs[Keys.CAPTURE_POINTS]) }
+            safeData.map { prefs -> decodePoints(prefs[Keys.CAPTURE_POINTS]) }
 
         val helperOpen: Flow<Boolean> =
             pref(Keys.HELPER_OPEN, false)
 
         val previousBrowserPackage: Flow<String?> =
-            dataStore.data
-                .catch { e ->
-                    if (e is IOException) {
-                        Log.e(TAG, "Error reading previous browser package", e)
-                        emit(emptyPreferences())
-                    } else {
-                        throw e
-                    }
-                }.map { prefs -> prefs[Keys.PREVIOUS_BROWSER]?.takeIf { it.isNotBlank() } }
+            safeData.map { prefs -> prefs[Keys.PREVIOUS_BROWSER]?.takeIf { it.isNotBlank() } }
 
         suspend fun setCaptureEnabled(enabled: Boolean) {
             dataStore.edit { prefs -> prefs[Keys.CAPTURE_ENABLED] = enabled }
@@ -123,20 +116,6 @@ class CaptureCoordinatesRepository
             if (trimmed.isEmpty()) return
             dataStore.edit { prefs -> prefs[Keys.PREVIOUS_BROWSER] = trimmed }
         }
-
-        private fun <T> pref(
-            key: Preferences.Key<T>,
-            default: T,
-        ): Flow<T> =
-            dataStore.data
-                .catch { e ->
-                    if (e is IOException) {
-                        Log.e(TAG, "Error reading preference '${key.name}'", e)
-                        emit(emptyPreferences())
-                    } else {
-                        throw e
-                    }
-                }.map { prefs -> prefs[key] ?: default }
 
         companion object {
             private const val TAG = "CaptureCoordsRepo"
