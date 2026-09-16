@@ -33,9 +33,7 @@
     <string name="favorites_list_no_favorites_match_your_search">"No favorites match your search"</string>
     <string name="favorites_list_favorites">"Favorites"</string>
     <string name="list_search_field_search_favorites">"Search favorites"</string>
-    <string name="lj_route_start_options_loop">"Loop"</string>
     <string name="lj_route_start_options_planting">"Planting"</string>
-    <string name="lj_route_start_options_reverse">"Reverse"</string>
     <string name="lj_route_start_options_return_to_location">"Return to location"</string>
     <string name="lj_route_start_options_follow_roads">"Follow roads"</string>
     <string name="lj_route_start_options_teleport_between_waypoints">"Teleport between waypoints"</string>
@@ -45,7 +43,6 @@
     <string name="paste_coordinates_form_select_all">"Select all"</string>
     <string name="paste_coordinates_form_clear_all">"Clear all"</string>
     <string name="paste_coordinates_form_name">"Name"</string>
-    <string name="paste_coordinates_form_cancel">"Cancel"</string>
     <string name="paste_coordinates_form_save">"Save"</string>
     <string name="paste_coordinates_form_teleport">"Teleport"</string>
     <string name="paste_coordinates_form_walk">"Walk"</string>

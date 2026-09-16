@@ -33,9 +33,7 @@
     <string name="favorites_list_no_favorites_match_your_search">"没有匹配的收藏"</string>
     <string name="favorites_list_favorites">"收藏"</string>
     <string name="list_search_field_search_favorites">"搜索收藏"</string>
-    <string name="lj_route_start_options_loop">"循环"</string>
     <string name="lj_route_start_options_planting">"种植"</string>
-    <string name="lj_route_start_options_reverse">"反向"</string>
     <string name="lj_route_start_options_return_to_location">"返回出发点"</string>
     <string name="lj_route_start_options_follow_roads">"沿道路行走"</string>
     <string name="lj_route_start_options_teleport_between_waypoints">"途经点之间瞬移"</string>
@@ -45,7 +43,6 @@
     <string name="paste_coordinates_form_select_all">"全选"</string>
     <string name="paste_coordinates_form_clear_all">"全部清除"</string>
     <string name="paste_coordinates_form_name">"名称"</string>
-    <string name="paste_coordinates_form_cancel">"取消"</string>
     <string name="paste_coordinates_form_save">"保存"</string>
     <string name="paste_coordinates_form_teleport">"瞬移"</string>
     <string name="paste_coordinates_form_walk">"行走"</string>

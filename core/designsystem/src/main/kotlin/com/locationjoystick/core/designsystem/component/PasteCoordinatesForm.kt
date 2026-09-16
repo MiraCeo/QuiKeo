@@ -237,7 +237,7 @@ fun PasteCoordinatesForm(
                         favoriteName = ""
                     },
                 ) {
-                    Text(stringResource(R.string.paste_coordinates_form_cancel))
+                    Text(stringResource(R.string.delete_confirm_dialog_cancel))
                 }
                 TextButton(
                     onClick = {

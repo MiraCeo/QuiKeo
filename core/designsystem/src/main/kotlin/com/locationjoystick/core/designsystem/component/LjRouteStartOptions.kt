@@ -61,7 +61,7 @@ fun LjRouteStartCheckboxes(
     CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
         Column(modifier = Modifier.fillMaxWidth()) {
             LjCheckboxRow(
-                title = stringResource(R.string.lj_route_start_options_loop),
+                title = stringResource(R.string.route_start_options_loop),
                 checked = loop || planting,
                 enabled = enabled && !returnToLocation && !planting,
                 onCheckedChange = onLoopChange,
@@ -75,7 +75,7 @@ fun LjRouteStartCheckboxes(
                 textColor = textColor,
             )
             LjCheckboxRow(
-                title = stringResource(R.string.lj_route_start_options_reverse),
+                title = stringResource(R.string.route_start_options_reverse),
                 checked = reverse,
                 enabled = enabled,
                 onCheckedChange = onReverseChange,
