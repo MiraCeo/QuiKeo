@@ -104,8 +104,9 @@ class ReplayOrchestratorTest {
     }
 
     @Test
-    fun handleResume_jumpsToNextWaypoint_before_resuming() {
+    fun handleResume_teleportBetweenWaypointsActive_jumpsToNextWaypoint_before_resuming() {
         val next = LatLng(1.0, 2.0)
+        every { routeReplayEngine.isTeleportBetweenWaypointsActive() } returns true
         every { routeReplayEngine.jumpToNextWaypoint(any(), any()) } returns next
         every { routeReplayEngine.currentProgress() } returns RouteProgress(2, 4)
 
@@ -118,6 +119,17 @@ class ReplayOrchestratorTest {
         assertEquals(MockMode.ROUTE_REPLAY, locationRepository.currentMode.value)
         assertEquals(next, locationRepository.currentPosition.value)
         assertEquals(RouteProgress(2, 4), locationRepository.routeProgress.value)
+        assertEquals(MockLocationState.RUNNING, locationRepository.mockLocationState.value)
+    }
+
+    @Test
+    fun handleResume_plainReplay_neverJumpsToNextWaypoint() {
+        every { routeReplayEngine.isTeleportBetweenWaypointsActive() } returns false
+
+        orchestrator.handleResume(1.4)
+
+        verify(exactly = 0) { routeReplayEngine.jumpToNextWaypoint(any(), any()) }
+        verify { routeReplayEngine.resume(any(), any()) }
         assertEquals(MockLocationState.RUNNING, locationRepository.mockLocationState.value)
     }
 

@@ -252,7 +252,7 @@ internal class ReplayOrchestrator(
         onStateChange(MockLocationState.RUNNING)
         locationRepository.startSpoofing()
         locationRepository.setMockMode(MockMode.ROUTE_REPLAY)
-        if (activeReplayer === routeReplayEngine) {
+        if (activeReplayer === routeReplayEngine && routeReplayEngine.isTeleportBetweenWaypointsActive()) {
             routeReplayEngine
                 .jumpToNextWaypoint(::tickPosition) {
                     finishReplay()

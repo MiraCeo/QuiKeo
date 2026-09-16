@@ -189,6 +189,13 @@ class RouteReplayEngine
         fun currentProgress(): RouteProgress? = computeRouteProgress(resumeWaypointIndex, boundaryIndices)
 
         /**
+         * Whether the active replay hops between stops instead of interpolating (planting's
+         * teleport-between-waypoints mode). Used by [ReplayOrchestrator.handleResume] to decide
+         * whether a plain Resume should snap to the next stop or continue the paused walk.
+         */
+        fun isTeleportBetweenWaypointsActive(): Boolean = teleportBetweenWaypoints
+
+        /**
          * Appends a waypoint to the current replay (used for recording).
          * @param pos Position to append
          */
