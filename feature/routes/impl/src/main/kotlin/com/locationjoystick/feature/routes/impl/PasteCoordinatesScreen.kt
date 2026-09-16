@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -332,7 +333,11 @@ internal fun PasteCoordinatesScreen(
                 }
                 if (state.cleanedPoints.isNotEmpty()) {
                     Text(
-                        "${state.cleanedPoints.size} point${if (state.cleanedPoints.size == 1) "" else "s"} loaded",
+                        pluralStringResource(
+                            R.plurals.paste_coordinates_screen_points_loaded,
+                            state.cleanedPoints.size,
+                            state.cleanedPoints.size,
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -414,7 +419,12 @@ internal fun PasteCoordinatesScreen(
                             "${distanceMeters.toInt()} m"
                         }
                     Text(
-                        "${state.previewWaypoints.size} waypoints · $distanceLabel",
+                        pluralStringResource(
+                            R.plurals.paste_coordinates_screen_waypoints_summary,
+                            state.previewWaypoints.size,
+                            state.previewWaypoints.size,
+                            distanceLabel,
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     LjPrimaryButton(

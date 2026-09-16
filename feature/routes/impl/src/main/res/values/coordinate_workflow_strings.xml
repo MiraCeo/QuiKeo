@@ -38,4 +38,12 @@
     <string name="paste_build_preview">Build preview</string>
     <string name="paste_save_route">Save route</string>
     <string name="paste_empty_clipboard">Clipboard is empty.</string>
+    <plurals name="paste_coordinates_screen_points_loaded">
+        <item quantity="one">"%1$d point loaded"</item>
+        <item quantity="other">"%1$d points loaded"</item>
+    </plurals>
+    <plurals name="paste_coordinates_screen_waypoints_summary">
+        <item quantity="one">"%1$d waypoint · %2$s"</item>
+        <item quantity="other">"%1$d waypoints · %2$s"</item>
+    </plurals>
 </resources>

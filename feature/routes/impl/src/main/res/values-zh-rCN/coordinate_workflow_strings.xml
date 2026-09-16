@@ -38,4 +38,10 @@
     <string name="paste_build_preview">构建预览</string>
     <string name="paste_save_route">保存路线</string>
     <string name="paste_empty_clipboard">剪贴板为空。</string>
+    <plurals name="paste_coordinates_screen_points_loaded">
+        <item quantity="other">"已加载 %1$d 个点位"</item>
+    </plurals>
+    <plurals name="paste_coordinates_screen_waypoints_summary">
+        <item quantity="other">"%1$d 个途经点 · %2$s"</item>
+    </plurals>
 </resources>
