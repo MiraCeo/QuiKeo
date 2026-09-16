@@ -56,40 +56,38 @@ class StartRouteReplayUseCaseTest {
     }
 
     @Test
-    fun execute_teleportsToFirstWaypoint_byDefault() =
+    fun execute_walksToFirstWaypoint_byDefault() =
         runTest {
             useCase.execute("route-1")
 
-            coVerify { teleportUseCase.execute(start, resetMovement = false) }
+            coVerify(exactly = 0) { teleportUseCase.execute(any(), any()) }
             verify { context.startService(any()) }
         }
 
     @Test
-    fun execute_reverse_teleportsToLastWaypoint() =
-        runTest {
-            useCase.execute("route-1", isReverse = true)
-
-            coVerify { teleportUseCase.execute(end, resetMovement = false) }
-        }
-
-    @Test
-    fun execute_hideTeleportFeatures_skipsTeleport() =
-        runTest {
-            every { settingsRepository.getHideTeleportFeatures() } returns flowOf(true)
-
-            useCase.execute("route-1")
-
-            coVerify(exactly = 0) { teleportUseCase.execute(any()) }
-            verify { context.startService(any()) }
-        }
-
-    @Test
-    fun execute_planting_stillTeleportsToSavedStart() =
+    fun execute_planting_stillWalksToSavedStart() =
         runTest {
             useCase.execute("route-1", isPlanting = true)
 
+            coVerify(exactly = 0) { teleportUseCase.execute(any(), any()) }
+            verify { context.startService(any()) }
+        }
+
+    @Test
+    fun execute_teleportBetweenWaypoints_teleportsToFirstWaypoint() =
+        runTest {
+            useCase.execute("route-1", teleportBetweenWaypoints = true)
+
             coVerify { teleportUseCase.execute(start, resetMovement = false) }
             verify { context.startService(any()) }
+        }
+
+    @Test
+    fun execute_teleportBetweenWaypoints_reverse_teleportsToLastWaypoint() =
+        runTest {
+            useCase.execute("route-1", isReverse = true, teleportBetweenWaypoints = true)
+
+            coVerify { teleportUseCase.execute(end, resetMovement = false) }
         }
 
     @Test
@@ -99,7 +97,7 @@ class StartRouteReplayUseCaseTest {
 
             useCase.execute("route-1", teleportBetweenWaypoints = true)
 
-            coVerify(exactly = 0) { teleportUseCase.execute(any()) }
+            coVerify(exactly = 0) { teleportUseCase.execute(any(), any()) }
             verify { context.startService(any()) }
         }
 

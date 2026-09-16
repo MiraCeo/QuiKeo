@@ -36,8 +36,11 @@ class StartRouteReplayUseCase
             val route = routeRepository.getRouteWithWaypoints(routeId).first()
             val speedMs = settingsRepository.activateSessionSpeed(route?.speedProfileId)
             val returnPosition = if (isReturnToLocation) locationRepository.currentPosition.value else null
-            val teleportToStart = !settingsRepository.getHideTeleportFeatures().first()
-            val teleportBetween = teleportBetweenWaypoints && teleportToStart
+            // Walking to the first waypoint is the default (docs/features/routes.md "Start Flow").
+            // Teleport between waypoints requires teleporting to the start too, since MockLocationService
+            // only honors the hop mode when teleportToStart is also set.
+            val teleportToStart = teleportBetweenWaypoints && !settingsRepository.getHideTeleportFeatures().first()
+            val teleportBetween = teleportToStart
             val hopDelaySeconds = clampTeleportBetweenDelaySeconds(teleportBetweenDelaySeconds)
             if (teleportToStart) {
                 route?.startWaypoint(isReverse)?.let { teleportUseCase.execute(it.position, resetMovement = false) }
