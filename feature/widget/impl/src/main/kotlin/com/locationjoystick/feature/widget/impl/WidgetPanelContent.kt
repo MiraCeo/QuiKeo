@@ -147,6 +147,22 @@ internal data class RoamingControlsState(
     val onStop: () -> Unit,
 )
 
+internal data class MasterToggleState(
+    val spoofingActive: Boolean,
+    val stopPopupVisible: Boolean,
+    val onToggle: () -> Unit,
+    val onLongPress: () -> Unit,
+    val onPark: () -> Unit,
+    val onStart: () -> Unit,
+    val onStop: () -> Unit,
+)
+
+internal data class PasteCaptureState(
+    val expanded: Boolean,
+    val onLongPress: () -> Unit,
+    val onCaptureShortcut: () -> Unit,
+)
+
 internal sealed interface WidgetPanelSection {
     data class TapToWalk(
         val active: Boolean,
@@ -179,17 +195,9 @@ internal fun WidgetPanel(
     roamingStartIgnored: Boolean = false,
     isPanelExpanded: Boolean,
     hasPendingCompletion: Boolean,
-    stopPopupVisible: Boolean,
-    spoofingActive: Boolean,
-    onToggleMaster: () -> Unit,
-    onLongPressMaster: () -> Unit,
-    onParkSpoofing: () -> Unit,
-    onStartSpoofing: () -> Unit,
-    onStopSpoofing: () -> Unit,
+    masterToggle: MasterToggleState,
     onFeatureClicked: (AppFeature) -> Unit,
-    pasteCaptureExpanded: Boolean,
-    onLongPressPaste: () -> Unit,
-    onCaptureShortcut: () -> Unit,
+    pasteCapture: PasteCaptureState,
     sections: List<WidgetPanelSection>,
     debugStats: DebugStats? = null,
     routeProgress: RouteProgress? = null,
@@ -216,7 +224,7 @@ internal fun WidgetPanel(
                                         delay(viewConfiguration.longPressTimeoutMillis.toLong())
                                         if (!isDragging) {
                                             longPressFired = true
-                                            onLongPressMaster()
+                                            masterToggle.onLongPress()
                                         }
                                     }
                                 try {
@@ -242,7 +250,7 @@ internal fun WidgetPanel(
                                     longPressJob.cancel()
                                 }
                                 if (!isDragging && !longPressFired) {
-                                    onToggleMaster()
+                                    masterToggle.onToggle()
                                 }
                             }
                         }
@@ -264,15 +272,15 @@ internal fun WidgetPanel(
                     modifier = Modifier.fillMaxSize().clip(CircleShape),
                 )
             }
-            WidgetSidePopup(visible = stopPopupVisible) {
+            WidgetSidePopup(visible = masterToggle.stopPopupVisible) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    when (widgetMasterPopupMode(spoofingActive)) {
+                    when (widgetMasterPopupMode(masterToggle.spoofingActive)) {
                         WidgetMasterPopupMode.PAUSE_AND_STOP -> {
                             WidgetIconButton(
                                 icon = LjIcons.Pause,
                                 contentDescription = stringResource(R.string.widget_panel_content_pause_spoofing),
                                 tint = WidgetInactiveTint,
-                                onClick = onParkSpoofing,
+                                onClick = masterToggle.onPark,
                             )
                         }
 
@@ -281,7 +289,7 @@ internal fun WidgetPanel(
                                 icon = LjIcons.PlayArrow,
                                 contentDescription = stringResource(R.string.widget_panel_content_start_spoofing),
                                 tint = LjSuccess,
-                                onClick = onStartSpoofing,
+                                onClick = masterToggle.onStart,
                             )
                         }
                     }
@@ -290,7 +298,7 @@ internal fun WidgetPanel(
                         contentDescription = stringResource(R.string.widget_panel_content_stop_spoofing),
                         tint = MaterialTheme.colorScheme.error,
                         enabled = widgetStopEnabled(),
-                        onClick = onStopSpoofing,
+                        onClick = masterToggle.onStop,
                     )
                 }
             }
@@ -312,7 +320,7 @@ internal fun WidgetPanel(
 
         // Feature icons — only shown when panel expanded
         if (isPanelExpanded) {
-            val controlsEnabled = widgetControlsEnabled(spoofingActive)
+            val controlsEnabled = widgetControlsEnabled(masterToggle.spoofingActive)
             features.forEach { feature ->
                 if (feature == AppFeature.ROUTES) {
                     val routeIconTint = if (routeControls.isActive) LjSuccess else MaterialTheme.colorScheme.primary
@@ -453,16 +461,16 @@ internal fun WidgetPanel(
                             enabled = controlsEnabled,
                             // While spoofing, joystick show/lock still launch the overlay; movement no-ops.
                             onClick = { onFeatureClicked(feature) },
-                            onLongClick = if (feature == AppFeature.PASTE_COORDINATES) onLongPressPaste else null,
+                            onLongClick = if (feature == AppFeature.PASTE_COORDINATES) pasteCapture.onLongPress else null,
                         )
                         if (feature == AppFeature.PASTE_COORDINATES) {
-                            WidgetSidePopup(visible = pasteCaptureExpanded) {
+                            WidgetSidePopup(visible = pasteCapture.expanded) {
                                 WidgetIconButton(
                                     icon = LjIcons.AddLocationAlt,
                                     contentDescription = stringResource(R.string.widget_panel_content_open_capture),
                                     tint = MaterialTheme.colorScheme.primary,
                                     enabled = controlsEnabled,
-                                    onClick = onCaptureShortcut,
+                                    onClick = pasteCapture.onCaptureShortcut,
                                 )
                             }
                         }

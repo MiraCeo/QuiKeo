@@ -394,6 +394,37 @@ class FloatingWidgetService :
                         onStop = { onRoamingStopClicked() },
                     )
 
+                val masterToggle =
+                    MasterToggleState(
+                        spoofingActive = mockLocationState != MockLocationState.IDLE,
+                        stopPopupVisible = stopPopupVisible,
+                        onToggle = {
+                            stopPopupVisibleFlow.value = false
+                            if (!isPanelExpandedFlow.value) pendingCompletionFlow.value = false
+                            isPanelExpandedFlow.value = !isPanelExpandedFlow.value
+                        },
+                        onLongPress = { stopPopupVisibleFlow.value = !stopPopupVisibleFlow.value },
+                        onPark = { parkSpoofingKeepWidget() },
+                        onStart = {
+                            stopPopupVisibleFlow.value = false
+                            mapController.startSpoofing()
+                        },
+                        onStop = {
+                            stopPopupVisibleFlow.value = false
+                            mapController.stopSpoofing()
+                            // Close immediately. After Pause the mock service is already IDLE, so
+                            // its overlay collector will not run again; Stop still must dismiss us.
+                            stopSelf()
+                        },
+                    )
+
+                val pasteCapture =
+                    PasteCaptureState(
+                        expanded = pasteCaptureExpanded,
+                        onLongPress = { pasteCaptureExpandedFlow.value = !pasteCaptureExpandedFlow.value },
+                        onCaptureShortcut = { openCaptureScreen() },
+                    )
+
                 val sections =
                     buildList {
                         if (isTapToWalkEnabled) {
@@ -437,34 +468,9 @@ class FloatingWidgetService :
                     roamingStartIgnored = isRoutePlaying(currentMode, mockLocationState),
                     isPanelExpanded = isPanelExpanded,
                     hasPendingCompletion = hasPendingCompletion,
-                    stopPopupVisible = stopPopupVisible,
-                    spoofingActive = mockLocationState != MockLocationState.IDLE,
-                    onToggleMaster = {
-                        stopPopupVisibleFlow.value = false
-                        if (!isPanelExpandedFlow.value) pendingCompletionFlow.value = false
-                        isPanelExpandedFlow.value = !isPanelExpandedFlow.value
-                    },
-                    onLongPressMaster = { stopPopupVisibleFlow.value = !stopPopupVisibleFlow.value },
-                    onParkSpoofing = {
-                        parkSpoofingKeepWidget()
-                    },
-                    onStartSpoofing = {
-                        stopPopupVisibleFlow.value = false
-                        mapController.startSpoofing()
-                    },
-                    onStopSpoofing = {
-                        stopPopupVisibleFlow.value = false
-                        mapController.stopSpoofing()
-                        // Close immediately. After Pause the mock service is already IDLE, so
-                        // its overlay collector will not run again; Stop still must dismiss us.
-                        stopSelf()
-                    },
+                    masterToggle = masterToggle,
                     onFeatureClicked = { feature -> onFeatureButtonClicked(feature) },
-                    pasteCaptureExpanded = pasteCaptureExpanded,
-                    onLongPressPaste = {
-                        pasteCaptureExpandedFlow.value = !pasteCaptureExpandedFlow.value
-                    },
-                    onCaptureShortcut = { openCaptureScreen() },
+                    pasteCapture = pasteCapture,
                     sections = sections,
                     debugStats = if (debugStatsEnabled) debugStats else null,
                     routeProgress = routeProgress,
