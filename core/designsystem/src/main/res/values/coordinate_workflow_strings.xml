@@ -80,6 +80,8 @@
     <string name="capture_ready_list">"Opening a map link adds its location to the list below."</string>
     <string name="capture_ready_jump">"Opening a map link jumps there immediately without adding it to the list."</string>
     <string name="capture_passthrough_label">"Pass-through: %1$s"</string>
+    <string name="capture_setup_form_pass_through_browser">"Pass-through browser"</string>
+    <string name="capture_setup_form_cancel">"Cancel"</string>
     <string name="capture_previous_points">"Previously captured locations: %1$d."</string>
     <string name="capture_point_count">"Captured locations: %1$d"</string>
     <string name="capture_copied_count">"Copied locations: %1$d"</string>

@@ -80,6 +80,8 @@
     <string name="capture_ready_list">"打开地图链接会将该位置添加到下方列表。"</string>
     <string name="capture_ready_jump">"打开地图链接会立即跳转到该位置，不会加入列表。"</string>
     <string name="capture_passthrough_label">"放行：%1$s"</string>
+    <string name="capture_setup_form_pass_through_browser">"放行浏览器"</string>
+    <string name="capture_setup_form_cancel">"取消"</string>
     <string name="capture_previous_points">"此前采集的位置：%1$d 个。"</string>
     <string name="capture_point_count">"已采集位置：%1$d 个"</string>
     <string name="capture_copied_count">"已复制位置：%1$d 个"</string>

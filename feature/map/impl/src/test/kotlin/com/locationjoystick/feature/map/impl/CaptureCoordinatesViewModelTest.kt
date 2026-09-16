@@ -10,7 +10,6 @@ import io.mockk.mockk
 import io.mockk.slot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -149,13 +148,5 @@ class CaptureCoordinatesViewModelTest {
             viewModel.saveRoute()
             assertEquals(R.string.capture_invalid_route, viewModel.uiState.value.saveError)
             coVerify(exactly = 0) { routeRepository.insertRoute(any()) }
-        }
-
-    @Test
-    fun `rememberPreviousBrowser persists package`() =
-        runTest {
-            viewModel.rememberPreviousBrowser("com.android.chrome")
-            assertEquals("com.android.chrome", captureRepository.previousBrowserPackage.first())
-            assertEquals("com.android.chrome", viewModel.uiState.value.previousBrowserPackage)
         }
 }

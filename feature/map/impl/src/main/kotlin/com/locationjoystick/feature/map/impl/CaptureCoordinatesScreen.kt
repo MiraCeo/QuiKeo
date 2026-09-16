@@ -1,12 +1,6 @@
 package com.locationjoystick.feature.map.impl
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -22,13 +16,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.locationjoystick.core.common.util.captureBrowserChoices
 import com.locationjoystick.core.common.util.isCaptureDefaultBrowser
-import com.locationjoystick.core.common.util.launchCaptureDefaultBrowser
-import com.locationjoystick.core.common.util.launchCaptureMapsLinks
-import com.locationjoystick.core.common.util.launchCaptureRestoreDefaultApps
-import com.locationjoystick.core.common.util.launchCaptureThisAppLinks
-import com.locationjoystick.core.common.util.resolvePreferredBrowserPackage
 import com.locationjoystick.core.designsystem.LjTheme
 import com.locationjoystick.core.designsystem.component.CaptureCoordinatesForm
 import com.locationjoystick.core.designsystem.component.CaptureModeState
@@ -48,18 +36,12 @@ fun CaptureCoordinatesRoute(
     val context = LocalContext.current
     val spoofToggle = rememberSpoofToggleState()
     var isDefaultBrowser by remember { mutableStateOf(context.isCaptureDefaultBrowser()) }
-    var showBrowserPicker by remember { mutableStateOf(false) }
-    var browserChoices by remember(context) { mutableStateOf(captureBrowserChoices(context)) }
-    val preferredBrowserPackage =
-        resolvePreferredBrowserPackage(uiState.previousBrowserPackage, context.packageName)
-    val selectedBrowser = browserChoices.firstOrNull { it.packageName == preferredBrowserPackage } ?: browserChoices.firstOrNull()
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer =
             LifecycleEventObserver { _, event ->
                 if (event == Lifecycle.Event.ON_RESUME) {
                     isDefaultBrowser = context.isCaptureDefaultBrowser()
-                    browserChoices = captureBrowserChoices(context)
                 }
             }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -81,45 +63,7 @@ fun CaptureCoordinatesRoute(
         onSaveRoute = viewModel::saveRoute,
         onClearPoints = viewModel::clearPoints,
         onRemoveLast = viewModel::removeLast,
-        onRequestDefaultBrowser = { context.launchCaptureDefaultBrowser(viewModel::rememberPreviousBrowser) },
-        onOpenThisAppLinks = { context.launchCaptureThisAppLinks() },
-        onOpenMapsLinks = { context.launchCaptureMapsLinks() },
-        onRestoreDefaultApps = { context.launchCaptureRestoreDefaultApps() },
-        passThroughBrowserName = selectedBrowser?.label ?: stringResource(R.string.capture_browser_automatic),
-        onChoosePassThroughBrowser = { showBrowserPicker = browserChoices.isNotEmpty() },
     )
-    if (showBrowserPicker) {
-        AlertDialog(
-            onDismissRequest = { showBrowserPicker = false },
-            title = { Text(stringResource(R.string.capture_coordinates_screen_pass_through_browser)) },
-            text = {
-                Column {
-                    browserChoices.forEach { choice ->
-                        androidx.compose.foundation.layout.Row(
-                            modifier =
-                                Modifier.clickable {
-                                    viewModel.rememberPreviousBrowser(choice.packageName)
-                                    showBrowserPicker = false
-                                },
-                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-                        ) {
-                            RadioButton(
-                                selected = choice.packageName == selectedBrowser?.packageName,
-                                onClick = {
-                                    viewModel.rememberPreviousBrowser(choice.packageName)
-                                    showBrowserPicker = false
-                                },
-                            )
-                            Text(choice.label)
-                        }
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { showBrowserPicker = false }) { Text(stringResource(R.string.capture_coordinates_screen_cancel)) }
-            },
-        )
-    }
 }
 
 @Composable
@@ -138,12 +82,6 @@ internal fun CaptureCoordinatesScreen(
     onSaveRoute: () -> Unit,
     onClearPoints: () -> Unit,
     onRemoveLast: () -> Unit,
-    onRequestDefaultBrowser: () -> Unit,
-    onOpenThisAppLinks: () -> Unit,
-    onOpenMapsLinks: () -> Unit,
-    onRestoreDefaultApps: () -> Unit,
-    passThroughBrowserName: String,
-    onChoosePassThroughBrowser: () -> Unit,
 ) {
     LjScaffold(
         title = stringResource(R.string.capture_coordinates_screen_capture),
@@ -158,15 +96,9 @@ internal fun CaptureCoordinatesScreen(
                     captureModeEnabled = uiState.captureModeEnabled,
                     captureEnabled = uiState.captureEnabled,
                     jumpEnabled = uiState.jumpEnabled,
-                    passThroughBrowserName = passThroughBrowserName,
                     onCaptureModeEnabledChange = onCaptureModeEnabledChange,
                     onCaptureEnabledChange = onCaptureEnabledChange,
                     onJumpEnabledChange = onJumpEnabledChange,
-                    onRequestDefaultBrowser = onRequestDefaultBrowser,
-                    onOpenMapsLinks = onOpenMapsLinks,
-                    onOpenThisAppLinks = onOpenThisAppLinks,
-                    onRestoreDefaultApps = onRestoreDefaultApps,
-                    onChoosePassThroughBrowser = onChoosePassThroughBrowser,
                     isDefaultBrowser = isDefaultBrowser,
                 ),
             capturePoints =
@@ -221,12 +153,6 @@ private fun CaptureCoordinatesScreenPreview() {
             onSaveRoute = {},
             onClearPoints = {},
             onRemoveLast = {},
-            onRequestDefaultBrowser = {},
-            onOpenThisAppLinks = {},
-            onOpenMapsLinks = {},
-            onRestoreDefaultApps = {},
-            passThroughBrowserName = "Chrome",
-            onChoosePassThroughBrowser = {},
         )
     }
 }

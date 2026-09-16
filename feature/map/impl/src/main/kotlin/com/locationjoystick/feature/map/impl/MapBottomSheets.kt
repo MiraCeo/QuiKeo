@@ -1,18 +1,13 @@
 package com.locationjoystick.feature.map.impl
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
@@ -22,7 +17,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -39,10 +33,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.locationjoystick.core.data.CooldownState
 import com.locationjoystick.core.data.toBadgeText
 import com.locationjoystick.core.designsystem.LjIcons
-import com.locationjoystick.core.designsystem.component.CaptureCoordinatesForm
-import com.locationjoystick.core.designsystem.component.CaptureModeState
-import com.locationjoystick.core.designsystem.component.CapturePointsState
-import com.locationjoystick.core.designsystem.component.CaptureRouteSaveState
 import com.locationjoystick.core.designsystem.component.CooldownAdvisoryBadge
 import com.locationjoystick.core.designsystem.component.FavoriteTargetDetail
 import com.locationjoystick.core.designsystem.component.FavoritesList
@@ -235,74 +225,6 @@ internal fun PasteCoordinatesSheet(
             title = title,
             initialText = initialText,
             initialRouteName = initialRouteName,
-        )
-    }
-}
-
-@Composable
-internal fun CaptureCoordinatesSheet(
-    uiState: CaptureCoordinatesUiState,
-    onCaptureModeEnabledChange: (Boolean) -> Unit,
-    onCaptureEnabledChange: (Boolean) -> Unit,
-    onJumpEnabledChange: (Boolean) -> Unit,
-    onRouteNameChange: (String) -> Unit,
-    onPointOrderChange: (CapturePointOrder) -> Unit,
-    onSaveRoute: () -> Unit,
-    onClearPoints: () -> Unit,
-    onRemoveLast: () -> Unit,
-    onRequestDefaultBrowser: () -> Unit,
-    onOpenThisAppLinks: () -> Unit,
-    onOpenMapsLinks: () -> Unit,
-    onRestoreDefaultApps: () -> Unit,
-    passThroughBrowserName: String,
-    onChoosePassThroughBrowser: () -> Unit,
-    onDismiss: () -> Unit,
-    isDefaultBrowser: Boolean = false,
-) {
-    BackHandler(onBack = onDismiss)
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.surface,
-    ) {
-        CaptureCoordinatesForm(
-            captureMode =
-                CaptureModeState(
-                    captureModeEnabled = uiState.captureModeEnabled,
-                    captureEnabled = uiState.captureEnabled,
-                    jumpEnabled = uiState.jumpEnabled,
-                    passThroughBrowserName = passThroughBrowserName,
-                    onCaptureModeEnabledChange = onCaptureModeEnabledChange,
-                    onCaptureEnabledChange = onCaptureEnabledChange,
-                    onJumpEnabledChange = onJumpEnabledChange,
-                    onRequestDefaultBrowser = onRequestDefaultBrowser,
-                    onOpenMapsLinks = onOpenMapsLinks,
-                    onOpenThisAppLinks = onOpenThisAppLinks,
-                    onRestoreDefaultApps = onRestoreDefaultApps,
-                    onChoosePassThroughBrowser = onChoosePassThroughBrowser,
-                    isDefaultBrowser = isDefaultBrowser,
-                ),
-            capturePoints =
-                CapturePointsState(
-                    points = uiState.points,
-                    onClearPoints = onClearPoints,
-                    onRemoveLast = onRemoveLast,
-                    optimizeProximity = uiState.pointOrder == CapturePointOrder.PROXIMITY,
-                    onOptimizeProximityChange = { optimize ->
-                        onPointOrderChange(if (optimize) CapturePointOrder.PROXIMITY else CapturePointOrder.ORIGINAL)
-                    },
-                    orderedPoints = uiState.orderedPoints,
-                ),
-            routeSave =
-                CaptureRouteSaveState(
-                    routeName = uiState.routeName,
-                    saved = uiState.saved,
-                    saveError = uiState.saveError?.let { stringResource(it) },
-                    canSave = uiState.canSave,
-                    onRouteNameChange = onRouteNameChange,
-                    onSaveRoute = onSaveRoute,
-                ),
-            onDismiss = onDismiss,
-            modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing),
         )
     }
 }

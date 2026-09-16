@@ -24,7 +24,6 @@ data class CaptureCoordinatesUiState(
     val captureModeEnabled: Boolean = false,
     val captureEnabled: Boolean = false,
     val jumpEnabled: Boolean = false,
-    val previousBrowserPackage: String? = null,
     val points: List<LatLng> = emptyList(),
     val pointOrder: CapturePointOrder = CapturePointOrder.PROXIMITY,
     val routeName: String = "",
@@ -69,11 +68,6 @@ class CaptureCoordinatesViewModel
                     _uiState.update { it.copy(jumpEnabled = enabled) }
                 }
             }
-            viewModelScope.launch {
-                captureRepository.previousBrowserPackage.collect { packageName ->
-                    _uiState.update { it.copy(previousBrowserPackage = packageName) }
-                }
-            }
         }
 
         fun setCaptureModeEnabled(enabled: Boolean) {
@@ -86,12 +80,6 @@ class CaptureCoordinatesViewModel
 
         fun setJumpEnabled(enabled: Boolean) {
             viewModelScope.launch { captureRepository.setJumpEnabled(enabled) }
-        }
-
-        fun rememberPreviousBrowser(packageName: String?) {
-            val trimmed = packageName?.trim().orEmpty()
-            if (trimmed.isEmpty()) return
-            viewModelScope.launch { captureRepository.setPreviousBrowserPackage(trimmed) }
         }
 
         fun onRouteNameChange(name: String) {

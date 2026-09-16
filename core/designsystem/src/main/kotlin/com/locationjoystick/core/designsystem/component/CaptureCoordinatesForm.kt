@@ -46,13 +46,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.LinkAnnotation
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLinkStyles
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,20 +61,14 @@ import com.locationjoystick.core.designsystem.LjWarning
 import com.locationjoystick.core.designsystem.R
 import com.locationjoystick.core.model.LatLng
 
-/** Capture-mode setup steps 1-5 plus the passthrough-browser row — see docs/features/capture-coordinates.md. */
+/** Capture-mode toggle (Step 1: mode + List/Jump) — see docs/features/capture-coordinates.md. */
 data class CaptureModeState(
     val captureModeEnabled: Boolean,
     val captureEnabled: Boolean,
     val jumpEnabled: Boolean,
-    val passThroughBrowserName: String,
     val onCaptureModeEnabledChange: (Boolean) -> Unit,
     val onCaptureEnabledChange: (Boolean) -> Unit,
     val onJumpEnabledChange: (Boolean) -> Unit,
-    val onRequestDefaultBrowser: () -> Unit,
-    val onOpenMapsLinks: () -> Unit,
-    val onOpenThisAppLinks: () -> Unit,
-    val onRestoreDefaultApps: () -> Unit,
-    val onChoosePassThroughBrowser: () -> Unit,
     val isDefaultBrowser: Boolean = false,
 )
 
@@ -179,18 +167,13 @@ fun CaptureCoordinatesForm(
                 modifier = Modifier.padding(bottom = LjSpacing.xs),
             )
         }
-        CaptureSetupSteps(
+        CaptureToggleStep(
             captureModeEnabled = captureMode.captureModeEnabled,
             captureEnabled = captureMode.captureEnabled,
             jumpEnabled = captureMode.jumpEnabled,
-            isDefaultBrowser = captureMode.isDefaultBrowser,
             onCaptureModeEnabledChange = ::requestCaptureMode,
             onCaptureEnabledChange = captureMode.onCaptureEnabledChange,
             onJumpEnabledChange = captureMode.onJumpEnabledChange,
-            onRequestDefaultBrowser = captureMode.onRequestDefaultBrowser,
-            onOpenMapsLinks = captureMode.onOpenMapsLinks,
-            onOpenThisAppLinks = captureMode.onOpenThisAppLinks,
-            onRestoreDefaultApps = captureMode.onRestoreDefaultApps,
         )
         if (!captureMode.captureModeEnabled || !captureMode.captureEnabled && !captureMode.jumpEnabled) {
             CaptureOffBanner(
@@ -208,12 +191,6 @@ fun CaptureCoordinatesForm(
                 jumpEnabled = captureMode.jumpEnabled,
                 modifier = Modifier.padding(top = LjSpacing.sm, bottom = LjSpacing.xs),
             )
-        }
-        TextButton(
-            onClick = captureMode.onChoosePassThroughBrowser,
-            modifier = Modifier.align(Alignment.End),
-        ) {
-            Text(stringResource(R.string.capture_passthrough_label, captureMode.passThroughBrowserName))
         }
         Text(
             text =
@@ -320,76 +297,6 @@ fun CaptureCoordinatesForm(
 }
 
 @Composable
-private fun CaptureSetupSteps(
-    captureModeEnabled: Boolean,
-    captureEnabled: Boolean,
-    jumpEnabled: Boolean,
-    isDefaultBrowser: Boolean,
-    onCaptureModeEnabledChange: (Boolean) -> Unit,
-    onCaptureEnabledChange: (Boolean) -> Unit,
-    onJumpEnabledChange: (Boolean) -> Unit,
-    onRequestDefaultBrowser: () -> Unit,
-    onOpenMapsLinks: () -> Unit,
-    onOpenThisAppLinks: () -> Unit,
-    onRestoreDefaultApps: () -> Unit,
-) {
-    CaptureToggleStep(
-        captureModeEnabled = captureModeEnabled,
-        captureEnabled = captureEnabled,
-        jumpEnabled = jumpEnabled,
-        onCaptureModeEnabledChange = onCaptureModeEnabledChange,
-        onCaptureEnabledChange = onCaptureEnabledChange,
-        onJumpEnabledChange = onJumpEnabledChange,
-    )
-    CaptureStepRow(
-        marker = captureBrowserMarker(isDefaultBrowser),
-        number = "2",
-        extraSpacing = true,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        CaptureLinkedText(
-            prefix =
-                if (isDefaultBrowser) {
-                    stringResource(
-                        R.string.capture_browser_prefix_is,
-                    )
-                } else {
-                    stringResource(R.string.capture_browser_prefix_set)
-                },
-            linkText = stringResource(R.string.capture_coordinates_form_default_browser),
-            onClick = onRequestDefaultBrowser,
-        )
-    }
-    CaptureStepRow(marker = CaptureStepMarker.ACTION, number = "3", extraSpacing = true) {
-        CaptureLinkedText(
-            prefix = stringResource(R.string.capture_coordinates_form_turn_off),
-            linkText = stringResource(R.string.capture_coordinates_form_google_maps_supported_links),
-            onClick = onOpenMapsLinks,
-        )
-    }
-    CaptureStepRow(marker = CaptureStepMarker.ACTION, number = "4", extraSpacing = true) {
-        CaptureLinkedText(
-            prefix = stringResource(R.string.capture_coordinates_form_turn_on),
-            linkText = stringResource(R.string.capture_coordinates_form_supported_links_for_this_app),
-            onClick = onOpenThisAppLinks,
-        )
-    }
-    CaptureStepRow(
-        marker = captureRestoreMarker(captureModeEnabled),
-        number = "5",
-        extraSpacing = true,
-        verticalAlignment = Alignment.Top,
-    ) {
-        CaptureLinkedText(
-            prefix = stringResource(R.string.capture_coordinates_form_when_you_are_done),
-            linkText = stringResource(R.string.capture_coordinates_form_restore_default_browser),
-            suffix = stringResource(R.string.capture_coordinates_form_and_reverse_steps_3_4),
-            onClick = onRestoreDefaultApps,
-        )
-    }
-}
-
-@Composable
 private fun CaptureToggleStep(
     captureModeEnabled: Boolean,
     captureEnabled: Boolean,
@@ -455,7 +362,7 @@ private fun CaptureFunctionToggle(
 }
 
 @Composable
-private fun CaptureStepRow(
+internal fun CaptureStepRow(
     marker: CaptureStepMarker,
     number: String,
     modifier: Modifier = Modifier,
@@ -537,38 +444,6 @@ private fun CaptureStepMarkerBadge(
             )
         }
     }
-}
-
-@Composable
-private fun CaptureLinkedText(
-    prefix: String,
-    linkText: String,
-    onClick: () -> Unit,
-    suffix: String = "",
-) {
-    val accent = MaterialTheme.colorScheme.primary
-    val annotated =
-        buildAnnotatedString {
-            append(prefix)
-            withLink(
-                LinkAnnotation.Clickable(
-                    tag = linkText,
-                    styles =
-                        TextLinkStyles(
-                            style =
-                                SpanStyle(
-                                    color = accent,
-                                    textDecoration = TextDecoration.Underline,
-                                ),
-                        ),
-                    linkInteractionListener = { onClick() },
-                ),
-            ) {
-                append(linkText)
-            }
-            append(suffix)
-        }
-    Text(text = annotated, style = MaterialTheme.typography.bodyMedium)
 }
 
 @Composable
@@ -707,15 +582,9 @@ private fun CaptureCoordinatesFormPreview() {
                     captureModeEnabled = true,
                     captureEnabled = true,
                     jumpEnabled = false,
-                    passThroughBrowserName = "Chrome",
                     onCaptureModeEnabledChange = {},
                     onCaptureEnabledChange = {},
                     onJumpEnabledChange = {},
-                    onRequestDefaultBrowser = {},
-                    onOpenMapsLinks = {},
-                    onOpenThisAppLinks = {},
-                    onRestoreDefaultApps = {},
-                    onChoosePassThroughBrowser = {},
                     isDefaultBrowser = true,
                 ),
             capturePoints =
@@ -748,15 +617,9 @@ private fun CaptureCoordinatesFormSetupPreview() {
                     captureModeEnabled = false,
                     captureEnabled = false,
                     jumpEnabled = false,
-                    passThroughBrowserName = "Chrome",
                     onCaptureModeEnabledChange = {},
                     onCaptureEnabledChange = {},
                     onJumpEnabledChange = {},
-                    onRequestDefaultBrowser = {},
-                    onOpenMapsLinks = {},
-                    onOpenThisAppLinks = {},
-                    onRestoreDefaultApps = {},
-                    onChoosePassThroughBrowser = {},
                     isDefaultBrowser = false,
                 ),
             capturePoints =
