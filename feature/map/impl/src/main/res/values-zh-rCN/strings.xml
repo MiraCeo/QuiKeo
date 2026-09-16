@@ -26,6 +26,7 @@
     <string name="map_hint_long_press_to_walk">"长按即可行走"</string>
     <string name="map_hint_tap_to_teleport_long_press">"点击瞬移 · 长按行走"</string>
     <string name="map_fab_recenter_gps_cd">"回到手机 GPS 位置"</string>
+    <string name="map_recenter_gps_fallback_error">"无法获取手机的 GPS 位置"</string>
     <string name="map_fab_recenter_mock_cd">"回到模拟位置"</string>
     <string name="map_fab_stop_walk_cd">"停止行走"</string>
     <string name="map_fab_walk_in_progress_cd">"正在行走，点击查看控制项"</string>

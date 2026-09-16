@@ -26,6 +26,7 @@
     <string name="map_hint_long_press_to_walk">"Long-press to walk"</string>
     <string name="map_hint_tap_to_teleport_long_press">"Tap to teleport · Long-press to walk"</string>
     <string name="map_fab_recenter_gps_cd">"Center on phone GPS"</string>
+    <string name="map_recenter_gps_fallback_error">"Couldn't get the phone's GPS location"</string>
     <string name="map_fab_recenter_mock_cd">"Re-center on mock location"</string>
     <string name="map_fab_stop_walk_cd">"Stop walk"</string>
     <string name="map_fab_walk_in_progress_cd">"Walk in progress, tap for controls"</string>

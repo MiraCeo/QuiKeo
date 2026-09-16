@@ -1,5 +1,6 @@
 package com.locationjoystick.feature.map.impl
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.locationjoystick.core.common.constants.AppConstants
@@ -22,7 +23,9 @@ import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.RecentSearch
 import com.locationjoystick.core.model.RoamingDefaults
 import com.locationjoystick.core.model.toConfig
+import com.locationjoystick.feature.map.impl.R
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,6 +60,7 @@ class MapViewModel
         private val settingsRepository: SettingsRepository,
         private val captureCoordinatesRepository: CaptureCoordinatesRepository,
         private val realLocationRepository: RealLocationRepository,
+        @ApplicationContext private val context: Context,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(MapUiState())
         val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
@@ -338,7 +342,9 @@ class MapViewModel
                                         )
                                     }
                                 }.onFailure { error ->
-                                    _cameraMessages.emit(error.message ?: "Couldn't get the phone's GPS location")
+                                    _cameraMessages.emit(
+                                        error.message ?: context.getString(R.string.map_recenter_gps_fallback_error),
+                                    )
                                 }
                         }
                     }

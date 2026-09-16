@@ -155,6 +155,7 @@ class MapViewModelTest {
             settingsRepository = settingsRepository,
             captureCoordinatesRepository = captureCoordinatesRepository,
             realLocationRepository = realLocationRepository,
+            context = context,
         )
     }
 
