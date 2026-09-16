@@ -97,7 +97,7 @@ class PlantingPathTest {
     @Test
     fun `clampPlantingRadius clamps to configured bounds`() {
         assertEquals(
-            AppConstants.RouteConstants.PLANTING_MIN_RADIUS_METERS,
+            AppConstants.RouteConstants.ROUTE_MIN_RADIUS_METERS,
             clampPlantingRadius(1.0),
             0.0,
         )

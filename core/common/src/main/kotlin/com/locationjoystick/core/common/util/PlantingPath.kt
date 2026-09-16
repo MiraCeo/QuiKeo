@@ -7,7 +7,7 @@ import kotlin.math.roundToInt
 
 fun clampPlantingRadius(radiusMeters: Double): Double =
     radiusMeters.coerceIn(
-        AppConstants.RouteConstants.PLANTING_MIN_RADIUS_METERS,
+        AppConstants.RouteConstants.ROUTE_MIN_RADIUS_METERS,
         AppConstants.RouteConstants.PLANTING_MAX_RADIUS_METERS,
     )
 

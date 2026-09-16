@@ -244,7 +244,7 @@ fun RoamingSheetContent(
                             draft.copy(
                                 plantingStartRadiusMeters =
                                     v.coerceIn(
-                                        AppConstants.RoamingConstants.PLANTING_MIN_RADIUS_METERS,
+                                        AppConstants.RoamingConstants.ROAMING_MIN_RADIUS_METERS,
                                         AppConstants.RoamingConstants.PLANTING_MAX_RADIUS_METERS,
                                     ),
                             ),
@@ -265,7 +265,7 @@ fun RoamingSheetContent(
                             draft.copy(
                                 plantingEndRadiusMeters =
                                     v.coerceIn(
-                                        AppConstants.RoamingConstants.PLANTING_MIN_RADIUS_METERS,
+                                        AppConstants.RoamingConstants.ROAMING_MIN_RADIUS_METERS,
                                         AppConstants.RoamingConstants.PLANTING_MAX_RADIUS_METERS,
                                     ),
                             ),

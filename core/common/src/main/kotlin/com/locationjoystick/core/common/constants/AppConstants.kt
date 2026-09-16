@@ -102,6 +102,12 @@ object AppConstants {
         const val ALTITUDE_TARGET_STEP_METERS_PER_TICK = 0.5
     }
 
+    /** Shared geometry values for both roaming and route planting circles. */
+    object PlantingConstants {
+        const val MAX_RADIUS_METERS = 200.0
+        const val CHORD_METERS = 8.0
+    }
+
     object RoamingConstants {
         const val DEFAULT_RADIUS_METERS = 2000.0
         const val OSRM_PROFILE_FOOT = "foot"
@@ -118,10 +124,10 @@ object AppConstants {
         const val MAX_OSRM_PLANNING_CALLS = 50
         const val PLANTING_START_RADIUS_METERS = 5.0
         const val PLANTING_END_RADIUS_METERS = 39.0
-        const val PLANTING_MIN_RADIUS_METERS = 1.0
-        const val PLANTING_MAX_RADIUS_METERS = 200.0
+        const val ROAMING_MIN_RADIUS_METERS = 1.0
+        val PLANTING_MAX_RADIUS_METERS = PlantingConstants.MAX_RADIUS_METERS
         const val PLANTING_PITCH_METERS = 5.0
-        const val PLANTING_CHORD_METERS = 8.0
+        val PLANTING_CHORD_METERS = PlantingConstants.CHORD_METERS
         const val PLANTING_MIN_REVOLUTIONS = 2
         const val PLANTING_DEFAULT_LOOP_COUNT = 1
         const val PLANTING_MAX_LOOP_COUNT = 99
@@ -378,9 +384,9 @@ object AppConstants {
         const val MIN_TELEPORT_WAIT_SECONDS = 1
         const val DEFAULT_TELEPORT_WAIT_SECONDS = 5
         const val PLANTING_DEFAULT_RADIUS_METERS = 35.0
-        const val PLANTING_MIN_RADIUS_METERS = 5.0
-        const val PLANTING_MAX_RADIUS_METERS = 200.0
-        const val PLANTING_CHORD_METERS = 8.0
+        const val ROUTE_MIN_RADIUS_METERS = 5.0
+        val PLANTING_MAX_RADIUS_METERS = PlantingConstants.MAX_RADIUS_METERS
+        val PLANTING_CHORD_METERS = PlantingConstants.CHORD_METERS
         const val PLANTING_MIN_VERTICES = 8
         const val PLANTING_MAX_VERTICES = 48
 

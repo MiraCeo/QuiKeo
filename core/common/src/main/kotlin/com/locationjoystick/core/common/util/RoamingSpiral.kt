@@ -10,7 +10,7 @@ private val MAX_STEP_RADIANS = Math.toRadians(30.0)
 
 fun clampPlantingRoamingRadius(meters: Double): Double =
     meters.coerceIn(
-        AppConstants.RoamingConstants.PLANTING_MIN_RADIUS_METERS,
+        AppConstants.RoamingConstants.ROAMING_MIN_RADIUS_METERS,
         AppConstants.RoamingConstants.PLANTING_MAX_RADIUS_METERS,
     )
 
@@ -28,7 +28,7 @@ fun normalizePlantingRadii(
     if (start >= end) {
         start =
             (end - AppConstants.RoamingConstants.PLANTING_PITCH_METERS)
-                .coerceAtLeast(AppConstants.RoamingConstants.PLANTING_MIN_RADIUS_METERS)
+                .coerceAtLeast(AppConstants.RoamingConstants.ROAMING_MIN_RADIUS_METERS)
     }
     return start to end
 }

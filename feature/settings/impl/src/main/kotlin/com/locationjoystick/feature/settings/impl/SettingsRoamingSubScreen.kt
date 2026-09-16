@@ -220,7 +220,7 @@ private fun RoamingSection(
                         roamingDefaults.copy(
                             plantingStartRadiusMeters =
                                 v.coerceIn(
-                                    AppConstants.RoamingConstants.PLANTING_MIN_RADIUS_METERS,
+                                    AppConstants.RoamingConstants.ROAMING_MIN_RADIUS_METERS,
                                     AppConstants.RoamingConstants.PLANTING_MAX_RADIUS_METERS,
                                 ),
                         ),
@@ -249,7 +249,7 @@ private fun RoamingSection(
                         roamingDefaults.copy(
                             plantingEndRadiusMeters =
                                 v.coerceIn(
-                                    AppConstants.RoamingConstants.PLANTING_MIN_RADIUS_METERS,
+                                    AppConstants.RoamingConstants.ROAMING_MIN_RADIUS_METERS,
                                     AppConstants.RoamingConstants.PLANTING_MAX_RADIUS_METERS,
                                 ),
                         ),
