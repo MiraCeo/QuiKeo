@@ -7,6 +7,7 @@ import com.locationjoystick.core.model.FavoriteLocation
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.MockMode
 import com.locationjoystick.core.routing.RouteReplayEngine
+import com.locationjoystick.core.routing.TeleportRouteEngine
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -24,6 +25,7 @@ class TeleportUseCaseTest {
     private val locationRepository = LocationRepository()
     private val roamingRepository = mockk<RoamingRepository>(relaxed = true)
     private val routeReplayEngine = mockk<RouteReplayEngine>(relaxed = true)
+    private val teleportRouteEngine = mockk<TeleportRouteEngine>(relaxed = true)
     private val walkCoordinator = mockk<WalkCoordinator>(relaxed = true)
     private val startedIntents = mutableListOf<Intent>()
     private val context =
@@ -44,6 +46,7 @@ class TeleportUseCaseTest {
             locationRepository,
             roamingRepository,
             routeReplayEngine,
+            teleportRouteEngine,
             walkCoordinator,
         )
 
@@ -153,6 +156,7 @@ class TeleportUseCaseTest {
             useCase.execute(target)
 
             coVerify { routeReplayEngine.stop() }
+            coVerify { teleportRouteEngine.stop() }
             verify { walkCoordinator.cancel() }
             assertEquals(MockMode.TELEPORT, locationRepository.currentMode.value)
             assertNull(locationRepository.activeRouteId.value)
@@ -172,6 +176,7 @@ class TeleportUseCaseTest {
             coVerify { roamingRepository.stopRoaming() }
             verify { walkCoordinator.cancel() }
             coVerify(exactly = 0) { routeReplayEngine.stop() }
+            coVerify(exactly = 0) { teleportRouteEngine.stop() }
         }
 
     @Test
@@ -185,6 +190,7 @@ class TeleportUseCaseTest {
 
             coVerify(exactly = 0) { roamingRepository.stopRoaming() }
             coVerify(exactly = 0) { routeReplayEngine.stop() }
+            coVerify(exactly = 0) { teleportRouteEngine.stop() }
             verify(exactly = 0) { walkCoordinator.cancel() }
             assertEquals(MockMode.ROUTE_REPLAY, locationRepository.currentMode.value)
             assertEquals("route-1", locationRepository.activeRouteId.value)

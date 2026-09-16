@@ -8,6 +8,7 @@ import com.locationjoystick.core.model.FavoriteLocation
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.MockMode
 import com.locationjoystick.core.routing.RouteReplayEngine
+import com.locationjoystick.core.routing.TeleportRouteEngine
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -40,6 +41,7 @@ class TeleportUseCase
         private val locationRepository: LocationRepository,
         private val roamingRepository: RoamingRepository,
         private val routeReplayEngine: RouteReplayEngine,
+        private val teleportRouteEngine: TeleportRouteEngine,
         private val walkCoordinator: WalkCoordinator,
     ) {
         /**
@@ -93,8 +95,12 @@ class TeleportUseCase
             // Always abort replay, even when mode is not yet ROUTE_REPLAY: Follow-roads
             // planning sets that mode only after OSRM returns, and a late start would
             // overwrite this teleport. STOP is a no-op when nothing is playing.
+            // Both engines are stopped here: TELEPORT-type routes tick via the separate
+            // teleportRouteEngine, not routeReplayEngine, so awaiting only one leaves the
+            // other free to overwrite this position before the async STOP intent lands.
             if (locationRepository.currentMode.value == MockMode.ROUTE_REPLAY) {
                 routeReplayEngine.stop()
+                teleportRouteEngine.stop()
                 locationRepository.setRouteWaypoints(null)
                 locationRepository.setRouteProgress(null)
                 locationRepository.setActiveRouteId(null)
