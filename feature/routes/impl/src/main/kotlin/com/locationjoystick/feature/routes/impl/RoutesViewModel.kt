@@ -123,24 +123,18 @@ class RoutesViewModel
 
         fun startReplay(
             route: Route,
-            isLooping: Boolean = false,
-            isReverse: Boolean = false,
-            isReturnToLocation: Boolean = false,
-            followRoadsToStart: Boolean = false,
-            isPlanting: Boolean = false,
-            teleportBetweenWaypoints: Boolean = false,
-            teleportBetweenDelaySeconds: Int = AppConstants.RouteConstants.TELEPORT_BETWEEN_DEFAULT_DELAY_SECONDS,
+            config: RouteStartConfig = RouteStartConfig(),
         ) {
             viewModelScope.launch {
                 startRouteReplayUseCase.execute(
                     routeId = route.id,
-                    isLooping = isLooping,
-                    isReverse = isReverse,
-                    isReturnToLocation = isReturnToLocation,
-                    followRoadsToStart = followRoadsToStart,
-                    isPlanting = isPlanting,
-                    teleportBetweenWaypoints = teleportBetweenWaypoints,
-                    teleportBetweenDelaySeconds = teleportBetweenDelaySeconds,
+                    isLooping = config.isLooping,
+                    isReverse = config.isReverse,
+                    isReturnToLocation = config.isReturnToLocation,
+                    followRoadsToStart = config.followRoadsToStart,
+                    isPlanting = config.isPlanting,
+                    teleportBetweenWaypoints = config.teleportBetweenWaypoints,
+                    teleportBetweenDelaySeconds = config.teleportBetweenDelaySeconds,
                 )
             }
         }

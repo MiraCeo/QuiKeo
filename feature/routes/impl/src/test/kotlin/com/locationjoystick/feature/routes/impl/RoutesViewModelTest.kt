@@ -165,11 +165,13 @@ class RoutesViewModelUiStateTest {
             val routeWithProfile = route("r1", "Bike Route", createdAt = 1000L).copy(speedProfileId = "bike")
             viewModel.startReplay(
                 routeWithProfile,
-                isLooping = true,
-                isReverse = true,
-                followRoadsToStart = true,
-                isPlanting = true,
-                teleportBetweenWaypoints = true,
+                RouteStartConfig(
+                    isLooping = true,
+                    isReverse = true,
+                    followRoadsToStart = true,
+                    isPlanting = true,
+                    teleportBetweenWaypoints = true,
+                ),
             )
 
             coVerify {
