@@ -117,11 +117,11 @@ internal class ReplayOrchestrator(
         activeReplayJob =
             scope.launch {
                 previous?.cancelAndJoin()
-                if (!isCurrentStart(generation)) return@launch
+                if (!isStartStillCurrent(generation)) return@launch
                 routeReplayEngine.stop()
                 teleportRouteEngine.stop()
                 val route = routeRepository.getRouteWithWaypoints(routeId).first() ?: return@launch
-                if (!isCurrentStart(generation)) return@launch
+                if (!isStartStillCurrent(generation)) return@launch
                 if (!isPlanting && route.waypoints.size < 2) return@launch
                 val orderedWaypoints = if (isBackward) route.waypoints.reversed() else route.waypoints
                 val isLooping = isPlanting || (isLoopingOverride ?: route.isLooping)
@@ -150,7 +150,7 @@ internal class ReplayOrchestrator(
                             else -> latLngs to null
                         }
 
-                    if (!isCurrentStart(generation)) return@launch
+                    if (!isStartStillCurrent(generation)) return@launch
                     startReplayWithWaypoints(
                         generation = generation,
                         teleportToStart = teleportToStart,
@@ -206,7 +206,7 @@ internal class ReplayOrchestrator(
         activeReplayJob =
             scope.launch {
                 previous?.cancelAndJoin()
-                if (!isCurrentStart(generation)) return@launch
+                if (!isStartStillCurrent(generation)) return@launch
                 routeReplayEngine.stop()
                 // Ephemeral (walk-here) replay has no persisted route, so it's never TELEPORT type.
                 activeReplayer = routeReplayEngine
@@ -218,11 +218,6 @@ internal class ReplayOrchestrator(
                     persistMetadata = null,
                 )
             }
-    }
-
-    private fun CoroutineScope.isCurrentStart(generation: Int): Boolean {
-        ensureActive()
-        return generation == startGeneration.get()
     }
 
     private suspend fun isStartStillCurrent(generation: Int): Boolean {
