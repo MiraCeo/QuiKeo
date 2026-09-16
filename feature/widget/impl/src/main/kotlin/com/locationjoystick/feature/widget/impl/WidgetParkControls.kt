@@ -19,5 +19,4 @@ internal fun widgetMasterPopupMode(spoofingActive: Boolean): WidgetMasterPopupMo
 internal fun widgetControlsEnabled(spoofingActive: Boolean): Boolean = spoofingActive
 
 /** Stop on the long-press popup is never faded or ignored, including while parked. */
-@Suppress("UNUSED_PARAMETER")
-internal fun widgetStopEnabled(spoofingActive: Boolean): Boolean = true
+internal fun widgetStopEnabled(): Boolean = true

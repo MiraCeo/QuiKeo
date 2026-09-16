@@ -22,7 +22,6 @@ class WidgetParkControlsTest {
 
     @Test
     fun `Stop stays available while parked`() {
-        assertEquals(true, widgetStopEnabled(spoofingActive = false))
-        assertEquals(true, widgetStopEnabled(spoofingActive = true))
+        assertEquals(true, widgetStopEnabled())
     }
 }

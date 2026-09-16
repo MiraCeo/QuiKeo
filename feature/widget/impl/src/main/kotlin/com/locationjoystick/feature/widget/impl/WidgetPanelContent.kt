@@ -344,7 +344,7 @@ internal fun WidgetPanel(
                         icon = LjIcons.Stop,
                         contentDescription = stringResource(R.string.widget_panel_content_stop_spoofing),
                         tint = MaterialTheme.colorScheme.error,
-                        enabled = widgetStopEnabled(spoofingActive),
+                        enabled = widgetStopEnabled(),
                         onClick = onStopSpoofing,
                     )
                 }
