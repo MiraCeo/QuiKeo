@@ -61,6 +61,8 @@ class MapSmokeTest : BaseSmokeTest() {
         composeRule.onNodeWithContentDescription("Start roaming").performClick()
         composeRule.waitForIdle()
         composeRule.onNodeWithText("Walk around the block").assertIsDisplayed()
+        composeRule.onNodeWithText("Planting mode").performClick()
+        composeRule.waitForIdle()
         composeRule.onNodeWithText("Planting").assertIsDisplayed()
     }
 

@@ -1,6 +1,6 @@
 # Roaming Mode
 
-Two mutually exclusive modes, configured via the roaming sheet on the Map screen, the floating widget, or Settings → Roaming. Only one roaming session can run at a time.
+Two mutually exclusive modes, configured via the roaming sheet on the Map screen, the floating widget, or Settings → Roaming. Only one roaming session can run at a time. The roaming sheet (map, widget panel, floating map) shows only one mode's config at a time — a "Planting mode" checkbox (unchecked by default = walk-around) switches which block is shown, instead of displaying both stacked. Settings → Roaming still shows both modes' default fields at once, since it's pre-configuring defaults for either mode rather than picking one to start now.
 
 - **Walk around the block** — set a center, radius, and distance. Walks randomly within the radius (straight-line or follow-roads). This is the original roaming behaviour.
 - **Planting** — Archimedean spiral around the current point from a starting radius (default 5 m) out to an ending radius (default 39 m), then back in. One loop is one full expand and contract. Infinite loop or N loops. Straight-line only (no follow-roads). Distinct from route Planting circles around saved-route stops (@docs/features/routes.md).
