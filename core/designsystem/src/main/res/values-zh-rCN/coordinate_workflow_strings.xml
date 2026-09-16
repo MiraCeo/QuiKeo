@@ -4,7 +4,6 @@
     <string name="capture_coordinates_form_clear">"清除"</string>
     <string name="capture_coordinates_form_keep">"保留"</string>
     <string name="capture_coordinates_form_capture_coordinates">"采集坐标"</string>
-    <string name="capture_coordinates_form_no_captured_points_yet">"尚未采集任何点"</string>
     <string name="capture_coordinates_form_point_order">"点位顺序"</string>
     <string name="capture_point_order_hint">"列表按采集顺序排列，方便你移除最后一个点。"</string>
     <string name="capture_coordinates_form_route_name">"路线名称"</string>
@@ -29,7 +28,6 @@
     <string name="capture_coordinates_form_remove_last">"移除最后一个"</string>
     <string name="capture_coordinates_form_last">"最后一个"</string>
     <string name="capture_coordinates_form_clear_list">"清空列表"</string>
-    <string name="favorites_list_search_favorites">"搜索收藏"</string>
     <string name="favorites_list_no_favorites_match_your_search">"没有匹配的收藏"</string>
     <string name="favorites_list_favorites">"收藏"</string>
     <string name="list_search_field_search_favorites">"搜索收藏"</string>

@@ -215,7 +215,7 @@ fun CaptureCoordinatesForm(
                 Modifier
                     .fillMaxWidth()
                     .padding(top = LjSpacing.xs),
-            placeholder = { Text(stringResource(R.string.capture_coordinates_form_no_captured_points_yet)) },
+            placeholder = { Text(stringResource(R.string.capture_empty)) },
             minLines = 3,
             maxLines = 8,
             colors =

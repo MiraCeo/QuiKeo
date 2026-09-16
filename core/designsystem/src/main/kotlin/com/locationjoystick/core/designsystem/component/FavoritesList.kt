@@ -94,7 +94,7 @@ fun FavoritesList(
             ListSearchField(
                 query = internalQuery,
                 onQueryChange = { internalQuery = it },
-                label = stringResource(R.string.favorites_list_search_favorites),
+                label = stringResource(R.string.list_search_field_search_favorites),
                 textColor = textColor,
                 modifier = Modifier.padding(top = if (title != null) 8.dp else 0.dp),
             )
