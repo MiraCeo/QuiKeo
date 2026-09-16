@@ -25,8 +25,21 @@ class AppConstantsTest {
     }
 
     @Test
-    fun `WALK_SPEED_MPS is 10 kmh`() {
-        assertEquals(10.0 / 3.6, AppConstants.ProfileConstants.WALK_SPEED_MPS, 0.001)
+    fun `WALK_SPEED_MPS is 5 kmh`() {
+        assertEquals(5.0 / 3.6, AppConstants.ProfileConstants.WALK_SPEED_MPS, 0.001)
+    }
+
+    @Test
+    fun `speed profile ordering is walk less than run less than bike less than drive`() {
+        assertTrue(
+            AppConstants.ProfileConstants.WALK_SPEED_MPS < AppConstants.ProfileConstants.RUN_SPEED_MPS,
+        )
+        assertTrue(
+            AppConstants.ProfileConstants.RUN_SPEED_MPS < AppConstants.ProfileConstants.BIKE_SPEED_MPS,
+        )
+        assertTrue(
+            AppConstants.ProfileConstants.BIKE_SPEED_MPS < AppConstants.ProfileConstants.DRIVE_SPEED_MPS,
+        )
     }
 
     @Test

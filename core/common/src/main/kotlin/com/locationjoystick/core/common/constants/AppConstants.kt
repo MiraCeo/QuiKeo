@@ -20,7 +20,7 @@ object AppConstants {
         const val PROFILE_ID_BIKE = "bike"
         const val PROFILE_ID_DRIVE = "drive"
         const val SLOW_WALK_SPEED_MPS = 0.3
-        const val WALK_SPEED_MPS = 10.0 / 3.6
+        const val WALK_SPEED_MPS = 5.0 / 3.6
         const val RUN_SPEED_MPS = 2.2222
         const val BIKE_SPEED_MPS = 18.5 / 3.6
         const val DRIVE_SPEED_MPS = 60.0 / 3.6

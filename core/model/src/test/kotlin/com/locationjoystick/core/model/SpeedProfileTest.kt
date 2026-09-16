@@ -23,9 +23,9 @@ class SpeedProfileTest {
     }
 
     @Test
-    fun `defaultProfiles walk speed is 10 kmh`() {
+    fun `defaultProfiles walk speed is 5 kmh`() {
         val walk = SpeedProfile.defaultProfiles().first { it.id == "walk" }
-        assertEquals(10.0 / 3.6, walk.speedMetersPerSecond, 0.001)
+        assertEquals(5.0 / 3.6, walk.speedMetersPerSecond, 0.001)
     }
 
     @Test
@@ -56,11 +56,11 @@ class SpeedProfileTest {
     }
 
     @Test
-    fun `defaultProfiles walk is faster than run`() {
+    fun `defaultProfiles walk is slower than run`() {
         val profiles = SpeedProfile.defaultProfiles().associateBy { it.id }
         assertTrue(
-            "walk (10 km/h) should be faster than run (8 km/h)",
-            profiles["walk"]!!.speedMetersPerSecond > profiles["run"]!!.speedMetersPerSecond,
+            "walk (5 km/h) should be slower than run (8 km/h)",
+            profiles["walk"]!!.speedMetersPerSecond < profiles["run"]!!.speedMetersPerSecond,
         )
     }
 
@@ -97,9 +97,9 @@ class SpeedProfileTest {
     }
 
     @Test
-    fun `defaultProfiles walk is exactly 10 kmh`() {
+    fun `defaultProfiles walk is exactly 5 kmh`() {
         val walk = SpeedProfile.defaultProfiles().first { it.id == "walk" }
-        assertEquals(10.0 / 3.6, walk.speedMetersPerSecond, 0.001)
+        assertEquals(5.0 / 3.6, walk.speedMetersPerSecond, 0.001)
     }
 
     @Test
