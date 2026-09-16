@@ -394,7 +394,7 @@ private fun RoamingGenerateStartRow(
                     strokeWidth = 2.dp,
                 )
             } else {
-                Text(stringResource(R.string.roaming_sheet_content_generate))
+                Text(stringResource(R.string.roaming_sheet_generate))
             }
         }
         LjButton(
@@ -402,7 +402,7 @@ private fun RoamingGenerateStartRow(
             enabled = hasCurrentPosition && isSpoofingActive && !isPreviewLoading && !routePlaying,
             modifier = Modifier.weight(1f).padding(start = 4.dp),
         ) {
-            Text(stringResource(R.string.roaming_sheet_content_start))
+            Text(stringResource(R.string.common_start))
         }
     }
 }

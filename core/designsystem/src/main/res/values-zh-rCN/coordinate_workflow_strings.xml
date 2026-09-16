@@ -55,8 +55,6 @@
     <string name="roaming_sheet_content_number_of_loops">"循环次数"</string>
     <string name="roaming_sheet_content_pause_or_stop_the_playing_route_first_to_start_roaming">"请先暂停或停止正在进行的路线，才能开始漫游"</string>
     <string name="roaming_sheet_content_speed_profile">"速度档位"</string>
-    <string name="roaming_sheet_content_generate">"生成"</string>
-    <string name="roaming_sheet_content_start">"开始"</string>
     <string name="route_progress_badge_stop_1_of_60">"第 1 站，共 60 站"</string>
     <string name="route_progress_badge_stop_16_of_41">"第 16 站，共 41 站"</string>
     <string name="routes_picker_list_search_routes">"搜索路线"</string>

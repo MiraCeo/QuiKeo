@@ -55,8 +55,6 @@
     <string name="roaming_sheet_content_number_of_loops">"Number of loops"</string>
     <string name="roaming_sheet_content_pause_or_stop_the_playing_route_first_to_start_roaming">"Pause or stop the playing route first to start roaming"</string>
     <string name="roaming_sheet_content_speed_profile">"Speed profile"</string>
-    <string name="roaming_sheet_content_generate">"Generate"</string>
-    <string name="roaming_sheet_content_start">"Start"</string>
     <string name="route_progress_badge_stop_1_of_60">"Stop 1 of 60"</string>
     <string name="route_progress_badge_stop_16_of_41">"Stop 16 of 41"</string>
     <string name="routes_picker_list_search_routes">"Search routes"</string>
