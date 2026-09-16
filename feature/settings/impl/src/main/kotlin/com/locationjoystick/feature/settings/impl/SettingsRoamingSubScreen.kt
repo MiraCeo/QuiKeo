@@ -269,10 +269,10 @@ private fun RoamingSection(
     LjSegmentedControl(
         options =
             listOf(
-                "walk" to "Walk",
-                "run" to "Run",
-                "bike" to "Bike",
-            ),
+                AppConstants.ProfileConstants.PROFILE_ID_WALK,
+                AppConstants.ProfileConstants.PROFILE_ID_RUN,
+                AppConstants.ProfileConstants.PROFILE_ID_BIKE,
+            ).map { it to speedProfileLabel(it) },
         selected = roamingDefaults.plantingSpeedProfileId,
         onSelect = { onAction(SettingsAction.UpdateRoamingDefaults(roamingDefaults.copy(plantingSpeedProfileId = it))) },
         modifier = Modifier.fillMaxWidth(),
