@@ -67,50 +67,71 @@ import com.locationjoystick.core.designsystem.LjWarning
 import com.locationjoystick.core.designsystem.R
 import com.locationjoystick.core.model.LatLng
 
+/** Capture-mode setup steps 1-5 plus the passthrough-browser row — see docs/features/capture-coordinates.md. */
+data class CaptureModeState(
+    val captureModeEnabled: Boolean,
+    val captureEnabled: Boolean,
+    val jumpEnabled: Boolean,
+    val passThroughBrowserName: String,
+    val onCaptureModeEnabledChange: (Boolean) -> Unit,
+    val onCaptureEnabledChange: (Boolean) -> Unit,
+    val onJumpEnabledChange: (Boolean) -> Unit,
+    val onRequestDefaultBrowser: () -> Unit,
+    val onOpenMapsLinks: () -> Unit,
+    val onOpenThisAppLinks: () -> Unit,
+    val onRestoreDefaultApps: () -> Unit,
+    val onChoosePassThroughBrowser: () -> Unit,
+    val isDefaultBrowser: Boolean = false,
+)
+
+/** Captured-points list, its point-order toggle, and its list actions. */
+data class CapturePointsState(
+    val points: List<LatLng>,
+    val onClearPoints: () -> Unit,
+    val onRemoveLast: () -> Unit,
+    val optimizeProximity: Boolean = true,
+    val onOptimizeProximityChange: (Boolean) -> Unit = {},
+    val orderedPoints: List<LatLng> = points,
+)
+
+/** Route-name field and Save-as-route action. */
+data class CaptureRouteSaveState(
+    val routeName: String,
+    val saved: Boolean,
+    val saveError: String?,
+    val canSave: Boolean,
+    val onRouteNameChange: (String) -> Unit,
+    val onSaveRoute: () -> Unit,
+)
+
 @Composable
 fun CaptureCoordinatesForm(
-    captureModeEnabled: Boolean,
-    captureEnabled: Boolean,
-    jumpEnabled: Boolean,
-    points: List<LatLng>,
-    routeName: String,
-    saved: Boolean,
-    saveError: String?,
-    canSave: Boolean,
-    passThroughBrowserName: String,
-    onCaptureModeEnabledChange: (Boolean) -> Unit,
-    onCaptureEnabledChange: (Boolean) -> Unit,
-    onJumpEnabledChange: (Boolean) -> Unit,
-    onRouteNameChange: (String) -> Unit,
-    onSaveRoute: () -> Unit,
-    onClearPoints: () -> Unit,
-    onRemoveLast: () -> Unit,
-    onRequestDefaultBrowser: () -> Unit,
-    onOpenThisAppLinks: () -> Unit,
-    onOpenMapsLinks: () -> Unit,
-    onRestoreDefaultApps: () -> Unit,
-    onChoosePassThroughBrowser: () -> Unit,
+    captureMode: CaptureModeState,
+    capturePoints: CapturePointsState,
+    routeSave: CaptureRouteSaveState,
     onDismiss: () -> Unit = {},
     modifier: Modifier = Modifier,
     showTitle: Boolean = true,
     showClose: Boolean = true,
-    isDefaultBrowser: Boolean = false,
-    optimizeProximity: Boolean = true,
-    onOptimizeProximityChange: (Boolean) -> Unit = {},
-    orderedPoints: List<LatLng> = points,
     contentPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
 ) {
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
-    val copiedMessage = stringResource(R.string.capture_copied_count, orderedPoints.size)
-    val ready = isCaptureReady(captureModeEnabled, captureEnabled, jumpEnabled, isDefaultBrowser)
+    val copiedMessage = stringResource(R.string.capture_copied_count, capturePoints.orderedPoints.size)
+    val ready =
+        isCaptureReady(
+            captureMode.captureModeEnabled,
+            captureMode.captureEnabled,
+            captureMode.jumpEnabled,
+            captureMode.isDefaultBrowser,
+        )
     var showClearPrompt by remember { mutableStateOf(false) }
 
     fun requestCaptureMode(enabled: Boolean) {
-        if (enabled && !captureModeEnabled && points.isNotEmpty()) {
+        if (enabled && !captureMode.captureModeEnabled && capturePoints.points.isNotEmpty()) {
             showClearPrompt = true
         } else {
-            onCaptureModeEnabledChange(enabled)
+            captureMode.onCaptureModeEnabledChange(enabled)
         }
     }
 
@@ -118,12 +139,12 @@ fun CaptureCoordinatesForm(
         AlertDialog(
             onDismissRequest = { showClearPrompt = false },
             title = { Text(stringResource(R.string.capture_coordinates_form_clear_captured_locations)) },
-            text = { Text(stringResource(R.string.capture_previous_points, points.size)) },
+            text = { Text(stringResource(R.string.capture_previous_points, capturePoints.points.size)) },
             confirmButton = {
                 Button(
                     onClick = {
-                        onClearPoints()
-                        onCaptureModeEnabledChange(true)
+                        capturePoints.onClearPoints()
+                        captureMode.onCaptureModeEnabledChange(true)
                         showClearPrompt = false
                     },
                 ) {
@@ -133,7 +154,7 @@ fun CaptureCoordinatesForm(
             dismissButton = {
                 TextButton(
                     onClick = {
-                        onCaptureModeEnabledChange(true)
+                        captureMode.onCaptureModeEnabledChange(true)
                         showClearPrompt = false
                     },
                 ) {
@@ -159,22 +180,22 @@ fun CaptureCoordinatesForm(
             )
         }
         CaptureSetupSteps(
-            captureModeEnabled = captureModeEnabled,
-            captureEnabled = captureEnabled,
-            jumpEnabled = jumpEnabled,
-            isDefaultBrowser = isDefaultBrowser,
+            captureModeEnabled = captureMode.captureModeEnabled,
+            captureEnabled = captureMode.captureEnabled,
+            jumpEnabled = captureMode.jumpEnabled,
+            isDefaultBrowser = captureMode.isDefaultBrowser,
             onCaptureModeEnabledChange = ::requestCaptureMode,
-            onCaptureEnabledChange = onCaptureEnabledChange,
-            onJumpEnabledChange = onJumpEnabledChange,
-            onRequestDefaultBrowser = onRequestDefaultBrowser,
-            onOpenMapsLinks = onOpenMapsLinks,
-            onOpenThisAppLinks = onOpenThisAppLinks,
-            onRestoreDefaultApps = onRestoreDefaultApps,
+            onCaptureEnabledChange = captureMode.onCaptureEnabledChange,
+            onJumpEnabledChange = captureMode.onJumpEnabledChange,
+            onRequestDefaultBrowser = captureMode.onRequestDefaultBrowser,
+            onOpenMapsLinks = captureMode.onOpenMapsLinks,
+            onOpenThisAppLinks = captureMode.onOpenThisAppLinks,
+            onRestoreDefaultApps = captureMode.onRestoreDefaultApps,
         )
-        if (!captureModeEnabled || !captureEnabled && !jumpEnabled) {
+        if (!captureMode.captureModeEnabled || !captureMode.captureEnabled && !captureMode.jumpEnabled) {
             CaptureOffBanner(
                 text =
-                    if (!captureModeEnabled) {
+                    if (!captureMode.captureModeEnabled) {
                         stringResource(R.string.capture_off_message)
                     } else {
                         stringResource(R.string.capture_passthrough_message)
@@ -183,30 +204,30 @@ fun CaptureCoordinatesForm(
             )
         } else if (ready) {
             CaptureReadyBanner(
-                captureEnabled = captureEnabled,
-                jumpEnabled = jumpEnabled,
+                captureEnabled = captureMode.captureEnabled,
+                jumpEnabled = captureMode.jumpEnabled,
                 modifier = Modifier.padding(top = LjSpacing.sm, bottom = LjSpacing.xs),
             )
         }
         TextButton(
-            onClick = onChoosePassThroughBrowser,
+            onClick = captureMode.onChoosePassThroughBrowser,
             modifier = Modifier.align(Alignment.End),
         ) {
-            Text(stringResource(R.string.capture_passthrough_label, passThroughBrowserName))
+            Text(stringResource(R.string.capture_passthrough_label, captureMode.passThroughBrowserName))
         }
         Text(
             text =
-                if (points.isEmpty()) {
+                if (capturePoints.points.isEmpty()) {
                     stringResource(R.string.capture_empty)
                 } else {
-                    stringResource(R.string.capture_point_count, points.size)
+                    stringResource(R.string.capture_point_count, capturePoints.points.size)
                 },
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(top = LjSpacing.sm),
         )
         OutlinedTextField(
             value =
-                points
+                capturePoints.points
                     .mapIndexed { index, point -> "${index + 1}. ${formatCapturedPoint(point)}" }
                     .joinToString("\n"),
             onValueChange = {},
@@ -236,8 +257,8 @@ fun CaptureCoordinatesForm(
                     false to stringResource(R.string.capture_original_order),
                     true to stringResource(R.string.capture_optimize_order),
                 ),
-            selected = optimizeProximity,
-            onSelect = onOptimizeProximityChange,
+            selected = capturePoints.optimizeProximity,
+            onSelect = capturePoints.onOptimizeProximityChange,
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -250,18 +271,18 @@ fun CaptureCoordinatesForm(
             modifier = Modifier.padding(top = LjSpacing.xs),
         )
         CapturePointActions(
-            enabled = points.isNotEmpty(),
+            enabled = capturePoints.points.isNotEmpty(),
             onCopy = {
-                clipboard.setText(AnnotatedString(formatCapturedPointsForClipboard(orderedPoints)))
+                clipboard.setText(AnnotatedString(formatCapturedPointsForClipboard(capturePoints.orderedPoints)))
                 Toast.makeText(context, copiedMessage, Toast.LENGTH_SHORT).show()
             },
-            onRemoveLast = onRemoveLast,
-            onClearPoints = onClearPoints,
+            onRemoveLast = capturePoints.onRemoveLast,
+            onClearPoints = capturePoints.onClearPoints,
             modifier = Modifier.padding(top = LjSpacing.xs),
         )
         OutlinedTextField(
-            value = routeName,
-            onValueChange = onRouteNameChange,
+            value = routeSave.routeName,
+            onValueChange = routeSave.onRouteNameChange,
             label = { Text(stringResource(R.string.capture_coordinates_form_route_name)) },
             modifier =
                 Modifier
@@ -269,13 +290,20 @@ fun CaptureCoordinatesForm(
                     .padding(top = LjSpacing.xs),
             singleLine = true,
             supportingText = {
-                Text(saveError ?: if (saved) stringResource(R.string.capture_saved) else stringResource(R.string.capture_need_points))
+                Text(
+                    routeSave.saveError
+                        ?: if (routeSave.saved) {
+                            stringResource(R.string.capture_saved)
+                        } else {
+                            stringResource(R.string.capture_need_points)
+                        },
+                )
             },
-            isError = saveError != null,
+            isError = routeSave.saveError != null,
         )
         Button(
-            onClick = onSaveRoute,
-            enabled = canSave,
+            onClick = routeSave.onSaveRoute,
+            enabled = routeSave.canSave,
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(stringResource(R.string.capture_coordinates_form_save_as_route))
@@ -674,29 +702,38 @@ private fun CapturePointActions(
 private fun CaptureCoordinatesFormPreview() {
     LjTheme {
         CaptureCoordinatesForm(
-            captureModeEnabled = true,
-            captureEnabled = true,
-            jumpEnabled = false,
-            points = listOf(LatLng(36.977695, 128.363905), LatLng(36.982194, 128.370129)),
-            routeName = "Morning route",
-            saved = false,
-            saveError = null,
-            canSave = true,
-            passThroughBrowserName = "Chrome",
-            onCaptureModeEnabledChange = {},
-            onCaptureEnabledChange = {},
-            onJumpEnabledChange = {},
-            onRouteNameChange = {},
-            onSaveRoute = {},
-            onClearPoints = {},
-            onRemoveLast = {},
-            onRequestDefaultBrowser = {},
-            onOpenThisAppLinks = {},
-            onOpenMapsLinks = {},
-            onRestoreDefaultApps = {},
-            onChoosePassThroughBrowser = {},
+            captureMode =
+                CaptureModeState(
+                    captureModeEnabled = true,
+                    captureEnabled = true,
+                    jumpEnabled = false,
+                    passThroughBrowserName = "Chrome",
+                    onCaptureModeEnabledChange = {},
+                    onCaptureEnabledChange = {},
+                    onJumpEnabledChange = {},
+                    onRequestDefaultBrowser = {},
+                    onOpenMapsLinks = {},
+                    onOpenThisAppLinks = {},
+                    onRestoreDefaultApps = {},
+                    onChoosePassThroughBrowser = {},
+                    isDefaultBrowser = true,
+                ),
+            capturePoints =
+                CapturePointsState(
+                    points = listOf(LatLng(36.977695, 128.363905), LatLng(36.982194, 128.370129)),
+                    onClearPoints = {},
+                    onRemoveLast = {},
+                ),
+            routeSave =
+                CaptureRouteSaveState(
+                    routeName = "Morning route",
+                    saved = false,
+                    saveError = null,
+                    canSave = true,
+                    onRouteNameChange = {},
+                    onSaveRoute = {},
+                ),
             onDismiss = {},
-            isDefaultBrowser = true,
         )
     }
 }
@@ -706,29 +743,38 @@ private fun CaptureCoordinatesFormPreview() {
 private fun CaptureCoordinatesFormSetupPreview() {
     LjTheme {
         CaptureCoordinatesForm(
-            captureModeEnabled = false,
-            captureEnabled = false,
-            jumpEnabled = false,
-            points = emptyList(),
-            routeName = "",
-            saved = false,
-            saveError = null,
-            canSave = false,
-            passThroughBrowserName = "Chrome",
-            onCaptureModeEnabledChange = {},
-            onCaptureEnabledChange = {},
-            onJumpEnabledChange = {},
-            onRouteNameChange = {},
-            onSaveRoute = {},
-            onClearPoints = {},
-            onRemoveLast = {},
-            onRequestDefaultBrowser = {},
-            onOpenThisAppLinks = {},
-            onOpenMapsLinks = {},
-            onRestoreDefaultApps = {},
-            onChoosePassThroughBrowser = {},
+            captureMode =
+                CaptureModeState(
+                    captureModeEnabled = false,
+                    captureEnabled = false,
+                    jumpEnabled = false,
+                    passThroughBrowserName = "Chrome",
+                    onCaptureModeEnabledChange = {},
+                    onCaptureEnabledChange = {},
+                    onJumpEnabledChange = {},
+                    onRequestDefaultBrowser = {},
+                    onOpenMapsLinks = {},
+                    onOpenThisAppLinks = {},
+                    onRestoreDefaultApps = {},
+                    onChoosePassThroughBrowser = {},
+                    isDefaultBrowser = false,
+                ),
+            capturePoints =
+                CapturePointsState(
+                    points = emptyList(),
+                    onClearPoints = {},
+                    onRemoveLast = {},
+                ),
+            routeSave =
+                CaptureRouteSaveState(
+                    routeName = "",
+                    saved = false,
+                    saveError = null,
+                    canSave = false,
+                    onRouteNameChange = {},
+                    onSaveRoute = {},
+                ),
             onDismiss = {},
-            isDefaultBrowser = false,
         )
     }
 }

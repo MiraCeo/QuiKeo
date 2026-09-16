@@ -31,6 +31,9 @@ import com.locationjoystick.core.common.util.launchCaptureThisAppLinks
 import com.locationjoystick.core.common.util.resolvePreferredBrowserPackage
 import com.locationjoystick.core.designsystem.LjTheme
 import com.locationjoystick.core.designsystem.component.CaptureCoordinatesForm
+import com.locationjoystick.core.designsystem.component.CaptureModeState
+import com.locationjoystick.core.designsystem.component.CapturePointsState
+import com.locationjoystick.core.designsystem.component.CaptureRouteSaveState
 import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.model.LatLng
@@ -150,35 +153,44 @@ internal fun CaptureCoordinatesScreen(
         onNavigationClick = onOpenDrawer,
     ) { paddingValues ->
         CaptureCoordinatesForm(
-            captureModeEnabled = uiState.captureModeEnabled,
-            captureEnabled = uiState.captureEnabled,
-            jumpEnabled = uiState.jumpEnabled,
-            points = uiState.points,
-            routeName = uiState.routeName,
-            saved = uiState.saved,
-            saveError = uiState.saveError?.let { stringResource(it) },
-            canSave = uiState.canSave,
-            passThroughBrowserName = passThroughBrowserName,
-            isDefaultBrowser = isDefaultBrowser,
+            captureMode =
+                CaptureModeState(
+                    captureModeEnabled = uiState.captureModeEnabled,
+                    captureEnabled = uiState.captureEnabled,
+                    jumpEnabled = uiState.jumpEnabled,
+                    passThroughBrowserName = passThroughBrowserName,
+                    onCaptureModeEnabledChange = onCaptureModeEnabledChange,
+                    onCaptureEnabledChange = onCaptureEnabledChange,
+                    onJumpEnabledChange = onJumpEnabledChange,
+                    onRequestDefaultBrowser = onRequestDefaultBrowser,
+                    onOpenMapsLinks = onOpenMapsLinks,
+                    onOpenThisAppLinks = onOpenThisAppLinks,
+                    onRestoreDefaultApps = onRestoreDefaultApps,
+                    onChoosePassThroughBrowser = onChoosePassThroughBrowser,
+                    isDefaultBrowser = isDefaultBrowser,
+                ),
+            capturePoints =
+                CapturePointsState(
+                    points = uiState.points,
+                    onClearPoints = onClearPoints,
+                    onRemoveLast = onRemoveLast,
+                    optimizeProximity = uiState.pointOrder == CapturePointOrder.PROXIMITY,
+                    onOptimizeProximityChange = { optimize ->
+                        onPointOrderChange(if (optimize) CapturePointOrder.PROXIMITY else CapturePointOrder.ORIGINAL)
+                    },
+                    orderedPoints = uiState.orderedPoints,
+                ),
+            routeSave =
+                CaptureRouteSaveState(
+                    routeName = uiState.routeName,
+                    saved = uiState.saved,
+                    saveError = uiState.saveError?.let { stringResource(it) },
+                    canSave = uiState.canSave,
+                    onRouteNameChange = onRouteNameChange,
+                    onSaveRoute = onSaveRoute,
+                ),
             showTitle = false,
             showClose = false,
-            optimizeProximity = uiState.pointOrder == CapturePointOrder.PROXIMITY,
-            onOptimizeProximityChange = { optimize ->
-                onPointOrderChange(if (optimize) CapturePointOrder.PROXIMITY else CapturePointOrder.ORIGINAL)
-            },
-            orderedPoints = uiState.orderedPoints,
-            onCaptureModeEnabledChange = onCaptureModeEnabledChange,
-            onCaptureEnabledChange = onCaptureEnabledChange,
-            onJumpEnabledChange = onJumpEnabledChange,
-            onRouteNameChange = onRouteNameChange,
-            onSaveRoute = onSaveRoute,
-            onClearPoints = onClearPoints,
-            onRemoveLast = onRemoveLast,
-            onRequestDefaultBrowser = onRequestDefaultBrowser,
-            onOpenThisAppLinks = onOpenThisAppLinks,
-            onOpenMapsLinks = onOpenMapsLinks,
-            onRestoreDefaultApps = onRestoreDefaultApps,
-            onChoosePassThroughBrowser = onChoosePassThroughBrowser,
             modifier = Modifier.padding(paddingValues),
         )
     }

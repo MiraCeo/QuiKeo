@@ -40,6 +40,9 @@ import com.locationjoystick.core.data.CooldownState
 import com.locationjoystick.core.data.toBadgeText
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.component.CaptureCoordinatesForm
+import com.locationjoystick.core.designsystem.component.CaptureModeState
+import com.locationjoystick.core.designsystem.component.CapturePointsState
+import com.locationjoystick.core.designsystem.component.CaptureRouteSaveState
 import com.locationjoystick.core.designsystem.component.CooldownAdvisoryBadge
 import com.locationjoystick.core.designsystem.component.FavoriteTargetDetail
 import com.locationjoystick.core.designsystem.component.FavoritesList
@@ -262,33 +265,42 @@ internal fun CaptureCoordinatesSheet(
         color = MaterialTheme.colorScheme.surface,
     ) {
         CaptureCoordinatesForm(
-            captureModeEnabled = uiState.captureModeEnabled,
-            captureEnabled = uiState.captureEnabled,
-            jumpEnabled = uiState.jumpEnabled,
-            points = uiState.points,
-            routeName = uiState.routeName,
-            saved = uiState.saved,
-            saveError = uiState.saveError?.let { stringResource(it) },
-            canSave = uiState.canSave,
-            passThroughBrowserName = passThroughBrowserName,
-            isDefaultBrowser = isDefaultBrowser,
-            optimizeProximity = uiState.pointOrder == CapturePointOrder.PROXIMITY,
-            onOptimizeProximityChange = { optimize ->
-                onPointOrderChange(if (optimize) CapturePointOrder.PROXIMITY else CapturePointOrder.ORIGINAL)
-            },
-            orderedPoints = uiState.orderedPoints,
-            onCaptureModeEnabledChange = onCaptureModeEnabledChange,
-            onCaptureEnabledChange = onCaptureEnabledChange,
-            onJumpEnabledChange = onJumpEnabledChange,
-            onRouteNameChange = onRouteNameChange,
-            onSaveRoute = onSaveRoute,
-            onClearPoints = onClearPoints,
-            onRemoveLast = onRemoveLast,
-            onRequestDefaultBrowser = onRequestDefaultBrowser,
-            onOpenThisAppLinks = onOpenThisAppLinks,
-            onOpenMapsLinks = onOpenMapsLinks,
-            onRestoreDefaultApps = onRestoreDefaultApps,
-            onChoosePassThroughBrowser = onChoosePassThroughBrowser,
+            captureMode =
+                CaptureModeState(
+                    captureModeEnabled = uiState.captureModeEnabled,
+                    captureEnabled = uiState.captureEnabled,
+                    jumpEnabled = uiState.jumpEnabled,
+                    passThroughBrowserName = passThroughBrowserName,
+                    onCaptureModeEnabledChange = onCaptureModeEnabledChange,
+                    onCaptureEnabledChange = onCaptureEnabledChange,
+                    onJumpEnabledChange = onJumpEnabledChange,
+                    onRequestDefaultBrowser = onRequestDefaultBrowser,
+                    onOpenMapsLinks = onOpenMapsLinks,
+                    onOpenThisAppLinks = onOpenThisAppLinks,
+                    onRestoreDefaultApps = onRestoreDefaultApps,
+                    onChoosePassThroughBrowser = onChoosePassThroughBrowser,
+                    isDefaultBrowser = isDefaultBrowser,
+                ),
+            capturePoints =
+                CapturePointsState(
+                    points = uiState.points,
+                    onClearPoints = onClearPoints,
+                    onRemoveLast = onRemoveLast,
+                    optimizeProximity = uiState.pointOrder == CapturePointOrder.PROXIMITY,
+                    onOptimizeProximityChange = { optimize ->
+                        onPointOrderChange(if (optimize) CapturePointOrder.PROXIMITY else CapturePointOrder.ORIGINAL)
+                    },
+                    orderedPoints = uiState.orderedPoints,
+                ),
+            routeSave =
+                CaptureRouteSaveState(
+                    routeName = uiState.routeName,
+                    saved = uiState.saved,
+                    saveError = uiState.saveError?.let { stringResource(it) },
+                    canSave = uiState.canSave,
+                    onRouteNameChange = onRouteNameChange,
+                    onSaveRoute = onSaveRoute,
+                ),
             onDismiss = onDismiss,
             modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing),
         )
