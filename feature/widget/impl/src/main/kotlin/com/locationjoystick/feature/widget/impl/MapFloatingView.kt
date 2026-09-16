@@ -313,6 +313,7 @@ internal fun MapFloatingView(
                                 onWalkToState.value(pos)
                             } else {
                                 pendingTap = pos
+                                lastFollowedPosition.value = pos
                             }
                             true
                         }
@@ -480,11 +481,12 @@ internal fun MapFloatingView(
                     contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                     onClick = {
                         isFollowingCamera.value = true
-                        if (currentPosition != null) {
-                            lastFollowedPosition.value = currentPosition
+                        val target = currentPosition ?: lastFollowedPosition.value
+                        if (target != null) {
+                            lastFollowedPosition.value = target
                             mapRef.value?.moveCamera(
                                 CameraUpdateFactory.newLatLngZoom(
-                                    MapLatLng(currentPosition.latitude, currentPosition.longitude),
+                                    MapLatLng(target.latitude, target.longitude),
                                     AppConstants.MapConstants.DEFAULT_ZOOM,
                                 ),
                             )

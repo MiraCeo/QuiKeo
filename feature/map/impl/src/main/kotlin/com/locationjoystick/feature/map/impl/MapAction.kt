@@ -14,7 +14,9 @@ sealed interface MapAction {
         val position: LatLng,
     ) : MapAction
 
-    data object RecenterCamera : MapAction
+    data class RecenterCamera(
+        val fallbackPosition: LatLng? = null,
+    ) : MapAction
 
     data object UserStartedPanning : MapAction
 

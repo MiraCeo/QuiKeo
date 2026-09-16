@@ -268,6 +268,7 @@ internal fun MapScreen(
             MapFabColumn(
                 uiState = uiState,
                 isFollowingCamera = isFollowingCamera.value,
+                lastFollowedPosition = lastFollowedPosition.value,
                 onAction = onAction,
                 onToggleSearch = { showSearch.value = !showSearch.value },
             )

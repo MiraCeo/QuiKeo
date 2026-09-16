@@ -316,7 +316,7 @@ class MapViewModel
                 }
 
                 // Camera
-                MapAction.RecenterCamera -> {
+                is MapAction.RecenterCamera -> {
                     val state = _uiState.value.mockLocationState
                     if (state != com.locationjoystick.core.model.MockLocationState.IDLE &&
                         state != com.locationjoystick.core.model.MockLocationState.ERROR
@@ -343,9 +343,22 @@ class MapViewModel
                                         )
                                     }
                                 }.onFailure { error ->
-                                    _cameraMessages.emit(
-                                        error.message ?: context.getString(R.string.map_recenter_gps_fallback_error),
-                                    )
+                                    val fallback = action.fallbackPosition
+                                    if (fallback != null) {
+                                        _uiState.update {
+                                            it.copy(
+                                                isUserPanning = true,
+                                                pendingCameraTarget = fallback,
+                                                pendingTapPosition = null,
+                                                isPendingTapSheetOpen = false,
+                                            )
+                                        }
+                                    } else {
+                                        _cameraMessages.emit(
+                                            error.message
+                                                ?: context.getString(R.string.map_recenter_gps_fallback_error),
+                                        )
+                                    }
                                 }
                         }
                     }

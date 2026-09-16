@@ -699,7 +699,7 @@ class MapViewModelTest {
             viewModel = createViewModel()
             advanceUntilIdle()
             viewModel.onAction(MapAction.UserStartedPanning)
-            viewModel.onAction(MapAction.RecenterCamera)
+            viewModel.onAction(MapAction.RecenterCamera())
             assertEquals(false, viewModel.uiState.value.isUserPanning)
         }
 
@@ -713,12 +713,44 @@ class MapViewModelTest {
             viewModel = createViewModel()
             advanceUntilIdle()
 
-            viewModel.onAction(MapAction.RecenterCamera)
+            viewModel.onAction(MapAction.RecenterCamera())
             advanceUntilIdle()
 
             assertEquals(realGps, viewModel.uiState.value.pendingCameraTarget)
             assertEquals(cachedMock, viewModel.uiState.value.currentPosition)
             assertEquals(true, viewModel.uiState.value.isUserPanning)
+        }
+
+    @Test
+    fun `RecenterCamera while stopped falls back to fallbackPosition when GPS fails`() =
+        runTest {
+            val fallback = LatLng(10.0, 20.0)
+            every { locationRepository.currentPosition } returns MutableStateFlow(null)
+            coEvery { realLocationRepository.getCurrentPosition() } returns
+                Result.failure(RuntimeException("no fix"))
+            viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onAction(MapAction.RecenterCamera(fallback))
+            advanceUntilIdle()
+
+            assertEquals(fallback, viewModel.uiState.value.pendingCameraTarget)
+            assertEquals(true, viewModel.uiState.value.isUserPanning)
+        }
+
+    @Test
+    fun `RecenterCamera while stopped emits error when GPS fails and no fallback given`() =
+        runTest {
+            every { locationRepository.currentPosition } returns MutableStateFlow(null)
+            coEvery { realLocationRepository.getCurrentPosition() } returns
+                Result.failure(RuntimeException("no fix"))
+            viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onAction(MapAction.RecenterCamera())
+            advanceUntilIdle()
+
+            assertEquals(null, viewModel.uiState.value.pendingCameraTarget)
         }
 
     @Test

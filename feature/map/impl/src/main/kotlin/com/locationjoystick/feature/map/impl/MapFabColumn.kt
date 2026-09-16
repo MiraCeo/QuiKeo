@@ -17,6 +17,7 @@ import com.locationjoystick.core.designsystem.component.LjMapIconButton
 import com.locationjoystick.core.designsystem.component.RouteProgressBadgeInMapFabSlot
 import com.locationjoystick.core.designsystem.component.routeProgressStopContentDescription
 import com.locationjoystick.core.model.AppFeature
+import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.MockLocationState
 import com.locationjoystick.feature.map.impl.R
 
@@ -24,6 +25,7 @@ import com.locationjoystick.feature.map.impl.R
 internal fun MapFabColumn(
     uiState: MapUiState,
     isFollowingCamera: Boolean,
+    lastFollowedPosition: LatLng?,
     onAction: (MapAction) -> Unit,
     onToggleSearch: () -> Unit,
 ) {
@@ -45,7 +47,7 @@ internal fun MapFabColumn(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor =
                 if (isFollowingCamera) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimaryContainer,
-            onClick = { onAction(MapAction.RecenterCamera) },
+            onClick = { onAction(MapAction.RecenterCamera(lastFollowedPosition)) },
         )
 
         if (uiState.walkTarget != null) {
