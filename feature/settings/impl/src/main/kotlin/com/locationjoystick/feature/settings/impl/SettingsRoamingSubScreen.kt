@@ -30,7 +30,9 @@ import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.component.LjCheckboxRow
 import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.designsystem.component.LjSegmentedControl
+import com.locationjoystick.core.designsystem.component.speedProfileLabel
 import com.locationjoystick.core.model.RoamingDefaults
+import com.locationjoystick.core.model.SpeedProfile
 import com.locationjoystick.core.model.SpeedUnit
 import com.locationjoystick.feature.settings.impl.R
 
@@ -176,14 +178,7 @@ private fun RoamingSection(
     Text(stringResource(R.string.settings_roaming_speed_profile), style = MaterialTheme.typography.labelLarge)
     Spacer(modifier = Modifier.height(4.dp))
     LjSegmentedControl(
-        options =
-            listOf(
-                "slow_walk" to stringResource(R.string.settings_roaming_profile_slow_walk),
-                "walk" to stringResource(R.string.settings_roaming_profile_walk),
-                "run" to stringResource(R.string.settings_roaming_profile_run),
-                "bike" to stringResource(R.string.settings_roaming_profile_bike),
-                "drive" to stringResource(R.string.settings_roaming_profile_drive),
-            ),
+        options = SpeedProfile.defaultProfiles().map { it.id to speedProfileLabel(it.id) },
         selected = roamingDefaults.speedProfileId,
         onSelect = { onAction(SettingsAction.UpdateRoamingDefaults(roamingDefaults.copy(speedProfileId = it))) },
         modifier = Modifier.fillMaxWidth(),

@@ -9,7 +9,8 @@
     <string name="favorites_list_save_current_location_cd">"Save current location"</string>
     <string name="favorites_list_no_saved_favorites_yet">"No saved favorites yet"</string>
     <string name="delete_confirm_dialog_title">"Delete \"%1$s\"?"</string>
-    <string name="delete_confirm_dialog_message">"This %1$s will be permanently deleted and cannot be undone."</string>
+    <string name="delete_confirm_dialog_message_favorite">"This favorite will be permanently deleted and cannot be undone."</string>
+    <string name="delete_confirm_dialog_message_route">"This route will be permanently deleted and cannot be undone."</string>
     <string name="delete_confirm_dialog_delete">"Delete"</string>
     <string name="delete_confirm_dialog_cancel">"Cancel"</string>
     <string name="route_start_options_loop">"Loop"</string>
@@ -31,9 +32,11 @@
     <string name="roaming_sheet_distance_mi">"Distance (mi)"</string>
     <string name="roaming_sheet_distance_m">"Distance (m)"</string>
     <string name="roaming_sheet_speed_profile">"Speed profile"</string>
-    <string name="roaming_sheet_profile_walk">"Walk"</string>
-    <string name="roaming_sheet_profile_run">"Run"</string>
-    <string name="roaming_sheet_profile_bike">"Bike"</string>
+    <string name="speed_profile_slow_walk">"Slow Walk"</string>
+    <string name="speed_profile_walk">"Walk"</string>
+    <string name="speed_profile_run">"Run"</string>
+    <string name="speed_profile_bike">"Bike"</string>
+    <string name="speed_profile_drive">"Drive"</string>
     <string name="roaming_sheet_follow_roads">"Follow roads"</string>
     <string name="roaming_sheet_return_to_start">"Return to start"</string>
     <string name="roaming_sheet_generate">"Generate"</string>
@@ -45,4 +48,12 @@
     <string name="theme_preview_mock_location_active">"Mock Location Active"</string>
     <string name="theme_preview_48_8566_n_2_3522_e">"48.8566° N, 2.3522° E"</string>
     <string name="theme_preview_stop">"Stop"</string>
+    <string name="top_bar_stop">"Stop"</string>
+    <string name="top_bar_start_with_location">"Start · %1$s"</string>
+    <string name="top_bar_stop_simulation_cd">"Stop location simulation"</string>
+    <string name="top_bar_start_simulation_cd">"Start location simulation"</string>
+    <string name="language_system_default">"System default"</string>
+    <string name="language_short_english">"EN"</string>
+    <string name="language_short_chinese">"CN"</string>
+    <string name="language_dropdown_cd">"Change language"</string>
 </resources>

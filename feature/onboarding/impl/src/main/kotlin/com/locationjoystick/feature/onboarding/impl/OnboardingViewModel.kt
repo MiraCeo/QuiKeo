@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.locationjoystick.core.common.util.LocaleContextWrapper
 import com.locationjoystick.core.common.util.isMockLocationEnabled
 import com.locationjoystick.core.common.util.isOverlayPermissionGranted
 import com.locationjoystick.core.data.SettingsRepository
@@ -28,6 +29,14 @@ class OnboardingViewModel
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(OnboardingUiState(isDebugBuild = BuildConfig.DEBUG))
         val uiState: StateFlow<OnboardingUiState> = _uiState.asStateFlow()
+
+        private val _languageTag = MutableStateFlow(LocaleContextWrapper.getLanguage(context))
+        val languageTag: StateFlow<String?> = _languageTag.asStateFlow()
+
+        fun setLanguage(tag: String?) {
+            LocaleContextWrapper.setLanguage(context, tag)
+            _languageTag.value = tag
+        }
 
         init {
             checkPermissions()

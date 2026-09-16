@@ -366,15 +366,7 @@ private fun RoamingSpeedProfileRow(
                 onClick = { onSelect(id) },
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = SPEED_PROFILES.size),
             ) {
-                Text(
-                    stringResource(
-                        when (id) {
-                            "walk" -> R.string.roaming_sheet_profile_walk
-                            "run" -> R.string.roaming_sheet_profile_run
-                            else -> R.string.roaming_sheet_profile_bike
-                        },
-                    ),
-                )
+                Text(speedProfileLabel(id))
             }
         }
     }

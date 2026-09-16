@@ -313,13 +313,9 @@ internal fun WidgetPanel(
                 Image(
                     painter = painterResource(id = R.drawable.ic_app_launcher),
                     contentDescription =
-                        if (isPanelExpanded) {
-                            stringResource(
-                                R.string.widget_collapse_widget,
-                            )
-                        } else {
-                            stringResource(R.string.widget_expand_widget)
-                        },
+                        stringResource(
+                            if (isPanelExpanded) R.string.widget_panel_collapse_cd else R.string.widget_panel_expand_cd,
+                        ),
                     modifier = Modifier.fillMaxSize().clip(CircleShape),
                 )
             }
@@ -378,7 +374,7 @@ internal fun WidgetPanel(
                     Box {
                         WidgetIconButton(
                             icon = LjIcons.Route,
-                            contentDescription = stringResource(R.string.widget_panel_content_routes_picker),
+                            contentDescription = stringResource(R.string.widget_panel_routes_picker_cd),
                             tint = routeIconTint,
                             enabled = controlsEnabled,
                             onClick = routeControls.onIconClick,
@@ -391,13 +387,13 @@ internal fun WidgetPanel(
                                     WidgetIconButton(
                                         icon = pauseResumeIcon,
                                         contentDescription =
-                                            if (routeControls.isPaused) {
-                                                stringResource(
-                                                    R.string.widget_resume,
-                                                )
-                                            } else {
-                                                stringResource(R.string.widget_pause)
-                                            },
+                                            stringResource(
+                                                if (routeControls.isPaused) {
+                                                    R.string.widget_panel_resume_cd
+                                                } else {
+                                                    R.string.widget_panel_pause_cd
+                                                },
+                                            ),
                                         tint = pauseResumeTint,
                                         enabled = controlsEnabled,
                                         onClick = routeControls.onPauseResume,
@@ -405,7 +401,7 @@ internal fun WidgetPanel(
                                 }
                                 WidgetIconButton(
                                     icon = LjIcons.Stop,
-                                    contentDescription = stringResource(R.string.widget_panel_content_stop),
+                                    contentDescription = stringResource(R.string.widget_panel_stop_cd),
                                     tint = MaterialTheme.colorScheme.error,
                                     enabled = controlsEnabled,
                                     onClick = routeControls.onStop,
@@ -416,14 +412,14 @@ internal fun WidgetPanel(
                                 ) {
                                     WidgetIconButton(
                                         icon = LjIcons.SkipPrevious,
-                                        contentDescription = stringResource(R.string.widget_panel_content_previous_waypoint),
+                                        contentDescription = stringResource(R.string.overlay_previous_waypoint_cd),
                                         tint = LjSuccess,
                                         enabled = controlsEnabled,
                                         onClick = routeControls.onJumpPrevious,
                                     )
                                     WidgetIconButton(
                                         icon = LjIcons.SkipNext,
-                                        contentDescription = stringResource(R.string.widget_panel_content_next_waypoint),
+                                        contentDescription = stringResource(R.string.overlay_next_waypoint_cd),
                                         tint = LjSuccess,
                                         enabled = controlsEnabled,
                                         onClick = routeControls.onJumpNext,
@@ -535,13 +531,13 @@ internal fun WidgetPanel(
                         WidgetIconButton(
                             icon = LjIcons.MyLocation,
                             contentDescription =
-                                if (section.active) {
-                                    stringResource(
-                                        R.string.widget_cancel_tap_to_walk,
-                                    )
-                                } else {
-                                    stringResource(R.string.widget_tap_to_walk)
-                                },
+                                stringResource(
+                                    if (section.active) {
+                                        R.string.tap_to_walk_overlay_cancel_tap_to_walk_cd
+                                    } else {
+                                        R.string.widget_panel_tap_to_walk_cd
+                                    },
+                                ),
                             tint = crosshairTint,
                             enabled = controlsEnabled,
                             onClick = section.onClick,
@@ -552,7 +548,7 @@ internal fun WidgetPanel(
                         Box {
                             WidgetIconButton(
                                 icon = LjIcons.Group,
-                                contentDescription = stringResource(R.string.widget_panel_content_group_sync),
+                                contentDescription = stringResource(R.string.widget_panel_group_sync_cd),
                                 tint = MaterialTheme.colorScheme.primary,
                                 enabled = controlsEnabled,
                                 onClick = section.onClick,
@@ -560,7 +556,7 @@ internal fun WidgetPanel(
                             WidgetSidePopup(visible = section.expanded) {
                                 WidgetIconButton(
                                     icon = LjIcons.MyLocation,
-                                    contentDescription = stringResource(R.string.widget_panel_content_teleport_to_leader_now),
+                                    contentDescription = stringResource(R.string.widget_panel_teleport_to_leader_cd),
                                     tint = LjSuccess,
                                     enabled = controlsEnabled,
                                     onClick = section.onTeleport,
@@ -573,7 +569,7 @@ internal fun WidgetPanel(
                         Box {
                             WidgetIconButton(
                                 icon = LjIcons.Terrain,
-                                contentDescription = stringResource(R.string.widget_panel_content_altitude_override),
+                                contentDescription = stringResource(R.string.widget_panel_altitude_override_cd),
                                 tint = if (section.expanded) LjSuccess else MaterialTheme.colorScheme.primary,
                                 enabled = controlsEnabled,
                                 onClick = section.onClick,
@@ -925,7 +921,7 @@ internal fun FavoritesFloatingView(
     val context = LocalContext.current
 
     FloatingPickerShell(
-        title = selectedFavorite?.name ?: stringResource(R.string.widget_favorites),
+        title = selectedFavorite?.name ?: stringResource(R.string.widget_panel_favorites_title),
         onDismiss = onDismiss,
         hasBack = selectedFavorite != null,
         onBack = { selectedFavorite = null },
@@ -1158,13 +1154,8 @@ internal fun RoutesFloatingView(
 
     FloatingPickerShell(
         title =
-            if (selectedRouteId !=
-                null
-            ) {
-                routes.find { it.id == selectedRouteId }?.name ?: stringResource(R.string.widget_routes)
-            } else {
-                stringResource(R.string.widget_routes)
-            },
+            selectedRouteId?.let { id -> routes.find { it.id == id }?.name }
+                ?: stringResource(R.string.widget_panel_routes_title),
         onDismiss = onDismiss,
         hasBack = selectedRouteId != null,
         onBack = { selectedRouteId = null },
@@ -1396,15 +1387,14 @@ private fun featureIconAndState(
 @Composable
 private fun AppFeature.toContentDescription(): String =
     when (this) {
-        AppFeature.JOYSTICK_TOGGLE -> stringResource(R.string.widget_show_hide_joystick)
-        AppFeature.JOYSTICK_LOCK -> stringResource(R.string.widget_lock_joystick_position)
-        AppFeature.ROUTES -> stringResource(R.string.widget_routes_picker)
-        AppFeature.FAVORITES -> stringResource(R.string.widget_favorites_picker)
-        AppFeature.SPEED_CYCLE -> stringResource(R.string.widget_speed_cycle)
-        AppFeature.MAP_FLOATING -> stringResource(R.string.widget_open_map)
+        AppFeature.JOYSTICK_TOGGLE -> stringResource(R.string.widget_feature_show_hide_joystick_cd)
+        AppFeature.JOYSTICK_LOCK -> stringResource(R.string.widget_feature_lock_joystick_cd)
+        AppFeature.ROUTES -> stringResource(R.string.widget_panel_routes_picker_cd)
+        AppFeature.FAVORITES -> stringResource(R.string.widget_feature_favorites_cd)
+        AppFeature.SPEED_CYCLE -> stringResource(R.string.widget_feature_speed_cycle_cd)
+        AppFeature.MAP_FLOATING -> stringResource(R.string.widget_feature_open_map_cd)
         AppFeature.PASTE_COORDINATES -> stringResource(R.string.widget_paste_coordinates)
-        AppFeature.ROAMING -> stringResource(R.string.widget_roaming)
-        AppFeature.SEARCH, AppFeature.CAPTURE_COORDINATES ->
+        AppFeature.ROAMING, AppFeature.SEARCH, AppFeature.CAPTURE_COORDINATES ->
             error(
                 "$this is map-only and never appears in the widget panel",
             )

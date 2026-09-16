@@ -37,9 +37,9 @@ internal fun MapFabColumn(
                     uiState.mockLocationState == MockLocationState.IDLE ||
                     uiState.mockLocationState == MockLocationState.ERROR
                 ) {
-                    "Center on phone GPS"
+                    stringResource(R.string.map_fab_recenter_gps_cd)
                 } else {
-                    "Re-center on mock location"
+                    stringResource(R.string.map_fab_recenter_mock_cd)
                 },
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor =
@@ -56,7 +56,14 @@ internal fun MapFabColumn(
                     Row(horizontalArrangement = Arrangement.spacedBy(UiConstants.FAB_CONTAINER_SIZE / 4)) {
                         LjMapIconButton(
                             icon = if (uiState.isWalkPaused) LjIcons.PlayArrow else LjIcons.Pause,
-                            contentDescription = if (uiState.isWalkPaused) "Resume walk" else "Pause walk",
+                            contentDescription =
+                                stringResource(
+                                    if (uiState.isWalkPaused) {
+                                        R.string.map_fab_resume_walk_cd
+                                    } else {
+                                        R.string.map_fab_pause_walk_cd
+                                    },
+                                ),
                             containerColor = MaterialTheme.colorScheme.surfaceVariant,
                             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             onClick = {
@@ -69,7 +76,7 @@ internal fun MapFabColumn(
                         )
                         LjMapIconButton(
                             icon = LjIcons.Stop,
-                            contentDescription = stringResource(R.string.map_fab_column_stop_walk),
+                            contentDescription = stringResource(R.string.map_fab_stop_walk_cd),
                             containerColor = MaterialTheme.colorScheme.error,
                             contentColor = MaterialTheme.colorScheme.onError,
                             onClick = { onAction(MapAction.StopWalk) },
@@ -78,7 +85,7 @@ internal fun MapFabColumn(
                 }
                 LjMapIconButton(
                     icon = LjIcons.DirectionsWalk,
-                    contentDescription = stringResource(R.string.map_fab_column_walk_in_progress_tap_for_controls),
+                    contentDescription = stringResource(R.string.map_fab_walk_in_progress_cd),
                     containerColor = LjAccent,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     onClick = { onAction(MapAction.ToggleWalkControls) },
@@ -93,7 +100,7 @@ internal fun MapFabColumn(
                     if (enabled) {
                         LjMapIconButton(
                             icon = LjIcons.Favorite,
-                            contentDescription = stringResource(R.string.map_fab_column_open_favorites),
+                            contentDescription = stringResource(R.string.map_fab_open_favorites_cd),
                             containerColor = MaterialTheme.colorScheme.secondaryContainer,
                             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                             onClick = { onAction(MapAction.OpenFavoritesPicker) },
@@ -111,7 +118,13 @@ internal fun MapFabColumn(
                             LjMapIconButton(
                                 icon = LjIcons.Route,
                                 contentDescription =
-                                    if (uiState.isRouteReplay) "Route active" else "Open routes",
+                                    stringResource(
+                                        if (uiState.isRouteReplay) {
+                                            R.string.map_fab_route_active_cd
+                                        } else {
+                                            R.string.map_fab_open_routes_cd
+                                        },
+                                    ),
                                 containerColor =
                                     if (uiState.isRouteReplay) LjSuccess else MaterialTheme.colorScheme.primaryContainer,
                                 contentColor =
@@ -128,7 +141,14 @@ internal fun MapFabColumn(
                                 Row(horizontalArrangement = Arrangement.spacedBy(UiConstants.FAB_CONTAINER_SIZE / 4)) {
                                     LjMapIconButton(
                                         icon = if (uiState.isRoutePaused) LjIcons.PlayArrow else LjIcons.Pause,
-                                        contentDescription = if (uiState.isRoutePaused) "Resume route" else "Pause route",
+                                        contentDescription =
+                                            stringResource(
+                                                if (uiState.isRoutePaused) {
+                                                    R.string.map_fab_resume_route_cd
+                                                } else {
+                                                    R.string.map_fab_pause_route_cd
+                                                },
+                                            ),
                                         containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                         onClick = {
@@ -141,7 +161,7 @@ internal fun MapFabColumn(
                                     )
                                     LjMapIconButton(
                                         icon = LjIcons.Stop,
-                                        contentDescription = stringResource(R.string.map_fab_column_stop_route),
+                                        contentDescription = stringResource(R.string.map_fab_stop_route_cd),
                                         containerColor = MaterialTheme.colorScheme.error,
                                         contentColor = MaterialTheme.colorScheme.onError,
                                         onClick = { onAction(MapAction.StopRouteReplay) },
@@ -149,14 +169,14 @@ internal fun MapFabColumn(
                                     if (!uiState.hideTeleportFeatures && uiState.showRouteJumpButtons) {
                                         LjMapIconButton(
                                             icon = LjIcons.SkipPrevious,
-                                            contentDescription = stringResource(R.string.map_fab_column_previous_waypoint),
+                                            contentDescription = stringResource(R.string.map_fab_previous_waypoint_cd),
                                             containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                             contentColor = LjSuccess,
                                             onClick = { onAction(MapAction.JumpToPreviousWaypoint) },
                                         )
                                         LjMapIconButton(
                                             icon = LjIcons.SkipNext,
-                                            contentDescription = stringResource(R.string.map_fab_column_next_waypoint),
+                                            contentDescription = stringResource(R.string.map_fab_next_waypoint_cd),
                                             containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                             contentColor = LjSuccess,
                                             onClick = { onAction(MapAction.JumpToNextWaypoint) },
@@ -181,14 +201,21 @@ internal fun MapFabColumn(
                                 Row(horizontalArrangement = Arrangement.spacedBy(UiConstants.FAB_CONTAINER_SIZE / 4)) {
                                     LjMapIconButton(
                                         icon = LjIcons.Stop,
-                                        contentDescription = stringResource(R.string.map_fab_column_stop_roaming),
+                                        contentDescription = stringResource(R.string.map_fab_stop_roaming_cd),
                                         containerColor = LjBg,
                                         contentColor = MaterialTheme.colorScheme.error,
                                         onClick = { onAction(MapAction.StopRoaming) },
                                     )
                                     LjMapIconButton(
                                         icon = if (uiState.isRoamingPaused) LjIcons.PlayArrow else LjIcons.Pause,
-                                        contentDescription = if (uiState.isRoamingPaused) "Resume roaming" else "Pause roaming",
+                                        contentDescription =
+                                            stringResource(
+                                                if (uiState.isRoamingPaused) {
+                                                    R.string.map_fab_resume_roaming_cd
+                                                } else {
+                                                    R.string.map_fab_pause_roaming_cd
+                                                },
+                                            ),
                                         containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                         onClick = {
@@ -205,10 +232,11 @@ internal fun MapFabColumn(
                                 icon = LjIcons.Explore,
                                 contentDescription =
                                     when {
-                                        uiState.isRoaming -> "Roaming active"
-                                        routePlaying -> "Roaming ignored — a route is playing"
-                                        uiState.isRoamingSheetMinimized -> "Expand roaming sheet"
-                                        else -> "Start roaming"
+                                        uiState.isRoaming -> stringResource(R.string.map_fab_roaming_active_cd)
+                                        routePlaying -> stringResource(R.string.map_fab_roaming_ignored_route_playing_cd)
+                                        uiState.isRoamingSheetMinimized ->
+                                            stringResource(R.string.map_fab_expand_roaming_sheet_cd)
+                                        else -> stringResource(R.string.map_fab_start_roaming_cd)
                                     },
                                 containerColor =
                                     when {
@@ -239,7 +267,7 @@ internal fun MapFabColumn(
                     if (enabled) {
                         LjMapIconButton(
                             icon = LjIcons.Search,
-                            contentDescription = stringResource(R.string.map_fab_column_search_location),
+                            contentDescription = stringResource(R.string.map_fab_search_location_cd),
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
                             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                             onClick = onToggleSearch,
@@ -277,7 +305,7 @@ internal fun MapFabColumn(
         if (hasClearableContent) {
             LjMapIconButton(
                 icon = LjIcons.Delete,
-                contentDescription = stringResource(R.string.map_fab_column_clear_map),
+                contentDescription = stringResource(R.string.map_fab_clear_map_cd),
                 containerColor = MaterialTheme.colorScheme.errorContainer,
                 contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 onClick = { onAction(MapAction.ClearMap) },

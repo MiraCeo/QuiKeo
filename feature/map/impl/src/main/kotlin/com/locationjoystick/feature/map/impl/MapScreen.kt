@@ -415,13 +415,13 @@ internal fun MapScreen(
             if (uiState.walkTarget == null && !uiState.isRouteReplay && !uiState.isRoaming) {
                 Text(
                     text =
-                        if (uiState.hideTeleportFeatures) {
-                            stringResource(
-                                R.string.map_long_press_to_walk,
-                            )
-                        } else {
-                            stringResource(R.string.map_tap_to_teleport_long_press_to_walk)
-                        },
+                        stringResource(
+                            if (uiState.hideTeleportFeatures) {
+                                R.string.map_hint_long_press_to_walk
+                            } else {
+                                R.string.map_hint_tap_to_teleport_long_press
+                            },
+                        ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -491,7 +491,11 @@ internal fun MapScreen(
                 onSaveRoute = onSavePastedRoute,
                 onStartRoute = onStartPastedRoute,
                 hideTeleportFeatures = uiState.hideTeleportFeatures,
-                title = uiState.pasteSheetTitle,
+                title =
+                    when (uiState.pasteSheetTitle) {
+                        PasteSheetTitle.GPX -> stringResource(R.string.map_paste_sheet_title_gpx)
+                        PasteSheetTitle.DEFAULT -> null
+                    },
                 initialText = uiState.pasteInitialText,
                 initialRouteName = uiState.pasteInitialRouteName,
             )

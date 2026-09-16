@@ -9,6 +9,7 @@
     { href: 'group.html', label: 'Group Sync' },
     { href: 'tap-to-walk.html', label: 'Tap to Walk' },
     { href: 'settings.html', label: 'Settings' },
+    { href: 'language.html', label: 'Language' },
     { href: 'overlays.html', label: 'Overlays' },
     { href: 'troubleshooting.html', label: 'Troubleshooting' },
     { href: 'changelog.html', label: 'Changelog' },

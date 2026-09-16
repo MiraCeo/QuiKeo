@@ -33,6 +33,7 @@ import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.component.LjCheckboxRow
 import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.designsystem.component.LjSegmentedControl
+import com.locationjoystick.core.designsystem.component.speedProfileLabel
 import com.locationjoystick.core.model.SpeedProfile
 import com.locationjoystick.core.model.SpeedUnit
 import com.locationjoystick.feature.settings.impl.R
@@ -138,7 +139,7 @@ private fun SpeedProfilesSection(
     profiles.forEachIndexed { index, profile ->
         val speedMs = uiState.speeds.getValue(profile.id)
         SpeedProfileInput(
-            label = profile.name,
+            label = speedProfileLabel(profile.id),
             displaySpeed = convertMsToDisplay(speedMs, uiState.speedUnit),
             onSpeedChange = { onAction(SettingsAction.SetSpeed(profile.id, it)) },
             unit =

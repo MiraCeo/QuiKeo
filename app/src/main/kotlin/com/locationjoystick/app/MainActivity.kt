@@ -1,5 +1,6 @@
 package com.locationjoystick.app
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -16,6 +17,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.locationjoystick.core.common.constants.AppConstants
+import com.locationjoystick.core.common.util.LocaleContextWrapper
 import com.locationjoystick.core.common.util.loadGpxForOpen
 import com.locationjoystick.core.data.DeepLinkRepository
 import com.locationjoystick.core.data.GoogleMapsShortLinkResolver
@@ -61,6 +63,10 @@ class MainActivity : ComponentActivity() {
     internal val deepLinkFailedFlow = deepLinkFailedMutableFlow.asSharedFlow()
     private val gpxOpenFailedMutableFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     internal val gpxOpenFailedFlow = gpxOpenFailedMutableFlow.asSharedFlow()
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleContextWrapper.wrap(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

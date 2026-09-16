@@ -59,10 +59,13 @@ import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.component.LjButton
 import com.locationjoystick.core.designsystem.component.LjCheckboxRow
+import com.locationjoystick.core.designsystem.component.LjLanguageDropdown
 import com.locationjoystick.core.designsystem.component.LjOutlinedButton
 import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.designsystem.component.LjTextButton
+import com.locationjoystick.core.designsystem.component.speedProfileLabel
 import com.locationjoystick.core.model.AppFeature
+import com.locationjoystick.core.model.AppLanguage
 import com.locationjoystick.core.model.FeatureSurface
 import com.locationjoystick.core.model.SpeedProfile
 import com.locationjoystick.core.model.ThemeMode
@@ -75,6 +78,7 @@ import kotlin.math.roundToInt
 internal fun SettingsMenusSubScreen(
     uiState: SettingsUiState,
     isRooted: Boolean,
+    languageTag: String? = null,
     onNavigateBack: () -> Unit,
     isSpoofing: Boolean,
     onToggleSpoofing: () -> Unit,
@@ -106,6 +110,12 @@ internal fun SettingsMenusSubScreen(
         bottomBar = bottomBar,
         snackbarHost = snackbarHost,
         floatingActionButton = { SettingsSaveDiscardFab(uiState.isDirty, onAction) },
+        actions = {
+            LjLanguageDropdown(
+                selected = AppLanguage.fromTag(languageTag),
+                onSelect = { language -> onAction(SettingsAction.SetLanguage(language.languageTag)) },
+            )
+        },
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             when {
@@ -741,7 +751,7 @@ private fun SpeedCycleSection(
             val checked = profile.id in uiState.enabledSpeedProfileIds
             LjCheckboxRow(
                 checked = checked,
-                title = profile.name,
+                title = speedProfileLabel(profile.id),
                 onCheckedChange = { isChecked ->
                     val updated = uiState.enabledSpeedProfileIds.toMutableSet()
                     if (isChecked) updated.add(profile.id) else updated.remove(profile.id)

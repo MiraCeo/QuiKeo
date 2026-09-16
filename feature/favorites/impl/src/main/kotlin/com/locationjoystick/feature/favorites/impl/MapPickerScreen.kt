@@ -190,7 +190,7 @@ internal fun MapPickerScreen(
             ) {
                 LjMapIconButton(
                     icon = LjIcons.Search,
-                    contentDescription = stringResource(R.string.map_picker_screen_search_location),
+                    contentDescription = stringResource(R.string.map_picker_search_location_cd),
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     onClick = { showSearchBar = !showSearchBar },
@@ -198,7 +198,7 @@ internal fun MapPickerScreen(
                 if (effectivePosition() != null) {
                     LjMapIconButton(
                         icon = LjIcons.Save,
-                        contentDescription = stringResource(R.string.map_picker_screen_save_location),
+                        contentDescription = stringResource(R.string.map_picker_save_location),
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         onClick = { showNameDialog = true },

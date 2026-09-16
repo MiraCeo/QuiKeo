@@ -53,6 +53,7 @@ import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.component.LjListItemCard
 import com.locationjoystick.core.designsystem.component.LjOverflowMenu
 import com.locationjoystick.core.designsystem.component.LjScaffold
+import com.locationjoystick.core.designsystem.component.speedProfileLabel
 import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.model.Route
 import com.locationjoystick.core.model.RouteType
@@ -305,7 +306,8 @@ fun RouteDetailScreen(
                                 var expanded by remember { mutableStateOf(false) }
                                 val noneLabel = stringResource(R.string.route_detail_speed_profile_none)
                                 val selectedLabel =
-                                    speedProfiles.find { it.id == route!!.speedProfileId }?.name ?: noneLabel
+                                    speedProfiles.find { it.id == route!!.speedProfileId }?.let { speedProfileLabel(it.id) }
+                                        ?: noneLabel
 
                                 ExposedDropdownMenuBox(
                                     expanded = expanded,
@@ -327,7 +329,7 @@ fun RouteDetailScreen(
                                     ) {
                                         options.forEach { profile ->
                                             DropdownMenuItem(
-                                                text = { Text(profile?.name ?: noneLabel) },
+                                                text = { Text(profile?.let { speedProfileLabel(it.id) } ?: noneLabel) },
                                                 onClick = {
                                                     viewModel.setSpeedProfile(profile?.id)
                                                     expanded = false

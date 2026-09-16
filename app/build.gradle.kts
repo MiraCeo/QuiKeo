@@ -14,6 +14,14 @@ android {
         applicationId = "com.locationjoystick.app"
         testInstrumentationRunner = "com.locationjoystick.app.HiltTestRunner"
     }
+    androidResources {
+        generateLocaleConfig = true
+    }
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
 }
 
 dependencies {

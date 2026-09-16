@@ -80,7 +80,7 @@ internal fun RoutesPickerSheet(
                         Icon(LjIcons.ArrowBack, contentDescription = stringResource(R.string.map_sheet_back_cd))
                     }
                     Text(
-                        text = route?.name ?: "Start route",
+                        text = route?.name ?: stringResource(R.string.map_bottom_sheets_start_route),
                         style = MaterialTheme.typography.titleLarge,
                     )
                 }
@@ -206,7 +206,7 @@ internal fun PasteCoordinatesSheet(
         teleportBetweenDelaySeconds: Int,
     ) -> Unit,
     hideTeleportFeatures: Boolean = false,
-    title: String = "Paste coordinates",
+    title: String? = null,
     initialText: String = "",
     initialRouteName: String = "",
 ) {
@@ -351,7 +351,8 @@ internal fun PendingTapSheet(
                 Text(stringResource(R.string.map_sheet_move_to_this_location), style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(12.dp))
                 CooldownAdvisoryBadge(
-                    (cooldownState as? CooldownState.Cooling)?.toAdvisoryLabel() ?: "No wait needed",
+                    (cooldownState as? CooldownState.Cooling)?.toAdvisoryLabel()
+                        ?: stringResource(R.string.map_sheet_no_wait_needed),
                 )
                 Spacer(Modifier.height(8.dp))
                 if (!hideTeleportFeatures) {

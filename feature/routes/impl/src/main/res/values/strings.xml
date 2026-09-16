@@ -41,10 +41,17 @@
     <string name="routes_screen_edit">"Edit"</string>
     <string name="routes_screen_export">"Export"</string>
     <string name="routes_screen_delete">"Delete"</string>
+    <string name="routes_screen_danger">"Danger"</string>
     <string name="routes_screen_start_route">"Start route"</string>
     <string name="route_creator_route_imported">"Route imported: %1$s"</string>
     <string name="route_creator_routes_imported">"%1$d routes imported"</string>
     <string name="route_creator_import_failed">"Import failed: %1$s"</string>
     <string name="route_creator_share_gpx">"Share GPX"</string>
     <string name="route_creator_export_failed">"Export failed: %1$s"</string>
+    <string name="routes_screen_pause">"Pause"</string>
+    <string name="routes_screen_resume">"Resume"</string>
+    <string name="route_creator_search_location_cd">"Search location"</string>
+    <string name="route_creator_center_on_location_cd">"Center on location"</string>
+    <string name="route_creator_pick_from_favorites_cd">"Pick from favorites"</string>
+    <string name="route_creator_undo_last_waypoint_cd">"Undo last waypoint"</string>
 </resources>

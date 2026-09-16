@@ -120,6 +120,7 @@ Rules:
 | Theme | @docs/features/theme.md |
 | Hide Teleport Features | @docs/features/hide-teleport.md |
 | What's New Popup | @docs/features/whats-new.md |
+| Localization | @docs/features/localization.md |
 
 ---
 

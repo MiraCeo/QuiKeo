@@ -192,7 +192,7 @@ internal fun RouteCreatorScreen(
             ) {
                 LjMapIconButton(
                     icon = LjIcons.Search,
-                    contentDescription = stringResource(R.string.route_creator_screen_search_location),
+                    contentDescription = stringResource(R.string.route_creator_search_location_cd),
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     onClick = { showSearch = !showSearch },
@@ -200,7 +200,7 @@ internal fun RouteCreatorScreen(
                 if (currentPosition != null) {
                     LjMapIconButton(
                         icon = LjIcons.MyLocation,
-                        contentDescription = stringResource(R.string.route_creator_screen_center_on_location),
+                        contentDescription = stringResource(R.string.route_creator_center_on_location_cd),
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                         contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                         onClick = {
@@ -214,14 +214,14 @@ internal fun RouteCreatorScreen(
                 }
                 LjMapIconButton(
                     icon = LjIcons.Favorite,
-                    contentDescription = stringResource(R.string.route_creator_screen_pick_from_favorites),
+                    contentDescription = stringResource(R.string.route_creator_pick_from_favorites_cd),
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                     onClick = { showFavoritesSheet = true },
                 )
                 LjMapIconButton(
                     icon = LjIcons.Undo,
-                    contentDescription = stringResource(R.string.route_creator_screen_undo_last_waypoint),
+                    contentDescription = stringResource(R.string.route_creator_undo_last_waypoint_cd),
                     containerColor =
                         if (state.waypoints.isNotEmpty()) {
                             MaterialTheme.colorScheme.secondaryContainer
@@ -239,7 +239,7 @@ internal fun RouteCreatorScreen(
                 if (state.waypoints.size >= 2) {
                     LjMapIconButton(
                         icon = LjIcons.Save,
-                        contentDescription = stringResource(R.string.route_creator_screen_save_route),
+                        contentDescription = stringResource(R.string.route_creator_save_route),
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         onClick = { showSaveDialog = true },

@@ -1045,7 +1045,7 @@ class MapViewModelTest {
 
             val state = viewModel.uiState.value
             assertTrue(state.showPasteCoordinatesSheet)
-            assertEquals("Open GPX", state.pasteSheetTitle)
+            assertEquals(PasteSheetTitle.GPX, state.pasteSheetTitle)
             assertEquals("morning ride", state.pasteInitialRouteName)
             assertTrue(state.pasteInitialText.contains("1.250000, 2.500000"))
             assertTrue(state.pasteFormNonce > 0)
@@ -1066,7 +1066,7 @@ class MapViewModelTest {
             advanceUntilIdle()
 
             assertTrue(second.uiState.value.showPasteCoordinatesSheet)
-            assertEquals("Open GPX", second.uiState.value.pasteSheetTitle)
+            assertEquals(PasteSheetTitle.GPX, second.uiState.value.pasteSheetTitle)
             assertEquals("morning ride", second.uiState.value.pasteInitialRouteName)
         }
 

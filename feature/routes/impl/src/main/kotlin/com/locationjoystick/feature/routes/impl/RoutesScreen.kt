@@ -48,12 +48,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.locationjoystick.core.common.util.formatCapturedPointsForClipboard
 import com.locationjoystick.core.designsystem.LjIcons
+import com.locationjoystick.core.designsystem.component.DeleteItemType
 import com.locationjoystick.core.designsystem.component.EmptyState
 import com.locationjoystick.core.designsystem.component.ListSearchField
 import com.locationjoystick.core.designsystem.component.LjActionSheetRow
 import com.locationjoystick.core.designsystem.component.LjDeleteConfirmDialog
 import com.locationjoystick.core.designsystem.component.LjListItemCard
 import com.locationjoystick.core.designsystem.component.LjListItemCardSkeletonList
+import com.locationjoystick.core.designsystem.component.LjOverflowMenuSectionLabel
 import com.locationjoystick.core.designsystem.component.LjPrimaryButton
 import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.designsystem.component.RouteStartSheetContent
@@ -296,7 +298,7 @@ internal fun RoutesScreen(
     deletingRoute?.let { route ->
         LjDeleteConfirmDialog(
             name = route.name,
-            itemType = "route",
+            itemType = DeleteItemType.ROUTE,
             onDismiss = { deletingRoute = null },
             onConfirm = {
                 onDeleteRoute(route.id)
@@ -436,7 +438,7 @@ private fun RouteCard(
                             }
                         }
                         IconButton(onClick = onStopReplay) {
-                            Icon(LjIcons.Stop, contentDescription = stringResource(R.string.routes_screen_stop))
+                            Icon(LjIcons.Stop, contentDescription = stringResource(R.string.routes_screen_stop_cd))
                         }
                     }
 
@@ -451,7 +453,7 @@ private fun RouteCard(
                             }
                         }
                         IconButton(onClick = onStopReplay) {
-                            Icon(LjIcons.Stop, contentDescription = stringResource(R.string.routes_screen_stop))
+                            Icon(LjIcons.Stop, contentDescription = stringResource(R.string.routes_screen_stop_cd))
                         }
                     }
 
@@ -469,7 +471,7 @@ private fun RouteCard(
                 }
                 Box {
                     IconButton(onClick = { menuExpanded = true }) {
-                        Icon(LjIcons.MoreVert, contentDescription = stringResource(R.string.routes_screen_menu))
+                        Icon(LjIcons.MoreVert, contentDescription = stringResource(R.string.routes_screen_menu_cd))
                     }
                     DropdownMenu(
                         expanded = menuExpanded,
@@ -499,6 +501,7 @@ private fun RouteCard(
                             },
                             leadingIcon = { Icon(LjIcons.FileDownload, contentDescription = null) },
                         )
+                        LjOverflowMenuSectionLabel(stringResource(R.string.routes_screen_danger))
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.routes_screen_delete), color = MaterialTheme.colorScheme.error) },
                             onClick = {

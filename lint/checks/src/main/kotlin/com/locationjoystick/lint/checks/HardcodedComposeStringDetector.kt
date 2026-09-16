@@ -9,10 +9,20 @@ import com.android.tools.lint.detector.api.Issue
 import com.android.tools.lint.detector.api.JavaContext
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
+import org.jetbrains.uast.UBinaryExpression
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UElement
+import org.jetbrains.uast.UExpression
+import org.jetbrains.uast.UExpressionList
+import org.jetbrains.uast.UIfExpression
 import org.jetbrains.uast.UMethod
+import org.jetbrains.uast.USimpleNameReferenceExpression
+import org.jetbrains.uast.USwitchClauseExpressionWithBody
+import org.jetbrains.uast.USwitchExpression
+import org.jetbrains.uast.UYieldExpression
+import org.jetbrains.uast.UastBinaryOperator
 import org.jetbrains.uast.getParentOfType
+import org.jetbrains.uast.kotlin.kinds.KotlinSpecialExpressionKinds
 import org.jetbrains.uast.skipParenthesizedExprDown
 
 /**
@@ -29,30 +39,52 @@ import org.jetbrains.uast.skipParenthesizedExprDown
 class HardcodedComposeStringDetector :
     Detector(),
     Detector.UastScanner {
-    override fun getApplicableUastTypes() = listOf(UCallExpression::class.java)
+    override fun getApplicableUastTypes() = listOf(UCallExpression::class.java, UBinaryExpression::class.java)
 
     override fun createUastHandler(context: JavaContext): UElementHandler =
         object : UElementHandler() {
             override fun visitCallExpression(node: UCallExpression) {
-                val target = TARGETS[node.methodName] ?: return
                 val method = node.resolve() ?: return
-                val containingClass = method.containingClass?.qualifiedName ?: return
-                if (target.classPrefixes.none { containingClass.startsWith(it) }) return
-
-                val mapping = context.evaluator.computeArgumentMapping(node, method)
-                val argumentExpression =
-                    mapping.entries.firstOrNull { it.value.name == target.paramName }?.key ?: return
-
-                val expression = argumentExpression.skipParenthesizedExprDown()
-                ConstantEvaluator.evaluate(context, expression) as? String ?: return
-
                 if (isInsidePreview(node)) return
 
-                context.report(
-                    ISSUE,
+                val target = TARGETS[node.methodName]
+                val containingClass = method.containingClass?.qualifiedName
+                val paramNames: Set<String> =
+                    when {
+                        target != null &&
+                            containingClass != null &&
+                            target.classPrefixes.any { containingClass.startsWith(it) } -> setOf(target.paramName)
+                        // animateFloatAsState/Crossfade/rememberInfiniteTransition etc. take a `label`
+                        // param that's an Android Studio animation-inspector tag, never user-facing text.
+                        containingClass != null && containingClass.startsWith("androidx.compose.animation") -> return
+                        context.evaluator.findAnnotation(method, COMPOSABLE_ANNOTATION) != null -> GENERIC_PARAM_NAMES
+                        else -> return
+                    }
+
+                val mapping = context.evaluator.computeArgumentMapping(node, method)
+                mapping.forEach { (argumentExpression, parameter) ->
+                    if (parameter.name !in paramNames) return@forEach
+                    reportHardcodedLeaves(
+                        context,
+                        node,
+                        argumentExpression,
+                        "Hardcoded string passed to ${node.methodName}() — use stringResource() instead",
+                    )
+                }
+            }
+
+            override fun visitBinaryExpression(node: UBinaryExpression) {
+                if (node.operator != UastBinaryOperator.ASSIGN) return
+                val leftName =
+                    (node.leftOperand.skipParenthesizedExprDown() as? USimpleNameReferenceExpression)?.identifier
+                if (leftName != "contentDescription") return
+                if (!isInsideSemanticsLambda(node)) return
+                if (isInsidePreview(node)) return
+                reportHardcodedLeaves(
+                    context,
                     node,
-                    context.getLocation(expression),
-                    "Hardcoded string passed to ${node.methodName}() — use stringResource() instead",
+                    node.rightOperand,
+                    "Hardcoded string assigned to contentDescription — use stringResource() instead",
                 )
             }
         }
@@ -62,12 +94,65 @@ class HardcodedComposeStringDetector :
         return method.uAnnotations.any { it.qualifiedName?.substringAfterLast('.') == "Preview" }
     }
 
+    private fun isInsideSemanticsLambda(node: UElement): Boolean {
+        val enclosingCall = node.getParentOfType(UCallExpression::class.java) ?: return false
+        return enclosingCall.methodName == "semantics"
+    }
+
+    private fun collectLeafExpressions(
+        expression: UExpression,
+        into: MutableList<UExpression>,
+    ) {
+        val expr = expression.skipParenthesizedExprDown()
+        when {
+            expr is UIfExpression -> {
+                expr.thenExpression?.let { collectLeafExpressions(it, into) }
+                expr.elseExpression?.let { collectLeafExpressions(it, into) }
+            }
+            expr is UExpressionList && expr.kind == KotlinSpecialExpressionKinds.ELVIS -> {
+                expr.expressions.forEach { collectLeafExpressions(it, into) }
+            }
+            expr is USwitchExpression -> {
+                expr.body.expressions
+                    .filterIsInstance<USwitchClauseExpressionWithBody>()
+                    .forEach { clause ->
+                        clause.body.expressions
+                            .lastOrNull()
+                            ?.let { collectLeafExpressions(it, into) }
+                    }
+            }
+            expr is UYieldExpression -> {
+                expr.expression?.let { collectLeafExpressions(it, into) }
+            }
+            else -> into.add(expr)
+        }
+    }
+
+    private fun reportHardcodedLeaves(
+        context: JavaContext,
+        reportNode: UElement,
+        argumentExpression: UExpression,
+        message: String,
+    ) {
+        val leaves = mutableListOf<UExpression>()
+        collectLeafExpressions(argumentExpression, leaves)
+        for (leaf in leaves) {
+            val value = ConstantEvaluator.evaluate(context, leaf) as? String ?: continue
+            if (value.isEmpty()) continue
+            context.report(ISSUE, reportNode, context.getLocation(leaf), message)
+        }
+    }
+
     private data class Target(
         val paramName: String,
         val classPrefixes: List<String>,
     )
 
     companion object {
+        private const val COMPOSABLE_ANNOTATION = "androidx.compose.runtime.Composable"
+        private val GENERIC_PARAM_NAMES =
+            setOf("contentDescription", "title", "label", "text", "placeholder")
+
         private val TARGETS =
             mapOf(
                 "Text" to

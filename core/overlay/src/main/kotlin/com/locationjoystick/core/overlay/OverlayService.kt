@@ -1,6 +1,7 @@
 package com.locationjoystick.core.overlay
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.PixelFormat
@@ -12,6 +13,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
 import com.locationjoystick.core.common.constants.AppConstants
+import com.locationjoystick.core.common.util.LocaleContextWrapper
 
 /**
  * Base service for creating and managing floating overlay views on top of all apps.
@@ -41,6 +43,10 @@ abstract class OverlayService : Service() {
     protected var overlayView: View? = null
 
     protected var currentParams: WindowManager.LayoutParams? = null
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleContextWrapper.wrap(newBase))
+    }
 
     override fun onCreate() {
         super.onCreate()

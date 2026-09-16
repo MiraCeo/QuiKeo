@@ -84,7 +84,14 @@ internal fun HotItemTreeSection(
             }) {
                 Icon(
                     imageVector = if (isCountryExpanded) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown,
-                    contentDescription = if (isCountryExpanded) "Collapse" else "Expand",
+                    contentDescription =
+                        stringResource(
+                            if (isCountryExpanded) {
+                                R.string.hot_item_tree_collapse_cd
+                            } else {
+                                R.string.hot_item_tree_expand_cd
+                            },
+                        ),
                 )
             }
         }
@@ -122,7 +129,14 @@ internal fun HotItemTreeSection(
                         }) {
                             Icon(
                                 imageVector = if (isCityExpanded) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown,
-                                contentDescription = if (isCityExpanded) "Collapse" else "Expand",
+                                contentDescription =
+                                    stringResource(
+                                        if (isCityExpanded) {
+                                            R.string.hot_item_tree_collapse_cd
+                                        } else {
+                                            R.string.hot_item_tree_expand_cd
+                                        },
+                                    ),
                             )
                         }
                     }

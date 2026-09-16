@@ -189,7 +189,7 @@ class MapViewModel
                     _uiState.update {
                         it.copy(
                             showPasteCoordinatesSheet = true,
-                            pasteSheetTitle = "Open GPX",
+                            pasteSheetTitle = PasteSheetTitle.GPX,
                             pasteInitialText = formatCapturedPointsForClipboard(pending.points),
                             pasteInitialRouteName = pending.suggestedName,
                             pasteFormNonce = it.pasteFormNonce + 1,
@@ -205,7 +205,7 @@ class MapViewModel
                 if (resetForm) {
                     it.copy(
                         showPasteCoordinatesSheet = false,
-                        pasteSheetTitle = "Paste coordinates",
+                        pasteSheetTitle = PasteSheetTitle.DEFAULT,
                         pasteInitialText = "",
                         pasteInitialRouteName = "",
                     )
@@ -537,7 +537,7 @@ class MapViewModel
                     _uiState.update {
                         it.copy(
                             showPasteCoordinatesSheet = true,
-                            pasteSheetTitle = "Paste coordinates",
+                            pasteSheetTitle = PasteSheetTitle.DEFAULT,
                             pasteInitialText = "",
                             pasteInitialRouteName = "",
                             pasteFormNonce = it.pasteFormNonce + 1,

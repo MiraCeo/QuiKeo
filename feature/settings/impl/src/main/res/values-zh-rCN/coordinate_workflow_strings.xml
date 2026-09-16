@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_roaming_sub_screen_walk_around_the_block">"绕街区行走"</string>
+    <string name="settings_roaming_sub_screen_picks_random_spots_within_a_radius_and_walks_between_them">"在半径范围内随机选取地点并在它们之间行走。"</string>
+    <string name="settings_roaming_sub_screen_planting">"种植"</string>
+    <string name="settings_roaming_sub_screen_starting_radius_m">"起始半径（米）"</string>
+    <string name="settings_roaming_sub_screen_ending_radius_m">"结束半径（米）"</string>
+    <string name="settings_roaming_sub_screen_speed_profile">"速度档位"</string>
+    <string name="settings_roaming_sub_screen_infinite_loop">"无限循环"</string>
+    <string name="settings_roaming_sub_screen_keeps_expanding_and_contracting_until_you_stop_roaming">"持续展开与收拢，直到你停止漫游。"</string>
+    <string name="settings_roaming_sub_screen_number_of_loops">"循环次数"</string>
+    <string name="settings_spiral_description">从当前位置绕出螺旋形路径，向外展开到外半径后再收拢回内半径。一圈即为一次完整的展开与收拢。</string>
+    <string name="menus_paste_coordinates">"粘贴坐标"</string>
+    <string name="menus_paste_latitude_and_longitude_to_teleport_walk_or_save_as_a_f">"粘贴经纬度以瞬移、行走或保存为收藏。"</string>
+    <string name="menus_capture_coordinates">"采集坐标"</string>
+    <string name="menus_collect_map_links_from_other_apps_into_a_list_then_save_them">"从其他应用收集地图链接到列表中，然后保存为路线。"</string>
+</resources>

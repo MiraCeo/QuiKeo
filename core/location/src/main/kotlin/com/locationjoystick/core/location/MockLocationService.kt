@@ -2,6 +2,7 @@ package com.locationjoystick.core.location
 
 import android.app.Notification
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
@@ -19,6 +20,7 @@ import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.common.constants.AppConstants.ServiceConstants
+import com.locationjoystick.core.common.util.LocaleContextWrapper
 import com.locationjoystick.core.common.util.NetworkUtils
 import com.locationjoystick.core.common.util.NsdCodeManager
 import com.locationjoystick.core.common.util.clampTeleportBetweenDelaySeconds
@@ -233,6 +235,10 @@ class MockLocationService : Service() {
 
     /** Timestamp of the previous tick; used to compute the debug overlay's tick interval. */
     @Volatile private var lastTickMs: Long = 0L
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleContextWrapper.wrap(newBase))
+    }
 
     override fun onCreate() {
         super.onCreate()

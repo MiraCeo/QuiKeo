@@ -54,7 +54,6 @@
     <string name="paste_coordinates_form_start_route">"Start route"</string>
     <string name="roaming_sheet_content_walk_around_the_block">"Walk around the block"</string>
     <string name="roaming_sheet_content_planting">"Planting"</string>
-    <string name="roaming_sheet_content_walks_a_spiral_around_where_you_are_now_opening_out_then_tig">"Walks a spiral around where you are now, opening out then tightening back in. "</string>
     <string name="roaming_sheet_content_starting_radius_m">"Starting radius (m)"</string>
     <string name="roaming_sheet_content_ending_radius_m">"Ending radius (m)"</string>
     <string name="roaming_sheet_content_infinite_loop">"Infinite loop"</string>

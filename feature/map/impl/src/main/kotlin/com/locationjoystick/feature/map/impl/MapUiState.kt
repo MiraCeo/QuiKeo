@@ -30,7 +30,7 @@ data class MapUiState(
     val showRoutesSheet: Boolean = false,
     val isRouteControlsExpanded: Boolean = false,
     val showPasteCoordinatesSheet: Boolean = false,
-    val pasteSheetTitle: String = "Paste coordinates",
+    val pasteSheetTitle: PasteSheetTitle = PasteSheetTitle.DEFAULT,
     val pasteInitialText: String = "",
     val pasteInitialRouteName: String = "",
     val pasteFormNonce: Int = 0,
@@ -56,6 +56,8 @@ data class MapUiState(
     val isRoadRouteFetchInFlight: Boolean = false,
     val routeProgress: RouteProgress? = null,
 )
+
+enum class PasteSheetTitle { DEFAULT, GPX }
 
 // Convenience accessors
 val MapUiState.walkTarget: LatLng? get() = (walkMode as? WalkMode.Walking)?.target

@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.common.root.SensorPermissionBootstrap
+import com.locationjoystick.core.common.util.LocaleContextWrapper
 import com.locationjoystick.core.common.util.NetworkUtils
 import com.locationjoystick.core.common.util.NsdCodeManager
 import com.locationjoystick.core.common.util.RandomCode
@@ -77,6 +78,14 @@ class SettingsViewModel
 
         private val _isRooted = MutableStateFlow(false)
         val isRooted: StateFlow<Boolean> = _isRooted.asStateFlow()
+
+        private val _languageTag = MutableStateFlow(LocaleContextWrapper.getLanguage(context))
+        val languageTag: StateFlow<String?> = _languageTag.asStateFlow()
+
+        fun setLanguage(tag: String?) {
+            LocaleContextWrapper.setLanguage(context, tag)
+            _languageTag.value = tag
+        }
 
         private val compassServiceGranted = MutableStateFlow(false)
 

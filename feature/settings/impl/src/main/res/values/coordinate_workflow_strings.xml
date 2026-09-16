@@ -3,7 +3,6 @@
     <string name="settings_roaming_sub_screen_walk_around_the_block">"Walk around the block"</string>
     <string name="settings_roaming_sub_screen_picks_random_spots_within_a_radius_and_walks_between_them">"Picks random spots within a radius and walks between them."</string>
     <string name="settings_roaming_sub_screen_planting">"Planting"</string>
-    <string name="settings_roaming_sub_screen_walks_a_spiral_around_the_current_point_opening_out_to_the_e">"Walks a spiral around the current point, opening out to the ending radius then tightening back in. "</string>
     <string name="settings_roaming_sub_screen_starting_radius_m">"Starting radius (m)"</string>
     <string name="settings_roaming_sub_screen_ending_radius_m">"Ending radius (m)"</string>
     <string name="settings_roaming_sub_screen_speed_profile">"Speed profile"</string>
