@@ -244,7 +244,7 @@ fun CaptureCoordinatesForm(
                     .padding(top = LjSpacing.xs),
         )
         Text(
-            stringResource(R.string.capture_coordinates_form_the_list_stays_in_capture_order_so_you_can_remove_the_last_p),
+            stringResource(R.string.capture_point_order_hint),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = LjSpacing.xs),

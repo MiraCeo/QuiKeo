@@ -6,7 +6,7 @@
     <string name="capture_coordinates_form_capture_coordinates">"Capture coordinates"</string>
     <string name="capture_coordinates_form_no_captured_points_yet">"No captured points yet"</string>
     <string name="capture_coordinates_form_point_order">"Point order"</string>
-    <string name="capture_coordinates_form_the_list_stays_in_capture_order_so_you_can_remove_the_last_p">"The list stays in capture order so you can remove the last point."</string>
+    <string name="capture_point_order_hint">"The list stays in capture order so you can remove the last point."</string>
     <string name="capture_coordinates_form_route_name">"Route name"</string>
     <string name="capture_coordinates_form_save_as_route">"Save as route"</string>
     <string name="capture_coordinates_form_close">"Close"</string>
