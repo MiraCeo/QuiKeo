@@ -20,6 +20,7 @@
     <string name="routes_screen_search_routes">"搜索路线"</string>
     <string name="routes_screen_paste_coordinates">"粘贴坐标"</string>
     <string name="routes_screen_share">"分享"</string>
+    <string name="routes_share_title">"分享 %1$s"</string>
     <string name="routes_screen_copy">"复制"</string>
     <string name="routes_screen_send_as_message">"以消息发送"</string>
     <string name="routes_screen_close">"关闭"</string>

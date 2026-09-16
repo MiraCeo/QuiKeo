@@ -20,6 +20,7 @@
     <string name="routes_screen_search_routes">"Search routes"</string>
     <string name="routes_screen_paste_coordinates">"Paste coordinates"</string>
     <string name="routes_screen_share">"Share"</string>
+    <string name="routes_share_title">"Share %1$s"</string>
     <string name="routes_screen_copy">"Copy"</string>
     <string name="routes_screen_send_as_message">"Send as message"</string>
     <string name="routes_screen_close">"Close"</string>

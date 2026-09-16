@@ -589,7 +589,7 @@ private fun RouteShareDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Share ${route.name}") },
+        title = { Text(stringResource(R.string.routes_share_title, route.name)) },
         text = {
             OutlinedTextField(
                 value = coordText,
