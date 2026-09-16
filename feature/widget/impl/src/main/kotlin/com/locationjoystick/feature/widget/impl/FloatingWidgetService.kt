@@ -60,6 +60,33 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import android.view.WindowManager as AndroidWindowManager
 
+/** Keys for the panel's independent expand/collapse StateFlows, held by [PanelExpandFlows]. */
+private enum class PanelExpandKey { ROUTE, ROAMING, PASTE_CAPTURE, GROUP_SYNC, ALTITUDE }
+
+/**
+ * Holds one collapsed/expanded [MutableStateFlow] per [PanelExpandKey], replacing five
+ * near-identical fields that each tracked one panel section's expand state independently.
+ */
+private class PanelExpandFlows {
+    private val flows: Map<PanelExpandKey, MutableStateFlow<Boolean>> =
+        PanelExpandKey.entries.associateWith { MutableStateFlow(false) }
+
+    fun flow(key: PanelExpandKey): StateFlow<Boolean> = flows.getValue(key)
+
+    fun toggle(key: PanelExpandKey) {
+        val f = flows.getValue(key)
+        f.value = !f.value
+    }
+
+    fun collapse(key: PanelExpandKey) {
+        flows.getValue(key).value = false
+    }
+
+    fun collapseAll() {
+        flows.values.forEach { it.value = false }
+    }
+}
+
 /**
  * Floating widget overlay service.
  *
@@ -129,17 +156,11 @@ class FloatingWidgetService :
     private val activeProfileIdFlow = MutableStateFlow("walk")
     private val profilesFlow = MutableStateFlow<List<com.locationjoystick.core.model.SpeedProfile>>(emptyList())
 
-    // Activity state — driven entirely by locationRepository.currentMode via isActivityActive/isActivityPausable
-    private val routeExpandedFlow = MutableStateFlow(false)
-    private val roamingExpandedFlow = MutableStateFlow(false)
     private val stopPopupVisibleFlow = MutableStateFlow(false)
-    private val pasteCaptureExpandedFlow = MutableStateFlow(false)
 
-    // Group sync button expand/collapse
-    private val groupSyncExpandedFlow = MutableStateFlow(false)
-
-    // Altitude override button expand/collapse
-    private val altitudeExpandedFlow = MutableStateFlow(false)
+    // One expand/collapse StateFlow per panel section (route, roaming, paste/capture,
+    // group sync, altitude override), keyed by PanelExpandKey.
+    private val panelExpand = PanelExpandFlows()
 
     // Master panel expand/collapse
     private val isPanelExpandedFlow = MutableStateFlow(false)
@@ -207,10 +228,7 @@ class FloatingWidgetService :
                         serviceBinder.unbindJoystick()
                         panelPresenter.hidePanelView()
                         dismissTapToWalkOverlay()
-                        routeExpandedFlow.value = false
-                        roamingExpandedFlow.value = false
-                        groupSyncExpandedFlow.value = false
-                        altitudeExpandedFlow.value = false
+                        panelExpand.collapseAll()
                     }
 
                     MockLocationState.RUNNING, MockLocationState.PAUSED -> {
@@ -231,12 +249,12 @@ class FloatingWidgetService :
         }
         lifecycleScope.launch {
             locationRepository.isActivityActive.collect { active ->
-                if (!active) routeExpandedFlow.value = false
+                if (!active) panelExpand.collapse(PanelExpandKey.ROUTE)
             }
         }
         lifecycleScope.launch {
             locationRepository.currentMode.collect { mode ->
-                if (mode != MockMode.ROAMING) roamingExpandedFlow.value = false
+                if (mode != MockMode.ROAMING) panelExpand.collapse(PanelExpandKey.ROAMING)
             }
         }
         lifecycleScope.launch {
@@ -255,7 +273,7 @@ class FloatingWidgetService :
         // Borrow focus only while that field is expanded, per the same fix already applied to
         // the map panel's search field (mapPanelLayoutParams).
         lifecycleScope.launch {
-            altitudeExpandedFlow.collect { expanded -> setOverlayFocusable(expanded) }
+            panelExpand.flow(PanelExpandKey.ALTITUDE).collect { expanded -> setOverlayFocusable(expanded) }
         }
         lifecycleScope.launch {
             groupRepository.teleportUnavailableEvent.collect {
@@ -342,23 +360,23 @@ class FloatingWidgetService :
                 initialValue = MockLocationState.IDLE,
             )
             val isActivityPaused by activityStateRepository.isActivityPaused.collectAsStateWithLifecycle(initialValue = false)
-            val routeExpanded by routeExpandedFlow.collectAsStateWithLifecycle()
-            val roamingExpanded by roamingExpandedFlow.collectAsStateWithLifecycle()
+            val routeExpanded by panelExpand.flow(PanelExpandKey.ROUTE).collectAsStateWithLifecycle()
+            val roamingExpanded by panelExpand.flow(PanelExpandKey.ROAMING).collectAsStateWithLifecycle()
             val stopPopupVisible by stopPopupVisibleFlow.collectAsStateWithLifecycle()
-            val pasteCaptureExpanded by pasteCaptureExpandedFlow.collectAsStateWithLifecycle()
+            val pasteCaptureExpanded by panelExpand.flow(PanelExpandKey.PASTE_CAPTURE).collectAsStateWithLifecycle()
             val isPanelExpanded by isPanelExpandedFlow.collectAsStateWithLifecycle()
             val hasPendingCompletion by pendingCompletionFlow.collectAsStateWithLifecycle()
             val isTapToWalkEnabled by settingsRepository.getTapToWalkOverlayEnabled().collectAsStateWithLifecycle(initialValue = false)
             val isTapToWalkActive by isTapToWalkActiveFlow.collectAsStateWithLifecycle()
             val groupState by groupRepository.groupState.collectAsStateWithLifecycle(initialValue = GroupState())
-            val isGroupSyncExpanded by groupSyncExpandedFlow.collectAsStateWithLifecycle()
+            val isGroupSyncExpanded by panelExpand.flow(PanelExpandKey.GROUP_SYNC).collectAsStateWithLifecycle()
             val hideTeleportFeatures by settingsRepository.getHideTeleportFeatures().collectAsStateWithLifecycle(initialValue = false)
             val showRouteJumpButtons by settingsRepository.getShowRouteJumpButtons().collectAsStateWithLifecycle(
                 initialValue = AppConstants.ProfileConstants.SHOW_ROUTE_JUMP_BUTTONS_DEFAULT,
             )
             val isAltitudeOverrideButtonVisible by
                 settingsRepository.getAltitudeOverrideButtonEnabled().collectAsStateWithLifecycle(initialValue = false)
-            val isAltitudeExpanded by altitudeExpandedFlow.collectAsStateWithLifecycle()
+            val isAltitudeExpanded by panelExpand.flow(PanelExpandKey.ALTITUDE).collectAsStateWithLifecycle()
             val reportedAltitudeMeters by locationRepository.reportedAltitudeMeters.collectAsStateWithLifecycle(initialValue = null)
             val debugStatsEnabled by settingsRepository.getDebugStatsEnabled().collectAsStateWithLifecycle(initialValue = false)
             val debugStats by locationRepository.debugStats.collectAsStateWithLifecycle(initialValue = null)
@@ -421,7 +439,7 @@ class FloatingWidgetService :
                 val pasteCapture =
                     PasteCaptureState(
                         expanded = pasteCaptureExpanded,
-                        onLongPress = { pasteCaptureExpandedFlow.value = !pasteCaptureExpandedFlow.value },
+                        onLongPress = { panelExpand.toggle(PanelExpandKey.PASTE_CAPTURE) },
                         onCaptureShortcut = { openCaptureScreen() },
                     )
 
@@ -434,7 +452,7 @@ class FloatingWidgetService :
                             add(
                                 WidgetPanelSection.GroupSync(
                                     expanded = isGroupSyncExpanded,
-                                    onClick = { groupSyncExpandedFlow.value = !groupSyncExpandedFlow.value },
+                                    onClick = { panelExpand.toggle(PanelExpandKey.GROUP_SYNC) },
                                     onTeleport = { teleportToLeaderNow() },
                                 ),
                             )
@@ -445,7 +463,7 @@ class FloatingWidgetService :
                                     expanded = isAltitudeExpanded,
                                     prefillMeters =
                                         reportedAltitudeMeters ?: AppConstants.RealismConstants.DEFAULT_ALTITUDE_METERS,
-                                    onClick = { altitudeExpandedFlow.value = !altitudeExpandedFlow.value },
+                                    onClick = { panelExpand.toggle(PanelExpandKey.ALTITUDE) },
                                     onConfirm = { onConfirmAltitude(it) },
                                 ),
                             )
@@ -502,7 +520,7 @@ class FloatingWidgetService :
 
     private fun onFeatureButtonClicked(feature: AppFeature) {
         if (!isSpoofingActive()) return
-        pasteCaptureExpandedFlow.value = false
+        panelExpand.collapse(PanelExpandKey.PASTE_CAPTURE)
         when (feature) {
             AppFeature.JOYSTICK_TOGGLE -> {
                 toggleJoystick()
@@ -543,7 +561,7 @@ class FloatingWidgetService :
     }
 
     private fun openCaptureScreen() {
-        pasteCaptureExpandedFlow.value = false
+        panelExpand.collapse(PanelExpandKey.PASTE_CAPTURE)
         isPanelExpandedFlow.value = false
         panelPresenter.hidePanelView()
         try {
@@ -562,7 +580,7 @@ class FloatingWidgetService :
     private fun onRoamingIconClicked() {
         if (!isSpoofingActive()) return
         if (mapController.sharedState.value.mockMode == MockMode.ROAMING) {
-            roamingExpandedFlow.value = !roamingExpandedFlow.value
+            panelExpand.toggle(PanelExpandKey.ROAMING)
         } else {
             panelPresenter.showRoamingFloatingView()
         }
@@ -577,7 +595,7 @@ class FloatingWidgetService :
     }
 
     private fun onRoamingStopClicked() {
-        roamingExpandedFlow.value = false
+        panelExpand.collapse(PanelExpandKey.ROAMING)
         mapController.stopRoaming()
     }
 
@@ -617,7 +635,7 @@ class FloatingWidgetService :
                 mode == MockMode.ROAMING ||
                 mode == MockMode.WALK_TO
         if (isActive) {
-            routeExpandedFlow.value = !routeExpandedFlow.value
+            panelExpand.toggle(PanelExpandKey.ROUTE)
         } else {
             panelPresenter.showRoutesFloatingView()
         }
@@ -652,7 +670,7 @@ class FloatingWidgetService :
     }
 
     private fun onRouteStopClicked() {
-        routeExpandedFlow.value = false
+        panelExpand.collapse(PanelExpandKey.ROUTE)
         when (mapController.sharedState.value.mockMode) {
             MockMode.ROAMING -> mapController.stopRoaming()
             MockMode.WALK_TO -> mapController.stopWalk()
@@ -689,7 +707,7 @@ class FloatingWidgetService :
 
     private fun onConfirmAltitude(meters: Double) {
         lifecycleScope.launch { settingsRepository.setBaseAltitudeOverride(meters) }
-        altitudeExpandedFlow.value = false
+        panelExpand.collapse(PanelExpandKey.ALTITUDE)
     }
 
     private fun setOverlayFocusable(focusable: Boolean) {
