@@ -1,8 +1,10 @@
-# Map tiles (OSM HTTP) — do not regress
+# Map tiles (OSM HTTP)
 
 OpenStreetMap raster tiles on every MapLibre surface. Blank/black/slow maps
 are almost always this stack, not a Compose or overlay bug. Follow this
 recipe whenever you touch MapLibre, OkHttp, R8, or a new `MapView`.
+
+Key files: `:core:map/MapTileHttp.kt`, `:core:map/MapViews.kt`, `:core:map/MapCamera.kt`, `:core:map/MapLibreStyleExt.kt`.
 
 Details of map UX (FABs, paste, jitter overlay) stay in @docs/features/map.md.
 Overlay compositing is also noted in @docs/features/widget.md.
