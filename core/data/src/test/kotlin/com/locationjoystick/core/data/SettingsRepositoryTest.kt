@@ -1452,6 +1452,14 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
         hideWidgetOverlayFlow.value = enabled
     }
 
+    private val keepWidgetOnIdleFlow = MutableStateFlow(false)
+
+    override fun getKeepWidgetOnIdle(): Flow<Boolean> = keepWidgetOnIdleFlow
+
+    override suspend fun setKeepWidgetOnIdle(enabled: Boolean) {
+        keepWidgetOnIdleFlow.value = enabled
+    }
+
     private val hideForegroundNotificationFlow = MutableStateFlow(false)
 
     override fun getHideForegroundNotification(): Flow<Boolean> = hideForegroundNotificationFlow

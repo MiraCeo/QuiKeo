@@ -59,7 +59,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlin.random.Random
@@ -103,9 +102,6 @@ class MockLocationService : Service() {
         const val EXTRA_IS_PLANTING = AppConstants.ServiceConstants.EXTRA_IS_PLANTING
         const val EXTRA_TELEPORT_BETWEEN_WAYPOINTS = AppConstants.ServiceConstants.EXTRA_TELEPORT_BETWEEN_WAYPOINTS
         const val EXTRA_TELEPORT_BETWEEN_DELAY_SECONDS = AppConstants.ServiceConstants.EXTRA_TELEPORT_BETWEEN_DELAY_SECONDS
-
-        private const val PREFS_NAME = "mock_location_service"
-        private const val PREFS_KEEP_WIDGET_ON_IDLE = "keep_widget_on_idle"
     }
 
     inner class LocalBinder : Binder() {
@@ -215,12 +211,6 @@ class MockLocationService : Service() {
     /** Atomically-updated push/pause phase state; avoids torn reads between isActive and startMs. */
     private val suspendedPhase = AtomicReference(SuspendedPhaseState(isActive = false, startMs = 0L))
 
-    /**
-     * Widget long-press Pause: mock GPS goes idle but [FloatingWidgetService] stays. Cleared on
-     * [startSpoofing] and on a full [stopSpoofing].
-     */
-    private val keepWidgetOverlayOnIdle = AtomicBoolean(false)
-
     /** Timestamp of the last satellite count refresh; controls the slow-churn update cadence. */
     @Volatile private var lastSatelliteUpdateMs: Long = 0L
 
@@ -276,7 +266,6 @@ class MockLocationService : Service() {
                 startUpdateLoop = ::startUpdateLoop,
             )
         createNotificationChannel()
-        restoreKeepWidgetOverlayOnIdle()
         observeLocationState()
         observeGroupState()
     }
@@ -345,7 +334,7 @@ class MockLocationService : Service() {
                         stopOverlayServices(
                             computeOverlayStopAction(
                                 OverlayStopTrigger.STATE_IDLE,
-                                keepWidgetOverlayOnIdle.get(),
+                                settingsRepository.getKeepWidgetOnIdle().first(),
                             ),
                         )
                     }
@@ -516,7 +505,7 @@ class MockLocationService : Service() {
             null -> {
                 // Service restarted by OS (START_STICKY). A parked widget must not resume mock GPS.
                 serviceScope.launch {
-                    when (computeStickyNullIntentAction(keepWidgetOverlayOnIdle.get())) {
+                    when (computeStickyNullIntentAction(settingsRepository.getKeepWidgetOnIdle().first())) {
                         StickyNullIntentAction.KEEP_PARKED -> {
                             Log.i(TAG, "OS restart: parked — keeping widget, not resuming spoofing")
                             val hideWidget = settingsRepository.getHideWidgetOverlay().first()
@@ -725,7 +714,7 @@ class MockLocationService : Service() {
             Log.i(TAG, "Spoofing already running; ignoring duplicate startSpoofing()")
             return
         }
-        setKeepWidgetOverlayOnIdle(false)
+        serviceScope.launch { settingsRepository.setKeepWidgetOnIdle(false) }
         // Reset ERROR state so a retry attempt can proceed cleanly.
         if (_state.value == MockLocationState.ERROR) {
             Log.i(TAG, "Clearing ERROR state before retry")
@@ -834,7 +823,7 @@ class MockLocationService : Service() {
     }
 
     fun stopSpoofing() {
-        setKeepWidgetOverlayOnIdle(false)
+        serviceScope.launch { settingsRepository.setKeepWidgetOnIdle(false) }
         // Already IDLE after Pause: the IDLE collector will not fire again, so Stop must
         // close the widget here. Also unbinds the widget's AUTO_CREATE hold on this service.
         stopOverlayServices(
@@ -848,28 +837,10 @@ class MockLocationService : Service() {
      * the floating widget stays on screen. Joystick overlay still stops.
      */
     fun parkSpoofingKeepWidget() {
-        setKeepWidgetOverlayOnIdle(true)
+        serviceScope.launch { settingsRepository.setKeepWidgetOnIdle(true) }
         serviceScope.launch { replayOrchestrator.handleStop() }
         tearDownSpoofing(stopService = false)
         Log.i(TAG, "Spoofing parked; widget overlay kept")
-    }
-
-    private fun restoreKeepWidgetOverlayOnIdle() {
-        keepWidgetOverlayOnIdle.set(
-            getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getBoolean(PREFS_KEEP_WIDGET_ON_IDLE, false),
-        )
-    }
-
-    private fun setKeepWidgetOverlayOnIdle(value: Boolean) {
-        keepWidgetOverlayOnIdle.set(value)
-        persistKeepWidgetOverlayOnIdle(value)
-    }
-
-    private fun persistKeepWidgetOverlayOnIdle(value: Boolean) {
-        getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-            .edit()
-            .putBoolean(PREFS_KEEP_WIDGET_ON_IDLE, value)
-            .apply()
     }
 
     private fun stopOverlayServices(action: IdleOverlayStopAction) {

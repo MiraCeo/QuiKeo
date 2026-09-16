@@ -67,6 +67,14 @@ class AppPreferencesDataSourceTest {
         }
 
     @Test
+    fun `keepWidgetOnIdle defaults to false and round-trips true`() =
+        runTest {
+            assertFalse(dataSource.getKeepWidgetOnIdle().first())
+            dataSource.setKeepWidgetOnIdle(true)
+            assertTrue(dataSource.getKeepWidgetOnIdle().first())
+        }
+
+    @Test
     fun `hideForegroundNotification defaults to false and round-trips true`() =
         runTest {
             assertFalse(dataSource.getHideForegroundNotification().first())

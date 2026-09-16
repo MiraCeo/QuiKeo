@@ -289,6 +289,10 @@ class SettingsRepository
 
         suspend fun setHideWidgetOverlay(enabled: Boolean) = dataSource.setHideWidgetOverlay(enabled)
 
+        fun getKeepWidgetOnIdle(): Flow<Boolean> = dataSource.getKeepWidgetOnIdle()
+
+        suspend fun setKeepWidgetOnIdle(enabled: Boolean) = dataSource.setKeepWidgetOnIdle(enabled)
+
         fun getHideForegroundNotification(): Flow<Boolean> = dataSource.getHideForegroundNotification()
 
         suspend fun setHideForegroundNotification(enabled: Boolean) = dataSource.setHideForegroundNotification(enabled)

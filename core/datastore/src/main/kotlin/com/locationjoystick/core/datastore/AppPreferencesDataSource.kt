@@ -106,6 +106,12 @@ interface PreferencesDataSource {
     /** Sets the theme mode preference. */
     suspend fun setThemeMode(mode: String)
 
+    /** Gets whether the widget overlay should stay parked (mock GPS off) across a service restart. */
+    fun getKeepWidgetOnIdle(): Flow<Boolean>
+
+    /** Sets whether the widget overlay should stay parked across a service restart. */
+    suspend fun setKeepWidgetOnIdle(enabled: Boolean)
+
     /** Gets the app version the user last saw the What's New popup for. */
     fun getWhatsNewLastSeenVersion(): Flow<String>
 
@@ -505,6 +511,7 @@ class AppPreferencesDataSource
             val ONBOARDING_COMPLETE = booleanPreferencesKey("onboarding_complete")
             val SPEED_UNIT = stringPreferencesKey("speed_unit")
             val THEME_MODE = stringPreferencesKey("theme_mode")
+            val KEEP_WIDGET_ON_IDLE = booleanPreferencesKey("keep_widget_on_idle")
             val WHATS_NEW_LAST_SEEN_VERSION = stringPreferencesKey("whats_new_last_seen_version")
             val REMEMBER_LAST_LOCATION = booleanPreferencesKey("remember_last_location")
             val LAST_LATITUDE = doublePreferencesKey("last_latitude")
@@ -703,6 +710,10 @@ class AppPreferencesDataSource
             )
 
         override suspend fun setThemeMode(mode: String) = setPref(Keys.THEME_MODE, mode)
+
+        override fun getKeepWidgetOnIdle(): Flow<Boolean> = pref(Keys.KEEP_WIDGET_ON_IDLE, false)
+
+        override suspend fun setKeepWidgetOnIdle(enabled: Boolean) = setPref(Keys.KEEP_WIDGET_ON_IDLE, enabled)
 
         override fun getWhatsNewLastSeenVersion(): Flow<String> =
             pref(
