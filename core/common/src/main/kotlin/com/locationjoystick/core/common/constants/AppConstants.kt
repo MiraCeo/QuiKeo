@@ -20,17 +20,17 @@ object AppConstants {
         const val PROFILE_ID_BIKE = "bike"
         const val PROFILE_ID_DRIVE = "drive"
         const val SLOW_WALK_SPEED_MPS = 0.3
-        const val WALK_SPEED_MPS = 5.0 / 3.6
+        const val WALK_SPEED_MPS = 0.5556
         const val RUN_SPEED_MPS = 2.2222
-        const val BIKE_SPEED_MPS = 18.5 / 3.6
-        const val DRIVE_SPEED_MPS = 60.0 / 3.6
+        const val BIKE_SPEED_MPS = 4.1667
+        const val DRIVE_SPEED_MPS = 15.0
         const val DEFAULT_ACTIVE_PROFILE_ID = PROFILE_ID_WALK
         const val MIN_SPEED_MS = 0.01
         const val MAX_SPEED_MS = 15.0
         const val ANTI_CHEAT_WARNING_THRESHOLD_MS = 8.0
         const val DEFAULT_SPEED_UNIT = "KMH"
-        const val SHOW_ROUTE_JUMP_BUTTONS_DEFAULT = true
-        val DEFAULT_ENABLED_SPEED_PROFILE_IDS = setOf(PROFILE_ID_WALK, PROFILE_ID_BIKE, PROFILE_ID_DRIVE)
+        const val SHOW_ROUTE_JUMP_BUTTONS_DEFAULT = false
+        val DEFAULT_ENABLED_SPEED_PROFILE_IDS = setOf(PROFILE_ID_WALK, PROFILE_ID_RUN, PROFILE_ID_BIKE)
     }
 
     object JitterConstants {

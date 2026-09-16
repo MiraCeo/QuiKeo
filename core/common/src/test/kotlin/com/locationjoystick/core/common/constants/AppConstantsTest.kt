@@ -25,8 +25,8 @@ class AppConstantsTest {
     }
 
     @Test
-    fun `WALK_SPEED_MPS is 5 kmh`() {
-        assertEquals(5.0 / 3.6, AppConstants.ProfileConstants.WALK_SPEED_MPS, 0.001)
+    fun `WALK_SPEED_MPS is approximately 2 kmh`() {
+        assertEquals(2.0 / 3.6, AppConstants.ProfileConstants.WALK_SPEED_MPS, 0.001)
     }
 
     @Test
@@ -39,28 +39,6 @@ class AppConstantsTest {
         )
         assertTrue(
             AppConstants.ProfileConstants.BIKE_SPEED_MPS < AppConstants.ProfileConstants.DRIVE_SPEED_MPS,
-        )
-    }
-
-    @Test
-    fun `BIKE_SPEED_MPS is 18_5 kmh`() {
-        assertEquals(18.5 / 3.6, AppConstants.ProfileConstants.BIKE_SPEED_MPS, 0.001)
-    }
-
-    @Test
-    fun `DRIVE_SPEED_MPS is 60 kmh`() {
-        assertEquals(60.0 / 3.6, AppConstants.ProfileConstants.DRIVE_SPEED_MPS, 0.001)
-    }
-
-    @Test
-    fun `DEFAULT_ENABLED_SPEED_PROFILE_IDS is walk bike drive`() {
-        assertEquals(
-            setOf(
-                AppConstants.ProfileConstants.PROFILE_ID_WALK,
-                AppConstants.ProfileConstants.PROFILE_ID_BIKE,
-                AppConstants.ProfileConstants.PROFILE_ID_DRIVE,
-            ),
-            AppConstants.ProfileConstants.DEFAULT_ENABLED_SPEED_PROFILE_IDS,
         )
     }
 

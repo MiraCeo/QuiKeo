@@ -161,7 +161,7 @@ which has no persisted waypoint list. Gated by `hideTeleportFeatures` like every
 (@docs/features/hide-teleport.md), **and** by a separate, independent
 opt-in toggle — `AppSettings.showRouteJumpButtons` (Settings → Menus →
 Privacy → "Show route jump buttons", DataStore key
-`show_route_jump_buttons`, default `true`). Both must allow the buttons
+`show_route_jump_buttons`, default `false`). Both must allow the buttons
 for them to show: `!hideTeleportFeatures && showRouteJumpButtons`.
 Jumping to the last waypoint while replay is running lets it complete
 naturally on the next tick, same as reaching it by walking.

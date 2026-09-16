@@ -83,11 +83,11 @@ class AppPreferencesDataSourceTest {
         }
 
     @Test
-    fun `showRouteJumpButtons defaults to true and round-trips false`() =
+    fun `showRouteJumpButtons defaults to false and round-trips true`() =
         runTest {
-            assertTrue(dataSource.getShowRouteJumpButtons().first())
-            dataSource.setShowRouteJumpButtons(false)
             assertFalse(dataSource.getShowRouteJumpButtons().first())
+            dataSource.setShowRouteJumpButtons(true)
+            assertTrue(dataSource.getShowRouteJumpButtons().first())
         }
 
     @Test

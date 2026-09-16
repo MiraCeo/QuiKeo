@@ -984,20 +984,20 @@ class SettingsRepositoryTest {
     // route jump buttons
 
     @Test
-    fun `getShowRouteJumpButtons returns true by default`() =
+    fun `getShowRouteJumpButtons returns false by default`() =
         runTest {
             repository.getShowRouteJumpButtons().test {
-                assertTrue(awaitItem())
+                assertFalse(awaitItem())
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `setShowRouteJumpButtons persists false`() =
+    fun `setShowRouteJumpButtons persists true`() =
         runTest {
-            repository.setShowRouteJumpButtons(false)
+            repository.setShowRouteJumpButtons(true)
             repository.getShowRouteJumpButtons().test {
-                assertFalse(awaitItem())
+                assertTrue(awaitItem())
                 cancelAndIgnoreRemainingEvents()
             }
         }
