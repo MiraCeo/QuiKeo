@@ -59,7 +59,7 @@ class MainActivityIntentTest {
             )
         }
         composeRule.waitForIdle()
-        composeRule.onNodeWithContentDescription("More actions").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Add favorite").assertIsDisplayed()
     }
 
     @Test
@@ -71,7 +71,7 @@ class MainActivityIntentTest {
             )
         }
         composeRule.waitForIdle()
-        composeRule.onNodeWithContentDescription("More actions").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Add route").assertIsDisplayed()
     }
 
     @Test
@@ -84,7 +84,7 @@ class MainActivityIntentTest {
         }
         composeRule.waitForIdle()
         composeRule.onNodeWithContentDescription("Open navigation menu").assertIsDisplayed()
-        composeRule.onNodeWithText("Capture").assertIsDisplayed()
+        composeRule.onNodeWithText("Capture mode").assertIsDisplayed()
     }
 
     @Test

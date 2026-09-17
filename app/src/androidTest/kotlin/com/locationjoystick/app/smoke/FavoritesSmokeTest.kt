@@ -33,7 +33,7 @@ class FavoritesSmokeTest : BaseSmokeTest() {
 
     @Test
     fun favorites_screen_loads() {
-        composeRule.onNodeWithContentDescription("More actions").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Add favorite").assertIsDisplayed()
     }
 
     @Test
@@ -77,7 +77,7 @@ class FavoritesSmokeTest : BaseSmokeTest() {
         composeRule.onNodeWithContentDescription("Search location").assertIsDisplayed()
         Espresso.pressBack()
         composeRule.waitForIdle()
-        composeRule.onNodeWithContentDescription("More actions").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Add favorite").assertIsDisplayed()
     }
 
     @Test

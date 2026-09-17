@@ -121,19 +121,14 @@ fun RoamingSheetContent(
             Spacer(Modifier.height(12.dp))
         }
 
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-            Checkbox(
-                checked = draft.kind == RoamingKind.PLANTING,
-                onCheckedChange = {
-                    onDraftChange(draft.copy(kind = if (it) RoamingKind.PLANTING else RoamingKind.WALK_AROUND))
-                },
-            )
-            Text(
-                stringResource(R.string.roaming_sheet_content_planting_mode),
-                style = MaterialTheme.typography.bodyMedium,
-                color = LjText,
-            )
-        }
+        LjCheckboxRow(
+            checked = draft.kind == RoamingKind.PLANTING,
+            onCheckedChange = {
+                onDraftChange(draft.copy(kind = if (it) RoamingKind.PLANTING else RoamingKind.WALK_AROUND))
+            },
+            title = stringResource(R.string.roaming_sheet_content_planting_mode),
+            textColor = LjText,
+        )
         Spacer(Modifier.height(12.dp))
 
         if (draft.kind == RoamingKind.WALK_AROUND) {

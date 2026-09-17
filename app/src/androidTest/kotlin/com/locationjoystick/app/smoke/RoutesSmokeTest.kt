@@ -49,7 +49,6 @@ class RoutesSmokeTest : BaseSmokeTest() {
 
     @Test
     fun routes_screen_loads() {
-        composeRule.onNodeWithContentDescription("More actions").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Add route").assertIsDisplayed()
     }
 

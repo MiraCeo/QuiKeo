@@ -53,19 +53,19 @@ class IdleSmokeTest : BaseSmokeTest() {
     @Test
     fun navigate_to_routes_via_card() {
         composeRule.navigateFromIdle("Routes")
-        composeRule.onNodeWithContentDescription("More actions").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Add route").assertIsDisplayed()
     }
 
     @Test
     fun navigate_to_favorites_via_card() {
         composeRule.navigateFromIdle("Favorites")
-        composeRule.onNodeWithContentDescription("More actions").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Add favorite").assertIsDisplayed()
     }
 
     @Test
     fun navigate_to_capture_via_card() {
         composeRule.navigateFromIdle("Capture")
-        composeRule.onNodeWithText("Turn on Capture").assertIsDisplayed()
+        composeRule.onNodeWithText("Capture mode").assertIsDisplayed()
     }
 
     @Test
@@ -89,18 +89,18 @@ class IdleSmokeTest : BaseSmokeTest() {
     @Test
     fun navigate_to_routes_via_drawer() {
         composeRule.navigateViaDrawer("Routes")
-        composeRule.onNodeWithContentDescription("More actions").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Add route").assertIsDisplayed()
     }
 
     @Test
     fun navigate_to_favorites_via_drawer() {
         composeRule.navigateViaDrawer("Favorites")
-        composeRule.onNodeWithContentDescription("More actions").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Add favorite").assertIsDisplayed()
     }
 
     @Test
     fun navigate_to_capture_via_drawer() {
         composeRule.navigateViaDrawer("Capture")
-        composeRule.onNodeWithText("Turn on Capture").assertIsDisplayed()
+        composeRule.onNodeWithText("Capture mode").assertIsDisplayed()
     }
 }
