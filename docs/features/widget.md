@@ -166,7 +166,10 @@ shrink restores its compact position without recreating the `MapView`.
 The floating map also has an always-visible **N + navigation arrow** north-lock button. North lock
 starts on, immediately keeps bearing at 0, and disables rotation gestures while leaving pan gestures
 available. Turning it off restores MapLibre's normal rotation gestures; it does not force a saved
-bearing after unlock. The lock is local UI state for that floating-map instance.
+bearing after unlock. The lock is local UI state for that floating-map instance. The floating map's
+own center (my-location) button centers on the current spoofed position while spoofing is active;
+when idle with no current position, it falls back to the last position the floating map's camera
+was moved to (a tap-to-pin, route jump, etc.) instead of doing nothing.
 
 ## Group Sync Button
 

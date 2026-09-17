@@ -34,9 +34,13 @@ Do not invent a second `MapLibre.getInstance` path. The empty style
 - Camera follow: disabled on `REASON_API_GESTURE`. The center FAB is always available. While
   spoofing is running or paused it preserves the existing behaviour and follows the cached mock
   position again. While spoofing is idle or in an error state it requests a fresh GPS fix from the
-  phone (falling back to the last real GPS fix) and centers the camera there. This real-GPS camera
-  move is deliberately read-only: it does not update `LocationRepository`, the remembered mock
-  position, or teleport cooldown state, so no destructive confirmation is needed.
+  phone (falling back to the last real GPS fix) and centers the camera there. If that GPS lookup
+  also fails (no last-known fix, permission denied, etc.), the button falls back to the last
+  position the camera was moved to on this screen — a tap-to-pin, favorite, search result, or deep
+  link — so it never silently no-ops as long as some point is already on the map. This real-GPS
+  (or pin-fallback) camera move is deliberately read-only: it does not update `LocationRepository`,
+  the remembered mock position, or teleport cooldown state, so no destructive confirmation is
+  needed.
   Walking follow uses a short `animateCamera`. Teleport-scale jumps (`SNAP_CAMERA_DISTANCE_METERS`,
   2 km) and favorite/search/recenter jumps use `moveCamera` so MapLibre does not request tiles
   along a flyover path (that left the destination on the empty-style canvas for many seconds).
