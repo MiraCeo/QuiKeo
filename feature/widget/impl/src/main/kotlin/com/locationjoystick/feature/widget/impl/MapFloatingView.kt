@@ -66,6 +66,7 @@ import com.locationjoystick.core.map.maplibre.MapLibreLayerIds
 import com.locationjoystick.core.map.maplibre.MapLibreSourceIds
 import com.locationjoystick.core.map.maplibre.addEphemeralRouteLayers
 import com.locationjoystick.core.map.maplibre.addLocationLayers
+import com.locationjoystick.core.map.maplibre.applyZoomBounds
 import com.locationjoystick.core.map.projection.projection
 import com.locationjoystick.core.map.ui.MapAttribution
 import com.locationjoystick.core.model.AppFeature
@@ -172,6 +173,7 @@ internal fun MapFloatingView(
 
     val applyStyle: (MapLibreMap) -> Unit = { map ->
         appliedTileSource.value = tileSource
+        map.applyZoomBounds(tileSource)
         map.setStyle(Style.Builder().fromUri(AppConstants.MapConstants.EMPTY_MAP_STYLE_URI)) { style ->
             val layers =
                 style.addLocationLayers(
@@ -263,7 +265,7 @@ internal fun MapFloatingView(
                                 .target(
                                     (
                                         initialPosition
-                                            ?: LatLng(AppConstants.MapConstants.DEFAULT_LAT, AppConstants.MapConstants.DEFAULT_LON)
+                                            ?: tileSource.defaultCenter
                                     ).toMapLatLng(),
                                 ).zoom(AppConstants.MapConstants.DEFAULT_ZOOM)
                                 .build()

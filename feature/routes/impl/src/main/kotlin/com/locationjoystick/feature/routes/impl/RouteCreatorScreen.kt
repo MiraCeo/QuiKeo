@@ -49,6 +49,7 @@ import com.locationjoystick.core.map.geojson.buildPositionGeoJson
 import com.locationjoystick.core.map.geojson.buildSegmentsGeoJson
 import com.locationjoystick.core.map.geojson.buildWaypointsGeoJson
 import com.locationjoystick.core.map.maplibre.addCreatorLayers
+import com.locationjoystick.core.map.maplibre.applyZoomBounds
 import com.locationjoystick.core.map.projection.projection
 import com.locationjoystick.core.map.ui.MapAttribution
 import com.locationjoystick.core.model.FavoriteLocation
@@ -163,6 +164,7 @@ internal fun RouteCreatorScreen(
 
     val applyStyle: (MapLibreMap) -> Unit = { map ->
         appliedTileSource.value = tileSource
+        map.applyZoomBounds(tileSource)
         map.setStyle(Style.Builder().fromUri(AppConstants.MapConstants.EMPTY_MAP_STYLE_URI)) { style ->
             val layers =
                 style.addCreatorLayers(
@@ -310,7 +312,7 @@ internal fun RouteCreatorScreen(
                                     .target(
                                         (
                                             initialPosition
-                                                ?: LatLng(AppConstants.MapConstants.DEFAULT_LAT, AppConstants.MapConstants.DEFAULT_LON)
+                                                ?: tileSource.defaultCenter
                                         ).toMapLatLng(),
                                     ).zoom(AppConstants.MapConstants.DEFAULT_ZOOM)
                                     .build()

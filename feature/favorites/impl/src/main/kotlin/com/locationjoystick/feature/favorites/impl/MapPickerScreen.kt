@@ -41,6 +41,7 @@ import com.locationjoystick.core.designsystem.component.NominatimSearchBar
 import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.map.geojson.buildMarkerGeoJson
 import com.locationjoystick.core.map.maplibre.addPickerLayers
+import com.locationjoystick.core.map.maplibre.applyZoomBounds
 import com.locationjoystick.core.map.projection.projection
 import com.locationjoystick.core.map.ui.MapAttribution
 import com.locationjoystick.core.model.LatLng
@@ -135,6 +136,7 @@ internal fun MapPickerScreen(
 
     val applyStyle: (MapLibreMap) -> Unit = { map ->
         appliedTileSource.value = tileSource
+        map.applyZoomBounds(tileSource)
         map.setStyle(Style.Builder().fromUri(AppConstants.MapConstants.EMPTY_MAP_STYLE_URI)) { style ->
             val layers =
                 style.addPickerLayers(
@@ -272,7 +274,7 @@ internal fun MapPickerScreen(
                                     .target(
                                         (
                                             initialPosition
-                                                ?: LatLng(AppConstants.MapConstants.DEFAULT_LAT, AppConstants.MapConstants.DEFAULT_LON)
+                                                ?: tileSource.defaultCenter
                                         ).toMapLatLng(),
                                     ).zoom(AppConstants.MapConstants.DEFAULT_ZOOM)
                                     .build()

@@ -5,6 +5,7 @@ import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.designsystem.LjMapColors
 import com.locationjoystick.core.map.geojson.emptyGeoJson
 import com.locationjoystick.core.model.MapTileSource
+import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.Style
 import org.maplibre.android.style.layers.CircleLayer
 import org.maplibre.android.style.layers.FillLayer
@@ -25,10 +26,21 @@ private fun rasterSource(
     RasterSource(
         sourceId,
         TileSet(AppConstants.MapConstants.TILESET_VERSION, *tileSource.tileUrlTemplates.toTypedArray()).apply {
+            minZoom = tileSource.minZoom
             maxZoom = tileSource.maxZoom
         },
         RASTER_TILE_SIZE_PX,
     )
+
+/**
+ * Clamps the camera to the zoom range [tileSource] actually serves. Call whenever the style is
+ * (re)applied — MapLibre snaps an out-of-range camera back into bounds immediately, so switching
+ * providers never leaves the user staring at blank tiles.
+ */
+fun MapLibreMap.applyZoomBounds(tileSource: MapTileSource) {
+    setMinZoomPreference(tileSource.minZoom.toDouble())
+    setMaxZoomPreference(tileSource.maxZoom.toDouble())
+}
 
 /**
  * Adds the base-map raster tiles for [tileSource] as the bottom-most layer.
