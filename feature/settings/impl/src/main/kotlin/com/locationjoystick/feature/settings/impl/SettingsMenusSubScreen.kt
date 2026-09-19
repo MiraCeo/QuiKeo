@@ -62,11 +62,13 @@ import com.locationjoystick.core.designsystem.component.LjCheckboxRow
 import com.locationjoystick.core.designsystem.component.LjLanguageDropdown
 import com.locationjoystick.core.designsystem.component.LjOutlinedButton
 import com.locationjoystick.core.designsystem.component.LjScaffold
+import com.locationjoystick.core.designsystem.component.LjSegmentedControl
 import com.locationjoystick.core.designsystem.component.LjTextButton
 import com.locationjoystick.core.designsystem.component.speedProfileLabel
 import com.locationjoystick.core.model.AppFeature
 import com.locationjoystick.core.model.AppLanguage
 import com.locationjoystick.core.model.FeatureSurface
+import com.locationjoystick.core.model.MapTileSource
 import com.locationjoystick.core.model.SpeedProfile
 import com.locationjoystick.core.model.ThemeMode
 import com.locationjoystick.feature.settings.impl.R
@@ -133,6 +135,8 @@ internal fun SettingsMenusSubScreen(
                     ) {
                         ThemeSection(uiState, onAction)
                         Spacer(Modifier.height(24.dp))
+                        MapSourceSection(uiState, onAction)
+                        Spacer(Modifier.height(24.dp))
                         AppFeaturesSection(uiState, isRooted, onAction)
                         Spacer(Modifier.height(24.dp))
                         SpeedCycleSection(uiState, onAction)
@@ -146,6 +150,45 @@ internal fun SettingsMenusSubScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun MapSourceSection(
+    uiState: SettingsUiState,
+    onAction: (SettingsAction) -> Unit,
+) {
+    Text(stringResource(R.string.settings_menus_map_section), style = MaterialTheme.typography.headlineSmall)
+    Spacer(Modifier.height(4.dp))
+    Text(
+        stringResource(R.string.settings_menus_map_source_desc),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Spacer(Modifier.height(8.dp))
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(stringResource(R.string.settings_menus_map_source), modifier = Modifier.weight(0.3f))
+        LjSegmentedControl(
+            options =
+                listOf(
+                    MapTileSource.OSM to stringResource(R.string.settings_menus_map_source_osm),
+                    MapTileSource.AMAP to stringResource(R.string.settings_menus_map_source_amap),
+                ),
+            selected = uiState.mapTileSource,
+            onSelect = { onAction(SettingsAction.SetMapTileSource(it)) },
+            modifier = Modifier.weight(0.7f),
+        )
+    }
+    if (uiState.mapTileSource == MapTileSource.AMAP) {
+        Spacer(Modifier.height(8.dp))
+        Text(
+            stringResource(R.string.settings_menus_map_source_amap_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
