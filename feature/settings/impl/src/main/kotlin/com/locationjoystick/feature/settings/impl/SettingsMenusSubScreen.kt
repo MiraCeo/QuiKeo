@@ -10,6 +10,7 @@ import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -57,12 +59,12 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.designsystem.LjIcons
+import com.locationjoystick.core.designsystem.LjSpacing
 import com.locationjoystick.core.designsystem.component.LjButton
 import com.locationjoystick.core.designsystem.component.LjCheckboxRow
 import com.locationjoystick.core.designsystem.component.LjLanguageDropdown
 import com.locationjoystick.core.designsystem.component.LjOutlinedButton
 import com.locationjoystick.core.designsystem.component.LjScaffold
-import com.locationjoystick.core.designsystem.component.LjSegmentedControl
 import com.locationjoystick.core.designsystem.component.LjTextButton
 import com.locationjoystick.core.designsystem.component.speedProfileLabel
 import com.locationjoystick.core.model.AppFeature
@@ -166,21 +168,59 @@ private fun MapSourceSection(
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
     Spacer(Modifier.height(8.dp))
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(stringResource(R.string.settings_menus_map_source), modifier = Modifier.weight(0.3f))
-        LjSegmentedControl(
-            options =
-                listOf(
-                    MapTileSource.OSM to stringResource(R.string.settings_menus_map_source_osm),
-                    MapTileSource.AMAP to stringResource(R.string.settings_menus_map_source_amap),
-                ),
-            selected = uiState.mapTileSource,
-            onSelect = { onAction(SettingsAction.SetMapTileSource(it)) },
-            modifier = Modifier.weight(0.7f),
+    Text(stringResource(R.string.settings_menus_map_source), style = MaterialTheme.typography.bodyLarge)
+    Spacer(Modifier.height(4.dp))
+    var sourcePickerExpanded by remember { mutableStateOf(false) }
+    var sourcePickerWidth by remember { mutableStateOf(0) }
+    val density = LocalDensity.current
+    Box(modifier = Modifier.fillMaxWidth()) {
+        val chevronRotation by animateFloatAsState(
+            targetValue = if (sourcePickerExpanded) 180f else 0f,
+            label = "mapSourceChevronRotation",
         )
+        LjOutlinedButton(
+            onClick = { sourcePickerExpanded = true },
+            modifier = Modifier.fillMaxWidth().onSizeChanged { sourcePickerWidth = it.width },
+        ) {
+            Text(
+                mapTileSourceLabel(uiState.mapTileSource),
+                modifier = Modifier.weight(1f),
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Icon(
+                LjIcons.ArrowDropDown,
+                contentDescription = null,
+                modifier = Modifier.graphicsLayer { rotationZ = chevronRotation },
+            )
+        }
+        // Same width as the button and the same horizontal padding as LjOutlinedButton's content,
+        // so item labels line up with the selected label and the check sits under the chevron.
+        DropdownMenu(
+            expanded = sourcePickerExpanded,
+            onDismissRequest = { sourcePickerExpanded = false },
+            modifier = Modifier.width(with(density) { sourcePickerWidth.toDp() }),
+        ) {
+            MapTileSource.entries.forEach { source ->
+                val isSelected = source == uiState.mapTileSource
+                DropdownMenuItem(
+                    text = { Text(mapTileSourceLabel(source)) },
+                    trailingIcon = {
+                        if (isSelected) {
+                            Icon(
+                                LjIcons.Check,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    },
+                    contentPadding = PaddingValues(horizontal = LjSpacing.lg),
+                    onClick = {
+                        onAction(SettingsAction.SetMapTileSource(source))
+                        sourcePickerExpanded = false
+                    },
+                )
+            }
+        }
     }
     if (uiState.mapTileSource == MapTileSource.AMAP) {
         Spacer(Modifier.height(8.dp))
@@ -191,6 +231,24 @@ private fun MapSourceSection(
         )
     }
 }
+
+/** "Provider — default start city", e.g. "OpenStreetMap — Paris, France". */
+@Composable
+private fun mapTileSourceLabel(source: MapTileSource): String =
+    when (source) {
+        MapTileSource.OSM ->
+            stringResource(
+                R.string.settings_menus_map_source_item,
+                stringResource(R.string.settings_menus_map_source_osm),
+                stringResource(R.string.settings_menus_map_source_osm_default_city),
+            )
+        MapTileSource.AMAP ->
+            stringResource(
+                R.string.settings_menus_map_source_item,
+                stringResource(R.string.settings_menus_map_source_amap),
+                stringResource(R.string.settings_menus_map_source_amap_default_city),
+            )
+    }
 
 @Composable
 private fun ThemeSection(
