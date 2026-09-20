@@ -119,6 +119,9 @@ instead of anchoring the altitude Gaussian walk to a flat `DEFAULT_ALTITUDE_METE
   (`AppConstants.RealismConstants.ELEVATION_FRACTIONAL_JITTER_METERS`,
   ±0.49 m) before becoming the convergence target — otherwise the anchor
   itself would lock onto a flat round number once converged (issue #52).
+- **Cache**: `ElevationRepository` keeps an in-memory LRU (`ElevationConstants.CACHE_MAX_ENTRIES`, 64)
+  keyed by a ~111 m cell (lat/lon rounded to 3 decimals, `CACHE_COORD_SCALE`), matching the 90 m DEM. No TTL —
+  ground elevation is static — and process lifetime only. A failed fetch is never cached.
 - **Failure/disabled**: the target simply doesn't move — the anchor stays wherever it last
   converged to (or the 35 m default on first failure).
 - **Manual override wins**: see "Altitude Override Button" in @docs/features/widget.md. Setting

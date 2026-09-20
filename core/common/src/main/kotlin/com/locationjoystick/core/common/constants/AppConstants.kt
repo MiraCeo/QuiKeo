@@ -163,6 +163,27 @@ object AppConstants {
         const val BISECTION_MIN_DISTANCE_METERS = 2_500.0
         const val BISECTION_MAX_DEPTH = 5
         const val BISECTION_TIME_BUDGET_MS = 2_000L
+
+        /** In-memory route cache capacity (LRU). */
+        const val CACHE_MAX_ENTRIES = 64
+
+        /** A cached route is served without a request for this long; after that only if the ladder fails. */
+        const val CACHE_TTL_MS = 3_600_000L
+
+        /** Waypoints are rounded to 1/scale degrees (5 decimals, ~1 m) to build the cache key. */
+        const val CACHE_COORD_SCALE = 100_000.0
+
+        /** Cooldown after an HTTP 429 with no numeric `Retry-After`, applied to the whole host. */
+        const val COOLDOWN_RATE_LIMITED_MS = 60_000L
+
+        /** Cooldown after an HTTP 5xx, applied to that backend base URL only. */
+        const val COOLDOWN_SERVER_ERROR_MS = 30_000L
+
+        /** Upper bound on any cooldown so a hostile `Retry-After` cannot disable routing. */
+        const val COOLDOWN_MAX_MS = 300_000L
+
+        /** SharedPreferences file persisting per-backend cooldown expiry (epoch ms). */
+        const val COOLDOWN_PREFS_NAME = "osrm_cooldowns"
     }
 
     object MapConstants {
@@ -223,12 +244,27 @@ object AppConstants {
         const val CONNECT_TIMEOUT_MS = 5000
         const val READ_TIMEOUT_MS = 5000
         const val RECENT_SEARCHES_MAX_COUNT = 5
+
+        /** Minimum gap between search request starts (Nominatim usage policy: 1 request/second). */
+        const val MIN_REQUEST_INTERVAL_MS = 1_100L
+
+        /** In-memory search cache capacity (LRU). */
+        const val CACHE_MAX_ENTRIES = 32
+
+        /** A cached search is served without a request for this long; after that only if the request fails. */
+        const val CACHE_TTL_MS = 86_400_000L
     }
 
     object ElevationConstants {
         const val BASE_URL = "https://api.open-meteo.com/v1/elevation"
         const val CONNECT_TIMEOUT_MS = 5000
         const val READ_TIMEOUT_MS = 5000
+
+        /** In-memory elevation cache capacity (LRU, no TTL: ground elevation is static). */
+        const val CACHE_MAX_ENTRIES = 64
+
+        /** Lookups are rounded to 1/scale degrees (3 decimals, ~111 m cell) to build the cache key. */
+        const val CACHE_COORD_SCALE = 1_000.0
     }
 
     object ExportConstants {

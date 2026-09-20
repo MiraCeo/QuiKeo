@@ -60,6 +60,12 @@ The map favorites and routes sheets (`FavoritesPickerSheet` / `RoutesPickerSheet
 title. Query is `remember`d in the list, so dismissing the sheet starts from the full list.
 See @docs/features/favorites.md and @docs/features/routes.md.
 
+## Search
+
+Nominatim search (`NominatimSearchBar`) keeps its 300 ms typing debounce and goes through the process-wide
+`NominatimSearchClient` (`:core:common`): results are cached (24 h fresh, expired entries served only if the
+request fails) and request starts are spaced at least 1.1 s apart to respect Nominatim's 1 request/second policy.
+
 ## Jitter Radius Overlay
 
 When Settings → Menus → Debug → "Debug stats" (`AppSettings.debugStatsEnabled`)
