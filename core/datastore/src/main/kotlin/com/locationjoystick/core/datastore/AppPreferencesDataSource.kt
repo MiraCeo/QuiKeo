@@ -197,6 +197,11 @@ interface PreferencesDataSource {
     /** Sets whether the foreground-service notification's status bar icon is hidden. */
     suspend fun setHideForegroundNotification(enabled: Boolean)
 
+    /** Whether leaving the app returns navigation to Home. Defaults to true. */
+    fun getReturnHomeOnBackground(): Flow<Boolean>
+
+    suspend fun setReturnHomeOnBackground(enabled: Boolean)
+
     /** Gets whether the route-replay jump-to-waypoint buttons are shown. */
     fun getShowRouteJumpButtons(): Flow<Boolean>
 
@@ -362,6 +367,7 @@ data class SettingsSnapshot(
     val hideTeleportFeatures: Boolean = false,
     val hideWidgetOverlay: Boolean = false,
     val hideForegroundNotification: Boolean = false,
+    val returnHomeOnBackground: Boolean = true,
     val showRouteJumpButtons: Boolean = false,
     val bypassMockLocationCheck: Boolean = false,
     val realismRealElevationEnabled: Boolean = AppConstants.RealismConstants.REAL_ELEVATION_ENABLED_DEFAULT,
@@ -460,6 +466,7 @@ class AppPreferencesDataSource
             val HIDE_TELEPORT_FEATURES = booleanPreferencesKey("hide_teleport_features")
             val HIDE_WIDGET_OVERLAY = booleanPreferencesKey("hide_widget_overlay")
             val HIDE_FOREGROUND_NOTIFICATION = booleanPreferencesKey("hide_foreground_notification")
+            val RETURN_HOME_ON_BACKGROUND = booleanPreferencesKey("return_home_on_background")
             val SHOW_ROUTE_JUMP_BUTTONS = booleanPreferencesKey("show_route_jump_buttons")
             val BYPASS_MOCK_LOCATION_CHECK = booleanPreferencesKey("bypass_mock_location_check")
             val RECENT_SEARCHES = stringPreferencesKey("recent_searches")
@@ -726,6 +733,10 @@ class AppPreferencesDataSource
 
         override suspend fun setHideWidgetOverlay(enabled: Boolean) = setPref(Keys.HIDE_WIDGET_OVERLAY, enabled)
 
+        override fun getReturnHomeOnBackground(): Flow<Boolean> = pref(Keys.RETURN_HOME_ON_BACKGROUND, true)
+
+        override suspend fun setReturnHomeOnBackground(enabled: Boolean) = setPref(Keys.RETURN_HOME_ON_BACKGROUND, enabled)
+
         override fun getHideForegroundNotification(): Flow<Boolean> = pref(Keys.HIDE_FOREGROUND_NOTIFICATION, false)
 
         override suspend fun setHideForegroundNotification(enabled: Boolean) = setPref(Keys.HIDE_FOREGROUND_NOTIFICATION, enabled)
@@ -901,6 +912,7 @@ class AppPreferencesDataSource
                 prefs[Keys.HIDE_TELEPORT_FEATURES] = snapshot.hideTeleportFeatures
                 prefs[Keys.HIDE_WIDGET_OVERLAY] = snapshot.hideWidgetOverlay
                 prefs[Keys.HIDE_FOREGROUND_NOTIFICATION] = snapshot.hideForegroundNotification
+                prefs[Keys.RETURN_HOME_ON_BACKGROUND] = snapshot.returnHomeOnBackground
                 prefs[Keys.SHOW_ROUTE_JUMP_BUTTONS] = snapshot.showRouteJumpButtons
                 prefs[Keys.BYPASS_MOCK_LOCATION_CHECK] = snapshot.bypassMockLocationCheck
                 prefs[Keys.REALISM_REAL_ELEVATION_ENABLED] = snapshot.realismRealElevationEnabled
@@ -999,6 +1011,7 @@ class AppPreferencesDataSource
                         hideTeleportFeatures = prefs[Keys.HIDE_TELEPORT_FEATURES] ?: false,
                         hideWidgetOverlay = prefs[Keys.HIDE_WIDGET_OVERLAY] ?: false,
                         hideForegroundNotification = prefs[Keys.HIDE_FOREGROUND_NOTIFICATION] ?: false,
+                        returnHomeOnBackground = prefs[Keys.RETURN_HOME_ON_BACKGROUND] ?: true,
                         showRouteJumpButtons = prefs[Keys.SHOW_ROUTE_JUMP_BUTTONS] ?: false,
                         bypassMockLocationCheck = prefs[Keys.BYPASS_MOCK_LOCATION_CHECK] ?: false,
                         realismRealElevationEnabled =

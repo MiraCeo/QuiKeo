@@ -41,6 +41,18 @@ class SettingsRepositoryTest {
     // getSpeedProfiles
 
     @Test
+    fun `returnHomeOnBackground defaults to true and persists changes`() =
+        runTest {
+            repository.getReturnHomeOnBackground().test {
+                assertTrue(awaitItem())
+                repository.setReturnHomeOnBackground(false)
+                assertFalse(awaitItem())
+                repository.setReturnHomeOnBackground(true)
+                assertTrue(awaitItem())
+            }
+        }
+
+    @Test
     fun `getSpeedProfiles returns slow_walk, walk, run, bike, drive from preferences`() =
         runTest {
             fakeDataSource.speedProfilesFlow.value =
@@ -1399,6 +1411,14 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
         hideWidgetOverlayFlow.value = enabled
     }
 
+    private val returnHomeOnBackgroundFlow = MutableStateFlow(true)
+
+    override fun getReturnHomeOnBackground(): Flow<Boolean> = returnHomeOnBackgroundFlow
+
+    override suspend fun setReturnHomeOnBackground(enabled: Boolean) {
+        returnHomeOnBackgroundFlow.value = enabled
+    }
+
     private val hideForegroundNotificationFlow = MutableStateFlow(false)
 
     override fun getHideForegroundNotification(): Flow<Boolean> = hideForegroundNotificationFlow
@@ -1571,6 +1591,7 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
         hideTeleportFeaturesFlow.value = false
         hideWidgetOverlayFlow.value = false
         hideForegroundNotificationFlow.value = false
+        returnHomeOnBackgroundFlow.value = true
         showRouteJumpButtonsFlow.value = false
         bypassMockLocationCheckFlow.value = false
         onboardingCompleteFlow.value = onboardingComplete

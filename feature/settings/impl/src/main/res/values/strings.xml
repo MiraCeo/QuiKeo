@@ -203,4 +203,6 @@
     <string name="qr_share_or_enter_code">"Or enter code: %1$s"</string>
     <string name="hot_item_tree_collapse_cd">"Collapse"</string>
     <string name="hot_item_tree_expand_cd">"Expand"</string>
+    <string name="settings_menus_return_home_on_background">Return to home when backgrounded</string>
+    <string name="settings_menus_return_home_on_background_desc">Turn off to keep your current screen when switching apps. When on, leaving the app returns to Home, except from Settings and setup. Location simulation is unaffected.</string>
 </resources>

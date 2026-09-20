@@ -20,6 +20,8 @@ Each entry in `routes` also includes `randomizeTeleportOrder` (`Route.randomizeT
 
 Each waypoint in a route includes `waitSeconds` (`Waypoint.waitSeconds`, used by teleport routes — see @docs/features/routes.md, "Teleport Routes"). Old exports without it import cleanly — a missing `waitSeconds` defaults to `0`.
 
+`AppSettings.returnHomeOnBackground` round-trips as the `settings.returnHomeOnBackground` boolean. Missing fields in older exports default to `true`, preserving the existing background-to-Home behavior. Explicit `false` is preserved by file and QR imports.
+
 Schema version: `AppConstants.ExportConstants.SCHEMA_VERSION`.
 
 ## Settings Screen Entry Point

@@ -364,6 +364,10 @@ fun SettingsRoute(
                     viewModel.setHideWidgetOverlay(action.enabled)
                 }
 
+                is SettingsAction.SetReturnHomeOnBackground -> {
+                    viewModel.setReturnHomeOnBackground(action.enabled)
+                }
+
                 is SettingsAction.SetHideForegroundNotification -> {
                     viewModel.setHideForegroundNotification(action.enabled)
                 }

@@ -88,6 +88,35 @@ class SettingsViewModelSaveTest {
     }
 
     @Test
+    fun `background navigation is a draft until saved and discard restores the stored value`() =
+        runTest(testDispatcher) {
+            backgroundScope.launch(testDispatcher) { viewModel.uiState.collect {} }
+            assertTrue(viewModel.uiState.value.returnHomeOnBackground)
+            viewModel.setReturnHomeOnBackground(false)
+            assertFalse(viewModel.uiState.value.returnHomeOnBackground)
+            assertTrue(viewModel.uiState.value.isDirty)
+            assertEquals(0, fakeDataSource.applySnapshotCallCount)
+            viewModel.discardChanges()
+            assertTrue(viewModel.uiState.value.returnHomeOnBackground)
+            assertFalse(viewModel.uiState.value.isDirty)
+            viewModel.setReturnHomeOnBackground(false)
+            viewModel.saveChanges()
+            assertFalse(fakeDataSource.lastAppliedSnapshot!!.returnHomeOnBackground)
+            assertEquals(1, fakeDataSource.applySnapshotCallCount)
+        }
+
+    @Test
+    fun `import applies the background navigation preference`() =
+        runTest(testDispatcher) {
+            viewModel.userFeedback.test {
+                viewModel.importSettings(ExportData(settings = AppSettings(returnHomeOnBackground = false)))
+                assertFalse(awaitItem().isError)
+                cancelAndIgnoreRemainingEvents()
+            }
+            assertFalse(fakeDataSource.lastAppliedSnapshot!!.returnHomeOnBackground)
+        }
+
+    @Test
     fun `saveChanges triggers exactly one applySnapshot call`() =
         runTest(testDispatcher) {
             viewModel.setSpeed("walk", 2.0)
@@ -623,6 +652,10 @@ internal class SaveTestPreferencesDataSource : PreferencesDataSource {
     override fun getHideWidgetOverlay(): Flow<Boolean> = flowOf(false)
 
     override suspend fun setHideWidgetOverlay(enabled: Boolean) = Unit
+
+    override fun getReturnHomeOnBackground(): Flow<Boolean> = flowOf(lastAppliedSnapshot?.returnHomeOnBackground ?: true)
+
+    override suspend fun setReturnHomeOnBackground(enabled: Boolean) = Unit
 
     override fun getHideForegroundNotification(): Flow<Boolean> = flowOf(false)
 

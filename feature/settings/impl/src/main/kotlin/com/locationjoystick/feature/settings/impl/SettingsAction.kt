@@ -134,6 +134,10 @@ internal sealed class SettingsAction {
         val enabled: Boolean,
     ) : SettingsAction()
 
+    data class SetReturnHomeOnBackground(
+        val enabled: Boolean,
+    ) : SettingsAction()
+
     data class SetHideForegroundNotification(
         val enabled: Boolean,
     ) : SettingsAction()

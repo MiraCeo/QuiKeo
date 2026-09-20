@@ -67,6 +67,22 @@ private fun fullExportData(): ExportData =
 @RunWith(RobolectricTestRunner::class)
 class SettingsExportCodecTest {
     @Test
+    fun `background navigation preference round-trips both values`() {
+        listOf(true, false).forEach { enabled ->
+            val data = minimalExportData().let { it.copy(settings = it.settings.copy(returnHomeOnBackground = enabled)) }
+            val parsed = SettingsExportCodec.parseExportData(SettingsExportCodec.serializeExportData(data))
+            assertEquals(enabled, parsed.settings.returnHomeOnBackground)
+        }
+    }
+
+    @Test
+    fun `older export without background navigation keeps legacy default`() {
+        val json = org.json.JSONObject(SettingsExportCodec.serializeExportData(minimalExportData()))
+        json.getJSONObject("settings").remove("returnHomeOnBackground")
+        assertEquals(true, SettingsExportCodec.parseExportData(json.toString()).settings.returnHomeOnBackground)
+    }
+
+    @Test
     fun `serialize produces compact JSON with no newlines or indentation`() {
         val json = SettingsExportCodec.serializeExportData(minimalExportData())
 

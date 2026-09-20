@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -28,10 +29,8 @@ import com.locationjoystick.app.navigation.LjNavHost
 import com.locationjoystick.core.model.RouteType
 import com.locationjoystick.feature.favorites.api.FAVORITES_ROUTE
 import com.locationjoystick.feature.map.api.MAP_ROUTE
-import com.locationjoystick.feature.onboarding.api.ONBOARDING_ROUTE
 import com.locationjoystick.feature.routes.api.ROUTES_ROUTE
 import com.locationjoystick.feature.routes.api.ROUTE_CREATOR_ROUTE
-import com.locationjoystick.feature.settings.api.SETTINGS_ROUTE
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
@@ -48,6 +47,7 @@ fun LjApp(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
+    val navigationViewModel: AppNavigationViewModel = hiltViewModel()
     val snackbarHostState = remember { SnackbarHostState() }
     val couldNotOpenLinkMessage = stringResource(R.string.app_couldn_t_open_that_link)
 
@@ -99,15 +99,13 @@ fun LjApp(
         }
     }
 
-    DisposableEffect(lifecycleOwner) {
+    DisposableEffect(lifecycleOwner, navController, navigationViewModel) {
         val observer =
             LifecycleEventObserver { _, event ->
                 if (event == Lifecycle.Event.ON_STOP) {
                     val current = navController.currentDestination?.route
-                    // Skip redirect for screens that may launch sub-activities (file pickers, etc.)
-                    val skipRedirect =
-                        current == IDLE_ROUTE || current == ONBOARDING_ROUTE || current == SETTINGS_ROUTE
-                    if (!skipRedirect) {
+                    // Read at event time: a saved setting must not be captured as a stale value.
+                    if (shouldReturnHomeOnBackground(current, navigationViewModel.returnHomeOnBackground.value)) {
                         navController.navigate(IDLE_ROUTE) {
                             popUpTo(IDLE_ROUTE) { inclusive = false }
                         }

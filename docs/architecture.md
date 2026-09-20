@@ -58,6 +58,8 @@ Drawer nav: `popUpTo(IDLE_ROUTE) { saveState = true }` + `launchSingleTop + rest
 
 `FavoritesViewModel` shared across favorites graph via `hiltViewModel(navController.getBackStackEntry("favorites_graph"))`.
 
+`AppNavigationViewModel` eagerly observes the saved `returnHomeOnBackground` preference. `LjApp` reads its latest value on `ON_STOP`, and `shouldReturnHomeOnBackground` applies the existing Home/onboarding/Settings exemptions. A not-yet-loaded preference never discards a destination. See @docs/features/navigation.md.
+
 ## Dependency Injection
 
 Hilt throughout. VMs: `@HiltViewModel`. Repos: `@Singleton`.

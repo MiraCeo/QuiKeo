@@ -116,6 +116,7 @@ Rules:
 | Group Sync | @docs/features/group-sync.md |
 | Tap to Walk | @docs/features/tap-to-walk.md |
 | Theme | @docs/features/theme.md |
+| Background Navigation | @docs/features/navigation.md |
 | Hide Teleport Features | @docs/features/hide-teleport.md |
 | What's New Popup | @docs/features/whats-new.md |
 | Localization | @docs/features/localization.md |

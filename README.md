@@ -25,6 +25,8 @@ Full setup guide with screenshots: **[locationjoystick.shrtcts.fr](https://locat
 
 See the **[wiki](https://locationjoystick.shrtcts.fr/)** for every feature: the map, joystick, routes, roaming, favorites, the floating widget, group sync, and more.
 
+You can also choose whether switching apps returns you to Home or keeps your current screen. See [Returning to the app](https://locationjoystick.shrtcts.fr/navigation.html).
+
 ## Community
 
 Join the **[Discord server](https://discord.gg/r9DRnkwbMf)** for help, feature requests, and updates.

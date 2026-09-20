@@ -84,6 +84,7 @@ internal object SettingsExportCodec {
         settingsObj.put("mapTileSource", data.settings.mapTileSource.name)
         settingsObj.put("hideWidgetOverlay", data.settings.hideWidgetOverlay)
         settingsObj.put("hideForegroundNotification", data.settings.hideForegroundNotification)
+        settingsObj.put("returnHomeOnBackground", data.settings.returnHomeOnBackground)
         settingsObj.put("showRouteJumpButtons", data.settings.showRouteJumpButtons)
         settingsObj.put("bypassMockLocationCheck", data.settings.bypassMockLocationCheck)
         settingsObj.put("realElevationEnabled", data.settings.realElevationEnabled)
@@ -222,6 +223,7 @@ internal object SettingsExportCodec {
         val mapTileSource = MapTileSource.fromName(settingsObj.optString("mapTileSource", null))
         val hideWidgetOverlay = settingsObj.optBoolean("hideWidgetOverlay", false)
         val hideForegroundNotification = settingsObj.optBoolean("hideForegroundNotification", false)
+        val returnHomeOnBackground = settingsObj.optBoolean("returnHomeOnBackground", true)
         val showRouteJumpButtons = settingsObj.optBoolean("showRouteJumpButtons", false)
         val bypassMockLocationCheck = settingsObj.optBoolean("bypassMockLocationCheck", false)
         val realElevationEnabled =
@@ -263,6 +265,7 @@ internal object SettingsExportCodec {
                 mapTileSource = mapTileSource,
                 hideWidgetOverlay = hideWidgetOverlay,
                 hideForegroundNotification = hideForegroundNotification,
+                returnHomeOnBackground = returnHomeOnBackground,
                 showRouteJumpButtons = showRouteJumpButtons,
                 bypassMockLocationCheck = bypassMockLocationCheck,
                 roamingDefaults = roamingDefaults,

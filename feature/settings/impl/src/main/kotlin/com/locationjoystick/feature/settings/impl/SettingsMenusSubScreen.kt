@@ -378,6 +378,13 @@ private fun PrivacySection(
     Text(stringResource(R.string.settings_menus_privacy), style = MaterialTheme.typography.headlineSmall)
     Spacer(Modifier.height(4.dp))
     LjCheckboxRow(
+        checked = uiState.returnHomeOnBackground,
+        onCheckedChange = { onAction(SettingsAction.SetReturnHomeOnBackground(it)) },
+        title = stringResource(R.string.settings_menus_return_home_on_background),
+        description = stringResource(R.string.settings_menus_return_home_on_background_desc),
+    )
+    Spacer(Modifier.height(8.dp))
+    LjCheckboxRow(
         checked = uiState.hideTeleportFeatures,
         onCheckedChange = { onAction(SettingsAction.SetHideTeleportFeatures(it)) },
         title = stringResource(R.string.settings_menus_hide_teleport_features),

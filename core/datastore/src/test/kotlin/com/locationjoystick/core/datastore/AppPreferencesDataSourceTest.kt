@@ -19,6 +19,28 @@ class AppPreferencesDataSourceTest {
     }
 
     @Test
+    fun `returnHomeOnBackground defaults to true and survives data source recreation`() =
+        runTest {
+            assertTrue(dataSource.getReturnHomeOnBackground().first())
+            dataSource.setReturnHomeOnBackground(false)
+            val recreated = AppPreferencesDataSource(fakeDataStore)
+            assertFalse(recreated.getReturnHomeOnBackground().first())
+            recreated.setReturnHomeOnBackground(true)
+            assertTrue(dataSource.getReturnHomeOnBackground().first())
+        }
+
+    @Test
+    fun `snapshot applies background navigation and reset restores default`() =
+        runTest {
+            assertTrue(dataSource.getSettingsSnapshot().first().returnHomeOnBackground)
+            dataSource.applySnapshot(dataSource.getSettingsSnapshot().first().copy(returnHomeOnBackground = false))
+            assertFalse(dataSource.getReturnHomeOnBackground().first())
+            assertFalse(dataSource.getSettingsSnapshot().first().returnHomeOnBackground)
+            dataSource.clearAllExceptOnboarding()
+            assertTrue(dataSource.getReturnHomeOnBackground().first())
+        }
+
+    @Test
     fun `hideTeleportFeatures defaults to false and round-trips true`() =
         runTest {
             assertFalse(dataSource.getHideTeleportFeatures().first())

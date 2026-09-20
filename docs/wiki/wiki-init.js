@@ -8,6 +8,7 @@
     { href: 'group.html', label: 'Group Sync' },
     { href: 'tap-to-walk.html', label: 'Tap to Walk' },
     { href: 'settings.html', label: 'Settings' },
+    { href: 'navigation.html', label: 'Returning to the app' },
     { href: 'language.html', label: 'Language' },
     { href: 'overlays.html', label: 'Overlays' },
     { href: 'troubleshooting.html', label: 'Troubleshooting' },

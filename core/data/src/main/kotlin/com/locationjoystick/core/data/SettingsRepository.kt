@@ -269,6 +269,10 @@ class SettingsRepository
 
         suspend fun setHideWidgetOverlay(enabled: Boolean) = dataSource.setHideWidgetOverlay(enabled)
 
+        fun getReturnHomeOnBackground(): Flow<Boolean> = dataSource.getReturnHomeOnBackground()
+
+        suspend fun setReturnHomeOnBackground(enabled: Boolean) = dataSource.setReturnHomeOnBackground(enabled)
+
         fun getHideForegroundNotification(): Flow<Boolean> = dataSource.getHideForegroundNotification()
 
         suspend fun setHideForegroundNotification(enabled: Boolean) = dataSource.setHideForegroundNotification(enabled)

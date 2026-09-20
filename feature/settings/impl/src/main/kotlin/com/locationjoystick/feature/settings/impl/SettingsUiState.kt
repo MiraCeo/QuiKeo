@@ -42,6 +42,7 @@ data class SettingsUiState(
     val hideTeleportFeatures: Boolean = false,
     val hideWidgetOverlay: Boolean = false,
     val hideForegroundNotification: Boolean = false,
+    val returnHomeOnBackground: Boolean = true,
     val showRouteJumpButtons: Boolean = false,
     val realismRealElevationEnabled: Boolean = AppConstants.RealismConstants.REAL_ELEVATION_ENABLED_DEFAULT,
     val hasAltitudeOverride: Boolean = false,

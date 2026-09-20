@@ -2,6 +2,15 @@
   "version": "0.23.0",
   "date": "2026-09-19",
   "entries": [
-    { "category": "feat", "scope": "Map", "summary": "Added a Map source switch in Settings → Menus to show Amap (高德) tiles instead of OpenStreetMap on every map, with automatic GCJ-02 conversion so markers, routes and taps stay accurate; saved data remains in standard GPS coordinates." }
+    {
+      "category": "feat",
+      "scope": "Map",
+      "summary": "Added a Map source switch in Settings → Menus to show Amap (高德) tiles instead of OpenStreetMap on every map, with automatic GCJ-02 conversion so markers, routes and taps stay accurate; saved data remains in standard GPS coordinates."
+    },
+    {
+      "category": "feat",
+      "scope": "Settings",
+      "summary": "Added an option in Menus → Privacy to keep your current page when switching apps. Returning to Home remains enabled by default."
+    }
   ]
 }

@@ -203,4 +203,6 @@
     <string name="qr_share_or_enter_code">"或输入代码：%1$s"</string>
     <string name="hot_item_tree_collapse_cd">"折叠"</string>
     <string name="hot_item_tree_expand_cd">"展开"</string>
+    <string name="settings_menus_return_home_on_background">切到后台时返回首页</string>
+    <string name="settings_menus_return_home_on_background_desc">关闭后，切换应用时保留当前页面。开启后，离开应用会返回首页，设置和引导页面除外。不影响模拟定位。</string>
 </resources>
