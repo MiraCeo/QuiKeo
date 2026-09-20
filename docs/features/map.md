@@ -107,3 +107,34 @@ map screen only, not the floating map.
   map). Pass `false` when the view must only be driven by later lifecycle events
   (favourites picker, route creator). The flag controls attach-time behaviour
   only - `ON_START`/`ON_STOP` forwarding is unconditional either way.
+
+## Rendering mode
+
+The main map screen builds its `MapView` in TextureView mode:
+
+```kotlin
+MapView(context, MapLibreMapOptions.createFromAttributes(context).textureMode(true))
+```
+
+In the default SurfaceView mode the framework destroys the `Surface` when the
+activity stops, which makes MapLibre tear down and rebuild its whole renderer
+(`MapRenderer::onSurfaceDestroyed` -> `resetRenderer()`). The rebuilt renderer
+starts empty - tile pyramid, glyph/icon atlases and GPU buffers are all gone -
+so returning to the foreground shows a visible redraw while tiles are refetched
+and reuploaded.
+
+A `TextureView` keeps its `SurfaceTexture` alive across activity stop
+(`destroyHardwareResources()` only detaches the hardware layer; the texture is
+released in `onDetachedFromWindowInternal()`, which stopping does not trigger),
+so the renderer survives and the previous frame is still on screen when the user
+comes back. Measured on a PJD110: no `surfaceDestroyed`, no Vulkan
+re-initialisation, and the frame after the window animation is pixel-identical
+to the one from before backgrounding.
+
+Cost is one extra composition copy per frame. This did not increase measured
+memory - foreground PSS was lower than with SurfaceView, because the per-return
+rebuild spike disappears. Under extreme memory pressure the texture can still be
+reclaimed, which degrades to the old redraw rather than failing.
+
+The favourites picker, route creator and floating map still use the default
+SurfaceView mode.

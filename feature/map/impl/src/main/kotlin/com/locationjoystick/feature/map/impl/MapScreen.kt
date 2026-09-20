@@ -63,6 +63,7 @@ import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.MapLibreMapOptions
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
 import org.maplibre.android.style.sources.GeoJsonSource
@@ -169,7 +170,12 @@ internal fun MapScreen(
     val mapView =
         remember {
             MapLibre.getInstance(context)
-            MapView(context)
+            // EXPERIMENT (FIX-06 option A): TextureView mode keeps the SurfaceTexture alive
+            // across Activity stop, so MapLibre never tears down and rebuilds its renderer.
+            MapView(
+                context,
+                MapLibreMapOptions.createFromAttributes(context).textureMode(true),
+            )
         }
     val mapRef = remember { mutableStateOf<MapLibreMap?>(null) }
     val positionSource = remember { mutableStateOf<GeoJsonSource?>(null) }
