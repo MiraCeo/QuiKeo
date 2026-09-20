@@ -1183,6 +1183,9 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
     val themeModeFlow = MutableStateFlow("DARK")
 
     val whatsNewLastSeenVersionFlow = MutableStateFlow("")
+    val updateCheckLastCheckedAtMsFlow = MutableStateFlow(0L)
+    val updateCheckCachedLatestVersionFlow = MutableStateFlow("")
+    val updateCheckDismissedVersionFlow = MutableStateFlow("")
 
     val rememberLastLocationFlow = MutableStateFlow(false)
 
@@ -1291,6 +1294,24 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
 
     override suspend fun setWhatsNewLastSeenVersion(version: String) {
         whatsNewLastSeenVersionFlow.value = version
+    }
+
+    override fun getUpdateCheckLastCheckedAtMs(): Flow<Long> = updateCheckLastCheckedAtMsFlow
+
+    override suspend fun setUpdateCheckLastCheckedAtMs(timestampMs: Long) {
+        updateCheckLastCheckedAtMsFlow.value = timestampMs
+    }
+
+    override fun getUpdateCheckCachedLatestVersion(): Flow<String> = updateCheckCachedLatestVersionFlow
+
+    override suspend fun setUpdateCheckCachedLatestVersion(version: String) {
+        updateCheckCachedLatestVersionFlow.value = version
+    }
+
+    override fun getUpdateCheckDismissedVersion(): Flow<String> = updateCheckDismissedVersionFlow
+
+    override suspend fun setUpdateCheckDismissedVersion(version: String) {
+        updateCheckDismissedVersionFlow.value = version
     }
 
     override fun getRememberLastLocation(): Flow<Boolean> = rememberLastLocationFlow

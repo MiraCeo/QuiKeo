@@ -184,6 +184,18 @@ class SettingsRepository
 
         suspend fun setWhatsNewLastSeenVersion(version: String) = dataSource.setWhatsNewLastSeenVersion(version)
 
+        fun getUpdateCheckLastCheckedAtMs(): Flow<Long> = dataSource.getUpdateCheckLastCheckedAtMs()
+
+        suspend fun setUpdateCheckLastCheckedAtMs(timestampMs: Long) = dataSource.setUpdateCheckLastCheckedAtMs(timestampMs)
+
+        fun getUpdateCheckCachedLatestVersion(): Flow<String> = dataSource.getUpdateCheckCachedLatestVersion()
+
+        suspend fun setUpdateCheckCachedLatestVersion(version: String) = dataSource.setUpdateCheckCachedLatestVersion(version)
+
+        fun getUpdateCheckDismissedVersion(): Flow<String> = dataSource.getUpdateCheckDismissedVersion()
+
+        suspend fun setUpdateCheckDismissedVersion(version: String) = dataSource.setUpdateCheckDismissedVersion(version)
+
         fun getRememberLastLocation(): Flow<Boolean> = dataSource.getRememberLastLocation()
 
         suspend fun setRememberLastLocation(enabled: Boolean) = dataSource.setRememberLastLocation(enabled)

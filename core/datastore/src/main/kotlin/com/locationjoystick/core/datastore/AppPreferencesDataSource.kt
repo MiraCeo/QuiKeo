@@ -118,6 +118,21 @@ interface PreferencesDataSource {
     /** Sets the app version the user last saw the What's New popup for. */
     suspend fun setWhatsNewLastSeenVersion(version: String)
 
+    /** Gets when the app last asked GitHub for the latest release (epoch ms). */
+    fun getUpdateCheckLastCheckedAtMs(): Flow<Long>
+
+    suspend fun setUpdateCheckLastCheckedAtMs(timestampMs: Long)
+
+    /** Gets the latest release version last seen on GitHub (no "v" prefix), empty if never fetched. */
+    fun getUpdateCheckCachedLatestVersion(): Flow<String>
+
+    suspend fun setUpdateCheckCachedLatestVersion(version: String)
+
+    /** Gets the release version whose "update available" badge the user already dismissed or opened. */
+    fun getUpdateCheckDismissedVersion(): Flow<String>
+
+    suspend fun setUpdateCheckDismissedVersion(version: String)
+
     /** Gets whether to remember the last spoofed location. */
     fun getRememberLastLocation(): Flow<Boolean>
 
@@ -513,6 +528,9 @@ class AppPreferencesDataSource
             val THEME_MODE = stringPreferencesKey("theme_mode")
             val KEEP_WIDGET_ON_IDLE = booleanPreferencesKey("keep_widget_on_idle")
             val WHATS_NEW_LAST_SEEN_VERSION = stringPreferencesKey("whats_new_last_seen_version")
+            val UPDATE_CHECK_LAST_CHECKED_AT_MS = longPreferencesKey("update_check_last_checked_at_ms")
+            val UPDATE_CHECK_CACHED_LATEST_VERSION = stringPreferencesKey("update_check_cached_latest_version")
+            val UPDATE_CHECK_DISMISSED_VERSION = stringPreferencesKey("update_check_dismissed_version")
             val REMEMBER_LAST_LOCATION = booleanPreferencesKey("remember_last_location")
             val LAST_LATITUDE = doublePreferencesKey("last_latitude")
             val LAST_LONGITUDE = doublePreferencesKey("last_longitude")
@@ -722,6 +740,30 @@ class AppPreferencesDataSource
             )
 
         override suspend fun setWhatsNewLastSeenVersion(version: String) = setPref(Keys.WHATS_NEW_LAST_SEEN_VERSION, version)
+
+        override fun getUpdateCheckLastCheckedAtMs(): Flow<Long> =
+            pref(
+                Keys.UPDATE_CHECK_LAST_CHECKED_AT_MS,
+                AppConstants.DataStoreConstants.DEFAULT_UPDATE_CHECK_LAST_CHECKED_AT_MS,
+            )
+
+        override suspend fun setUpdateCheckLastCheckedAtMs(timestampMs: Long) = setPref(Keys.UPDATE_CHECK_LAST_CHECKED_AT_MS, timestampMs)
+
+        override fun getUpdateCheckCachedLatestVersion(): Flow<String> =
+            pref(
+                Keys.UPDATE_CHECK_CACHED_LATEST_VERSION,
+                AppConstants.DataStoreConstants.DEFAULT_UPDATE_CHECK_LATEST_VERSION,
+            )
+
+        override suspend fun setUpdateCheckCachedLatestVersion(version: String) = setPref(Keys.UPDATE_CHECK_CACHED_LATEST_VERSION, version)
+
+        override fun getUpdateCheckDismissedVersion(): Flow<String> =
+            pref(
+                Keys.UPDATE_CHECK_DISMISSED_VERSION,
+                AppConstants.DataStoreConstants.DEFAULT_UPDATE_CHECK_DISMISSED_VERSION,
+            )
+
+        override suspend fun setUpdateCheckDismissedVersion(version: String) = setPref(Keys.UPDATE_CHECK_DISMISSED_VERSION, version)
 
         override fun getRememberLastLocation(): Flow<Boolean> =
             pref(Keys.REMEMBER_LAST_LOCATION, AppConstants.DataStoreConstants.DEFAULT_REMEMBER_LAST_LOCATION)

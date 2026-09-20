@@ -120,6 +120,7 @@ Rules:
 | Theme | @docs/features/theme.md |
 | Hide Teleport Features | @docs/features/hide-teleport.md |
 | What's New Popup | @docs/features/whats-new.md |
+| Update Available Check | @docs/features/update-check.md |
 | Localization | @docs/features/localization.md |
 
 ---
@@ -150,6 +151,7 @@ Rules:
 | `CaptureCoordinatesRepository` | `:core:data` | Repository (`@Singleton`) | Owns Capture mode, List/Jump actions, captured points, and the pass-through browser choice. DataStore-only; intercepts use `TeleportUseCase` for jumps. |
 | `RealLocationRepository` | `:core:data` | Repository (`@Singleton`) | Obtains a real GPS fix for idle map recentering without changing the mock-position cache or cooldown. |
 | `GpxOpenRepository` | `:core:data` | Repository (`@Singleton`) | Buffers externally opened GPX files until the map paste sheet consumes them. |
+| `UpdateCheckRepository` | `:core:data` | Repository (`@Singleton`) | Fetches the latest GitHub release tag (api.github.com) for the home-screen "update available" badge; gated by a 24h cache, no toggle. |
 | `StartRouteReplayUseCase` | `:core:location` | Class (`@Singleton`) | Starts a route replay: resolves the route's speed profile, optionally teleports to the start waypoint first (via `TeleportUseCase`), then sends the start-replay intent to `MockLocationService`. Dedupes route-replay-start logic previously duplicated in `MapViewModel` and `FloatingWidgetService`. |
 
 ---

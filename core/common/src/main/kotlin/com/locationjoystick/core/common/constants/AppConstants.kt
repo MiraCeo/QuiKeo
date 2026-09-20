@@ -317,6 +317,9 @@ object AppConstants {
         const val DEFAULT_LAST_TELEPORT_TIME_MS = 0L
         const val DEFAULT_THEME_MODE = "DARK"
         const val DEFAULT_WHATS_NEW_LAST_SEEN_VERSION = ""
+        const val DEFAULT_UPDATE_CHECK_LAST_CHECKED_AT_MS = 0L
+        const val DEFAULT_UPDATE_CHECK_LATEST_VERSION = ""
+        const val DEFAULT_UPDATE_CHECK_DISMISSED_VERSION = ""
         const val KEY_GROUP_ROLE = "group_role"
         const val KEY_GROUP_ID = "group_id"
         const val KEY_GROUP_LEADER_HOST = "group_leader_host"
@@ -413,7 +416,8 @@ object AppConstants {
 
     object AppInfo {
         const val VERSION_NAME = "0.21.0" // x-release-please-version
-        const val GITHUB_ISSUES_URL = "https://github.com/shortcuts/locationjoystick/issues/new?template=bug_report.yml"
+        const val GITHUB_REPO_SLUG = "shortcuts/locationjoystick"
+        const val GITHUB_ISSUES_URL = "https://github.com/$GITHUB_REPO_SLUG/issues/new?template=bug_report.yml"
         const val DOCS_URL = "https://locationjoystick.shrtcts.fr/"
         const val TROUBLESHOOTING_URL = "https://locationjoystick.shrtcts.fr/troubleshooting.html"
         const val CHANGELOG_URL = "https://locationjoystick.shrtcts.fr/changelog.html"
@@ -423,6 +427,19 @@ object AppConstants {
             lat: Double,
             lon: Double,
         ) = "https://$DEEP_LINK_HOST/?lat=$lat&lon=$lon"
+    }
+
+    /** Home-screen "new version available" badge (see docs/features/update-check.md). */
+    object UpdateCheckConstants {
+        const val GITHUB_API_URL = "https://api.github.com/repos/${AppInfo.GITHUB_REPO_SLUG}/releases/latest"
+        const val CONNECT_TIMEOUT_MS = 5000
+        const val READ_TIMEOUT_MS = 5000
+        const val CHECK_INTERVAL_MS = 24L * 60 * 60 * 1000
+
+        fun userAgent() = "locationjoystick/${AppInfo.VERSION_NAME}"
+
+        // GitHub's release-tag URL has a fixed shape, so it is derived from the cached version.
+        fun releaseUrl(version: String) = "https://github.com/${AppInfo.GITHUB_REPO_SLUG}/releases/tag/v$version"
     }
 
     /**

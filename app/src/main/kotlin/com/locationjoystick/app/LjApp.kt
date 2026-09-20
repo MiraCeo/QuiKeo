@@ -167,6 +167,9 @@ fun LjApp(
             WhatsNewPopup(
                 modifier = Modifier.align(Alignment.BottomStart).padding(16.dp),
             )
+            UpdateAvailablePopup(
+                modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
+            )
         }
     }
 }
