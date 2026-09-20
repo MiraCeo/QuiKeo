@@ -12,6 +12,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Response
 import org.maplibre.android.MapLibre
 import org.maplibre.android.module.http.HttpRequestUtil
+import org.maplibre.android.offline.OfflineManager
 import java.io.File
 
 /**
@@ -93,7 +94,24 @@ object MapTileHttp {
         overwriteMapLibreHttp(client, userAgent)
         installed = true
         Log.i(TAG, "OSM tile User-Agent installed: $userAgent")
+        raiseAmbientCacheMax(app)
     }
+}
+
+private fun raiseAmbientCacheMax(context: Context) {
+    val bytes = AppConstants.MapConstants.OSM_AMBIENT_CACHE_MAX_BYTES
+    OfflineManager.getInstance(context).setMaximumAmbientCacheSize(
+        bytes,
+        object : OfflineManager.FileSourceCallback {
+            override fun onSuccess() {
+                Log.i(TAG, "Tile cache max set to $bytes bytes")
+            }
+
+            override fun onError(message: String) {
+                Log.e(TAG, "Failed to raise tile cache max: $message")
+            }
+        },
+    )
 }
 
 internal fun isMapLibreCacheEntry(name: String): Boolean {

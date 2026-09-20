@@ -13,7 +13,7 @@ All constants → `:core:common/constants/AppConstants.kt`.
 | `PedometerConstants` | Max walking speed, stride base, stride speed factor, stride jitter percentage |
 | `RoamingConstants` | Default radius/distance, planting start/end radius, planting default speed (Bike), spiral pitch/chord, loop defaults, speed profile IDs, arrival threshold, road-snapping defaults |
 | `OsrmConstants` | Demo + FOSSGIS base URLs, ladder backoffs, time budgets, bisection thresholds, route cache size/TTL/coordinate scale, cooldown durations and cap, cooldown prefs file name |
-| `MapConstants` | Default coordinates, zoom, favorite street-level zoom, tile URL, OSM User-Agent app name, OSM cache-bust marker, OSM OkHttp per-host limit, preview max zoom, camera snap distance, map source/layer IDs (including preview) |
+| `MapConstants` | Default coordinates, zoom, favorite street-level zoom, tile URL, OSM User-Agent app name, OSM cache-bust marker, OSM OkHttp per-host limit, ambient tile cache max bytes, preview max zoom, camera snap distance, map source/layer IDs (including preview) |
 | `NominatimConstants` | Search + reverse endpoints, debounce, timeouts, min request interval, search cache size/TTL |
 | `ElevationConstants` | Open-Meteo endpoint, timeouts, elevation cache size and coordinate scale |
 | `ExportConstants` | Schema version, MIME type, GPX version/creator, max GPX import size, max GPX route waypoint count |

@@ -54,6 +54,13 @@ These must all stay true. Breaking any one of them blanks or crawls the map.
    `:core:map` assets (not `:feature:map:impl`). A light background means
    "tiles not here yet", not a black void.
 
+9. **Ambient cache cap raised in `install`.**
+   `OfflineManager.setMaximumAmbientCacheSize(OSM_AMBIENT_CACHE_MAX_BYTES)` (200 MB,
+   default 50 MB) runs once per process inside `MapTileHttp.install`, after `getInstance`
+   and the purge. The native cache cap is process-local config, so it must be set every
+   launch. No bulk/region tile pre-download (OSM policy). Do not bump the cache-bust marker
+   for this.
+
 Tests: `MapTileUserAgentTest` — UA string, interceptor replaces `okhttp`
 and empty UA + sets Referer, dispatcher is 20/host, cache-file name matcher.
 
@@ -110,6 +117,6 @@ cache wipes.
 | Preview + detail OSM rasters | `:core:map` `MapLibreStyleExt.kt` |
 | App startup | `LjApplication.onCreate` |
 | Empty style | `core/map/src/main/assets/empty.json` |
-| OSM URL / UA app name / cache marker / 20/host / preview zoom / snap distance | `AppConstants.MapConstants` |
+| OSM URL / UA app name / cache marker / 20/host / ambient cache cap / preview zoom / snap distance | `AppConstants.MapConstants` |
 | R8 | `app/proguard-rules.pro` |
 | Tests | `MapTileUserAgentTest`, `MapCameraTest` |

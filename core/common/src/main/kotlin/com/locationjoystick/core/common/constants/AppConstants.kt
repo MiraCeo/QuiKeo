@@ -204,6 +204,9 @@ object AppConstants {
          * `http_file_source` cap). OkHttp's own default is 5 — too slow for raster tiles.
          */
         const val OSM_MAX_REQUESTS_PER_HOST = 20
+
+        /** MapLibre ambient (tile) cache cap. Default is 50 MB; larger keeps panning/reloads off OSM's servers. */
+        const val OSM_AMBIENT_CACHE_MAX_BYTES = 200L * 1024 * 1024
         const val TILESET_VERSION = "2.2.0"
         const val OSM_MAX_ZOOM = 19f
 
