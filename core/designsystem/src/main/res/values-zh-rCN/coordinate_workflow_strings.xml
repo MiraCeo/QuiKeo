@@ -50,6 +50,7 @@
     <string name="roaming_sheet_content_walk_around_the_block">"绕街区行走"</string>
     <string name="roaming_sheet_content_planting">"种植"</string>
     <string name="roaming_sheet_content_planting_mode">"种植模式"</string>
+    <string name="roaming_sheet_content_walk_around">"绕行"</string>
     <string name="roaming_sheet_content_starting_radius_m">"起始半径（米）"</string>
     <string name="roaming_sheet_content_ending_radius_m">"结束半径（米）"</string>
     <string name="roaming_sheet_content_infinite_loop">"无限循环"</string>

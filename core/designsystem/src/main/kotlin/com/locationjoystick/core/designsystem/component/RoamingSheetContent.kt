@@ -1,5 +1,6 @@
 package com.locationjoystick.core.designsystem.component
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -103,7 +104,27 @@ fun RoamingSheetContent(
                 .padding(horizontal = LjSpacing.md)
                 .padding(bottom = LjSpacing.lg),
     ) {
-        Text(stringResource(R.string.roaming_sheet_roaming), style = MaterialTheme.typography.headlineSmall, color = LjText)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(stringResource(R.string.roaming_sheet_roaming), style = MaterialTheme.typography.headlineSmall, color = LjText)
+            LjTextButton(
+                onClick = {
+                    val nextKind = if (draft.kind == RoamingKind.PLANTING) RoamingKind.WALK_AROUND else RoamingKind.PLANTING
+                    onDraftChange(draft.copy(kind = nextKind))
+                },
+            ) {
+                Text(
+                    if (draft.kind == RoamingKind.PLANTING) {
+                        stringResource(R.string.roaming_sheet_content_walk_around)
+                    } else {
+                        stringResource(R.string.roaming_sheet_content_planting_mode)
+                    },
+                )
+            }
+        }
 
         Spacer(Modifier.height(LjSpacing.sm))
 
@@ -121,14 +142,6 @@ fun RoamingSheetContent(
             Spacer(Modifier.height(12.dp))
         }
 
-        LjCheckboxRow(
-            checked = draft.kind == RoamingKind.PLANTING,
-            onCheckedChange = {
-                onDraftChange(draft.copy(kind = if (it) RoamingKind.PLANTING else RoamingKind.WALK_AROUND))
-            },
-            title = stringResource(R.string.roaming_sheet_content_planting_mode),
-            textColor = LjText,
-        )
         Spacer(Modifier.height(12.dp))
 
         if (draft.kind == RoamingKind.WALK_AROUND) {
