@@ -37,5 +37,4 @@
     <string name="menus_paste_latitude_and_longitude_to_teleport_walk_or_save_as_a_f">"Paste latitude and longitude to teleport, walk, or save as a favorite."</string>
     <string name="menus_capture_coordinates">"Capture coordinates"</string>
     <string name="menus_collect_map_links_from_other_apps_into_a_list_then_save_them">"Collect map links from other apps into a list, then save them as a route."</string>
-    <string name="capture_browser_automatic">Automatic</string>
 </resources>

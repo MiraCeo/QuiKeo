@@ -16,12 +16,19 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.locationjoystick.core.common.util.captureBrowserChoices
 import com.locationjoystick.core.common.util.isCaptureDefaultBrowser
+import com.locationjoystick.core.common.util.launchCaptureDefaultBrowser
+import com.locationjoystick.core.common.util.launchCaptureMapsLinks
+import com.locationjoystick.core.common.util.launchCaptureRestoreDefaultApps
+import com.locationjoystick.core.common.util.launchCaptureThisAppLinks
+import com.locationjoystick.core.common.util.resolvePreferredBrowserPackage
 import com.locationjoystick.core.designsystem.LjTheme
 import com.locationjoystick.core.designsystem.component.CaptureCoordinatesForm
 import com.locationjoystick.core.designsystem.component.CaptureModeState
 import com.locationjoystick.core.designsystem.component.CapturePointsState
 import com.locationjoystick.core.designsystem.component.CaptureRouteSaveState
+import com.locationjoystick.core.designsystem.component.CaptureSetupState
 import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.model.LatLng
@@ -35,13 +42,19 @@ fun CaptureCoordinatesRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val spoofToggle = rememberSpoofToggleState()
+    val previousBrowserPackage by viewModel.previousBrowserPackage.collectAsStateWithLifecycle()
     var isDefaultBrowser by remember { mutableStateOf(context.isCaptureDefaultBrowser()) }
+    var browserChoices by remember(context) { mutableStateOf(captureBrowserChoices(context)) }
+    val preferredBrowserPackage = resolvePreferredBrowserPackage(previousBrowserPackage, context.packageName)
+    val selectedBrowser =
+        browserChoices.firstOrNull { it.packageName == preferredBrowserPackage } ?: browserChoices.firstOrNull()
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer =
             LifecycleEventObserver { _, event ->
                 if (event == Lifecycle.Event.ON_RESUME) {
                     isDefaultBrowser = context.isCaptureDefaultBrowser()
+                    browserChoices = captureBrowserChoices(context)
                 }
             }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -51,6 +64,18 @@ fun CaptureCoordinatesRoute(
     CaptureCoordinatesScreen(
         uiState = uiState,
         isDefaultBrowser = isDefaultBrowser,
+        captureSetup =
+            CaptureSetupState(
+                isDefaultBrowser = isDefaultBrowser,
+                passThroughBrowserName = selectedBrowser?.label ?: stringResource(R.string.capture_browser_automatic),
+                browserChoices = browserChoices,
+                selectedBrowserPackage = selectedBrowser?.packageName,
+                onSelectBrowser = viewModel::rememberPreviousBrowser,
+                onRequestDefaultBrowser = { context.launchCaptureDefaultBrowser(viewModel::rememberPreviousBrowser) },
+                onOpenMapsLinks = { context.launchCaptureMapsLinks() },
+                onOpenThisAppLinks = { context.launchCaptureThisAppLinks() },
+                onRestoreDefaultApps = { context.launchCaptureRestoreDefaultApps() },
+            ),
         isSpoofing = spoofToggle.isSpoofing,
         onToggleSpoofing = spoofToggle.onToggle,
         locationLabel = spoofToggle.locationLabel,
@@ -70,6 +95,7 @@ fun CaptureCoordinatesRoute(
 internal fun CaptureCoordinatesScreen(
     uiState: CaptureCoordinatesUiState,
     isDefaultBrowser: Boolean,
+    captureSetup: CaptureSetupState,
     isSpoofing: Boolean,
     onToggleSpoofing: () -> Unit,
     locationLabel: String?,
@@ -101,6 +127,7 @@ internal fun CaptureCoordinatesScreen(
                     onJumpEnabledChange = onJumpEnabledChange,
                     isDefaultBrowser = isDefaultBrowser,
                 ),
+            captureSetup = captureSetup,
             capturePoints =
                 CapturePointsState(
                     points = uiState.points,
@@ -141,6 +168,18 @@ private fun CaptureCoordinatesScreenPreview() {
                     routeName = "Mushrooms",
                 ),
             isDefaultBrowser = true,
+            captureSetup =
+                CaptureSetupState(
+                    isDefaultBrowser = true,
+                    passThroughBrowserName = "Chrome",
+                    browserChoices = emptyList(),
+                    selectedBrowserPackage = null,
+                    onSelectBrowser = {},
+                    onRequestDefaultBrowser = {},
+                    onOpenMapsLinks = {},
+                    onOpenThisAppLinks = {},
+                    onRestoreDefaultApps = {},
+                ),
             isSpoofing = false,
             onToggleSpoofing = {},
             locationLabel = null,

@@ -11,8 +11,10 @@ import com.locationjoystick.core.model.RouteType
 import com.locationjoystick.core.model.Waypoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -68,6 +70,16 @@ class CaptureCoordinatesViewModel
                     _uiState.update { it.copy(jumpEnabled = enabled) }
                 }
             }
+        }
+
+        val previousBrowserPackage: StateFlow<String?> =
+            captureRepository.previousBrowserPackage
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+        fun rememberPreviousBrowser(packageName: String?) {
+            val trimmed = packageName?.trim().orEmpty()
+            if (trimmed.isEmpty()) return
+            viewModelScope.launch { captureRepository.setPreviousBrowserPackage(trimmed) }
         }
 
         fun setCaptureModeEnabled(enabled: Boolean) {

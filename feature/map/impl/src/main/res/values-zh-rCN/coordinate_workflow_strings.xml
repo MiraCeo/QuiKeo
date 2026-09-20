@@ -3,4 +3,5 @@
     <string name="capture_coordinates_screen_capture">"采集"</string>
     <string name="map_fab_column_paste_coordinates">"粘贴坐标"</string>
     <string name="capture_invalid_route">需要名称和至少 2 个点。</string>
+    <string name="capture_browser_automatic">自动</string>
 </resources>

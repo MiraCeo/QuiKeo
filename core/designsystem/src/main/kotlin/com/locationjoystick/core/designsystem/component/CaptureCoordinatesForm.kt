@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -50,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.locationjoystick.core.common.util.CaptureBrowserChoice
 import com.locationjoystick.core.common.util.formatCapturedPoint
 import com.locationjoystick.core.common.util.formatCapturedPointsForClipboard
 import com.locationjoystick.core.designsystem.LjAccent
@@ -92,9 +94,26 @@ data class CaptureRouteSaveState(
     val onSaveRoute: () -> Unit,
 )
 
+/**
+ * Capture-mode setup guidance (default-browser role, the two supported-links steps, and the
+ * restore reminder) plus the passthrough-browser picker — see docs/features/capture-coordinates.md.
+ */
+data class CaptureSetupState(
+    val isDefaultBrowser: Boolean,
+    val passThroughBrowserName: String,
+    val browserChoices: List<CaptureBrowserChoice>,
+    val selectedBrowserPackage: String?,
+    val onSelectBrowser: (String) -> Unit,
+    val onRequestDefaultBrowser: () -> Unit,
+    val onOpenMapsLinks: () -> Unit,
+    val onOpenThisAppLinks: () -> Unit,
+    val onRestoreDefaultApps: () -> Unit,
+)
+
 @Composable
 fun CaptureCoordinatesForm(
     captureMode: CaptureModeState,
+    captureSetup: CaptureSetupState,
     capturePoints: CapturePointsState,
     routeSave: CaptureRouteSaveState,
     onDismiss: () -> Unit = {},
@@ -175,6 +194,7 @@ fun CaptureCoordinatesForm(
             onCaptureEnabledChange = captureMode.onCaptureEnabledChange,
             onJumpEnabledChange = captureMode.onJumpEnabledChange,
         )
+        CaptureSetupSection(state = captureSetup, modifier = Modifier.padding(top = LjSpacing.sm))
         if (!captureMode.captureModeEnabled || !captureMode.captureEnabled && !captureMode.jumpEnabled) {
             CaptureOffBanner(
                 text =
@@ -306,7 +326,7 @@ private fun CaptureToggleStep(
     onJumpEnabledChange: (Boolean) -> Unit,
 ) {
     CaptureStepRow(
-        marker = captureToggleMarker(captureModeEnabled),
+        done = captureModeEnabled,
         number = "1",
         verticalAlignment = Alignment.Top,
     ) {
@@ -342,6 +362,98 @@ private fun CaptureToggleStep(
 }
 
 @Composable
+private fun CaptureSetupSection(
+    state: CaptureSetupState,
+    modifier: Modifier = Modifier,
+) {
+    var showBrowserPicker by remember { mutableStateOf(false) }
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        LjGuidedStepCard(
+            title = stringResource(R.string.capture_setup_step_browser_title),
+            description =
+                if (state.isDefaultBrowser) {
+                    stringResource(R.string.capture_setup_step_browser_desc_done)
+                } else {
+                    stringResource(R.string.capture_setup_step_browser_desc_needed)
+                },
+            isGranted = state.isDefaultBrowser,
+            icon = LjIcons.OpenInNew,
+            actionLabel = stringResource(R.string.capture_setup_step_browser_action),
+            onAction = state.onRequestDefaultBrowser,
+        )
+        LjGuidedStepCard(
+            title = stringResource(R.string.capture_setup_step_maps_links_title),
+            description = stringResource(R.string.capture_setup_step_maps_links_desc),
+            isGranted = false,
+            icon = LjIcons.Map,
+            actionLabel = stringResource(R.string.capture_setup_step_maps_links_action),
+            modifier = Modifier.padding(top = 12.dp),
+            onAction = state.onOpenMapsLinks,
+        )
+        LjGuidedStepCard(
+            title = stringResource(R.string.capture_setup_step_this_app_links_title),
+            description = stringResource(R.string.capture_setup_step_this_app_links_desc),
+            isGranted = false,
+            icon = LjIcons.LocationOn,
+            actionLabel = stringResource(R.string.capture_setup_step_this_app_links_action),
+            modifier = Modifier.padding(top = 12.dp),
+            onAction = state.onOpenThisAppLinks,
+        )
+        LjGuidedStepCard(
+            title = stringResource(R.string.capture_setup_step_restore_title),
+            description = stringResource(R.string.capture_setup_step_restore_desc),
+            isGranted = false,
+            icon = LjIcons.Undo,
+            actionLabel = stringResource(R.string.capture_setup_step_restore_action),
+            modifier = Modifier.padding(top = 12.dp),
+            onAction = state.onRestoreDefaultApps,
+        )
+        TextButton(
+            onClick = { showBrowserPicker = state.browserChoices.isNotEmpty() },
+            modifier = Modifier.align(Alignment.End).padding(top = 4.dp),
+        ) {
+            Text(stringResource(R.string.capture_passthrough_label, state.passThroughBrowserName))
+        }
+    }
+
+    if (showBrowserPicker) {
+        AlertDialog(
+            onDismissRequest = { showBrowserPicker = false },
+            title = { Text(stringResource(R.string.capture_setup_form_pass_through_browser)) },
+            text = {
+                Column {
+                    state.browserChoices.forEach { choice ->
+                        Row(
+                            modifier =
+                                Modifier.clickable {
+                                    state.onSelectBrowser(choice.packageName)
+                                    showBrowserPicker = false
+                                },
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            RadioButton(
+                                selected = choice.packageName == state.selectedBrowserPackage,
+                                onClick = {
+                                    state.onSelectBrowser(choice.packageName)
+                                    showBrowserPicker = false
+                                },
+                            )
+                            Text(choice.label)
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showBrowserPicker = false }) {
+                    Text(stringResource(R.string.capture_setup_form_cancel))
+                }
+            },
+        )
+    }
+}
+
+@Composable
 private fun CaptureFunctionToggle(
     label: String,
     description: String,
@@ -363,7 +475,7 @@ private fun CaptureFunctionToggle(
 
 @Composable
 internal fun CaptureStepRow(
-    marker: CaptureStepMarker,
+    done: Boolean,
     number: String,
     modifier: Modifier = Modifier,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
@@ -380,7 +492,7 @@ internal fun CaptureStepRow(
         horizontalArrangement = Arrangement.spacedBy(LjSpacing.sm),
     ) {
         Box(modifier = Modifier.padding(top = if (verticalAlignment == Alignment.Top) 2.dp else 0.dp)) {
-            CaptureStepMarkerBadge(marker = marker, number = number)
+            CaptureStepMarkerBadge(done = done, number = number)
         }
         Box(modifier = Modifier.weight(1f)) {
             content()
@@ -391,53 +503,29 @@ internal fun CaptureStepRow(
 
 @Composable
 private fun CaptureStepMarkerBadge(
-    marker: CaptureStepMarker,
+    done: Boolean,
     number: String,
 ) {
-    val borderColor: Color
-    val contentColor: Color
-    val background: Color
-    when (marker) {
-        CaptureStepMarker.NEEDED -> {
-            borderColor = LjWarning
-            contentColor = LjWarning
-            background = LjWarning.copy(alpha = 0.2f)
-        }
-        CaptureStepMarker.DONE, CaptureStepMarker.RESTORE -> {
-            borderColor = LjSuccess
-            contentColor = LjSuccess
-            background = LjSuccess.copy(alpha = 0.2f)
-        }
-        CaptureStepMarker.ACTION -> {
-            borderColor = LjAccent
-            contentColor = LjAccent
-            background = Color.Transparent
-        }
-        CaptureStepMarker.IDLE -> {
-            borderColor = MaterialTheme.colorScheme.outlineVariant
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-            background = Color.Transparent
-        }
-    }
+    val color = if (done) LjSuccess else LjWarning
     Box(
         modifier =
             Modifier
                 .size(20.dp)
-                .border(1.5.dp, borderColor, CircleShape)
-                .background(background, CircleShape),
+                .border(1.5.dp, color, CircleShape)
+                .background(color.copy(alpha = 0.2f), CircleShape),
         contentAlignment = Alignment.Center,
     ) {
-        if (marker == CaptureStepMarker.DONE) {
+        if (done) {
             Icon(
                 imageVector = LjIcons.Check,
                 contentDescription = null,
-                tint = contentColor,
+                tint = color,
                 modifier = Modifier.size(12.dp),
             )
         } else {
             Text(
                 text = number,
-                color = contentColor,
+                color = color,
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 fontSize = 11.sp,
@@ -587,6 +675,18 @@ private fun CaptureCoordinatesFormPreview() {
                     onJumpEnabledChange = {},
                     isDefaultBrowser = true,
                 ),
+            captureSetup =
+                CaptureSetupState(
+                    isDefaultBrowser = true,
+                    passThroughBrowserName = "Chrome",
+                    browserChoices = emptyList(),
+                    selectedBrowserPackage = null,
+                    onSelectBrowser = {},
+                    onRequestDefaultBrowser = {},
+                    onOpenMapsLinks = {},
+                    onOpenThisAppLinks = {},
+                    onRestoreDefaultApps = {},
+                ),
             capturePoints =
                 CapturePointsState(
                     points = listOf(LatLng(36.977695, 128.363905), LatLng(36.982194, 128.370129)),
@@ -622,6 +722,18 @@ private fun CaptureCoordinatesFormSetupPreview() {
                     onJumpEnabledChange = {},
                     isDefaultBrowser = false,
                 ),
+            captureSetup =
+                CaptureSetupState(
+                    isDefaultBrowser = false,
+                    passThroughBrowserName = "Chrome",
+                    browserChoices = emptyList(),
+                    selectedBrowserPackage = null,
+                    onSelectBrowser = {},
+                    onRequestDefaultBrowser = {},
+                    onOpenMapsLinks = {},
+                    onOpenThisAppLinks = {},
+                    onRestoreDefaultApps = {},
+                ),
             capturePoints =
                 CapturePointsState(
                     points = emptyList(),
@@ -638,6 +750,27 @@ private fun CaptureCoordinatesFormSetupPreview() {
                     onSaveRoute = {},
                 ),
             onDismiss = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun CaptureSetupSectionPreview() {
+    LjTheme {
+        CaptureSetupSection(
+            state =
+                CaptureSetupState(
+                    isDefaultBrowser = false,
+                    passThroughBrowserName = "Chrome",
+                    browserChoices = emptyList(),
+                    selectedBrowserPackage = null,
+                    onSelectBrowser = {},
+                    onRequestDefaultBrowser = {},
+                    onOpenMapsLinks = {},
+                    onOpenThisAppLinks = {},
+                    onRestoreDefaultApps = {},
+                ),
         )
     }
 }
