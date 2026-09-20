@@ -113,6 +113,18 @@ class FollowerSyncClientTest {
     }
 
     @Test
+    fun `stale inactive update is still delivered so a late follower still pauses`() {
+        server.push(freshUpdate().copy(timestamp = System.currentTimeMillis() - 60_000L, active = false))
+        val results = LinkedBlockingQueue<Boolean>()
+
+        client.startPolling("127.0.0.1", serverPort, "test-group") { update -> results.offer(update.active) }
+
+        val result = results.poll(3, TimeUnit.SECONDS)
+        assertNotNull("Stale inactive update should still be delivered", result)
+        assertFalse(result!!)
+    }
+
+    @Test
     fun `wrong token returns no position`() {
         server.push(freshUpdate(lat = 5.0, lon = 6.0))
         val results = LinkedBlockingQueue<Pair<Double, Double>>()

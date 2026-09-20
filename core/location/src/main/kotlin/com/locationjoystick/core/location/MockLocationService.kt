@@ -193,6 +193,9 @@ class MockLocationService : Service() {
 
     @Volatile private var leaderSharingEnabled: Boolean = false
 
+    /** Role, not the Sharing toggle: the toggle must not decide whether Stop keeps the sync server alive. */
+    @Volatile internal var isGroupLeader: Boolean = false
+
     // Per-tick realism state
 
     /** Bearing from the last tick where speedMs > 0; held when the device is stationary. */
@@ -480,6 +483,12 @@ class MockLocationService : Service() {
                 val lat = intent.getDoubleExtra(ServiceConstants.EXTRA_LAT, AppConstants.MapConstants.DEFAULT_LAT)
                 val lon = intent.getDoubleExtra(ServiceConstants.EXTRA_LON, AppConstants.MapConstants.DEFAULT_LON)
                 startSpoofing(lat, lon)
+                // Safety net: a leader whose service was destroyed (OS kill) must serve followers again.
+                serviceScope.launch {
+                    val gs = groupRepository.groupState.first()
+                    val id = gs.groupId
+                    if (gs.role == GroupRole.LEADER && id != null && !leaderSyncServer.isRunning) enterLeaderMode(id)
+                }
             }
 
             ACTION_ENTER_FOLLOWER -> {
@@ -550,9 +559,12 @@ class MockLocationService : Service() {
             }
 
             ACTION_STOP -> {
+                val stopService = shouldStopServiceOnStop()
                 stopSpoofing()
-                stopSelf()
-                return START_NOT_STICKY
+                if (stopService) {
+                    stopSelf()
+                    return START_NOT_STICKY
+                }
             }
 
             ACTION_PARK_KEEP_WIDGET -> {
@@ -829,7 +841,27 @@ class MockLocationService : Service() {
         stopOverlayServices(
             computeOverlayStopAction(OverlayStopTrigger.FULL_STOP, keepWidgetOverlay = false),
         )
-        tearDownSpoofing(stopService = true)
+        tearDownSpoofing(stopService = shouldStopServiceOnStop())
+    }
+
+    /** A group leader's Stop keeps the service (and its sync server) alive so followers can pause and resume. */
+    internal fun shouldStopServiceOnStop(): Boolean = !isGroupLeader
+
+    /** Tells followers the leader went inactive — the loop that normally reports it is cancelled by teardown. */
+    internal fun pushInactiveToFollowersIfLeader() {
+        if (shouldStopServiceOnStop() || !leaderSyncServer.isRunning) return
+        val pos = positionRef.get()
+        leaderSyncServer.push(
+            SyncPositionUpdate(
+                timestamp = System.currentTimeMillis(),
+                latitude = pos.latitude,
+                longitude = pos.longitude,
+                speedMs = 0f,
+                bearing = currentBearing,
+                seq = 0,
+                active = false,
+            ),
+        )
     }
 
     /**
@@ -858,6 +890,7 @@ class MockLocationService : Service() {
     }
 
     private fun tearDownSpoofing(stopService: Boolean) {
+        pushInactiveToFollowersIfLeader()
         // Cancel immediately (idempotent); null assignment deferred under mutex so the
         // RUNNING observer can't start a new loop between our cancel and the null write.
         updateJob?.cancel()
@@ -936,8 +969,12 @@ class MockLocationService : Service() {
                 },
             ) { update ->
                 val (lat, lon, _, bearing, active) = update
-                followerCatchUp.setTarget(LatLng(lat, lon), bearing)
-                groupRepository.setLeaderPosition(LatLng(lat, lon))
+                // An inactive leader's position is stale: keep no target so Teleport to leader
+                // reports "position not yet known" instead of silently moving nowhere.
+                if (active) {
+                    followerCatchUp.setTarget(LatLng(lat, lon), bearing)
+                    groupRepository.setLeaderPosition(LatLng(lat, lon))
+                }
                 when (followerCatchUp.handleLeaderActiveUpdate(active, _state.value)) {
                     FollowerActiveAction.BOOTSTRAP -> {
                         serviceScope.launch {
@@ -949,6 +986,8 @@ class MockLocationService : Service() {
                     }
 
                     FollowerActiveAction.PAUSE -> {
+                        followerCatchUp.clearTarget()
+                        groupRepository.setLeaderPosition(null)
                         serviceScope.launch { pauseFollowerForInactiveLeader() }
                     }
 
@@ -1068,7 +1107,8 @@ class MockLocationService : Service() {
     private fun observeGroupState() {
         serviceScope.launch {
             groupRepository.groupState.collect { state ->
-                leaderSharingEnabled = state.role == GroupRole.LEADER && state.sharingEnabled
+                isGroupLeader = state.role == GroupRole.LEADER
+                leaderSharingEnabled = isGroupLeader && state.sharingEnabled
             }
         }
     }

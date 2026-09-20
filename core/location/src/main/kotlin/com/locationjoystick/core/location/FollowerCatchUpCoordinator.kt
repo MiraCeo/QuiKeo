@@ -39,6 +39,11 @@ internal class FollowerCatchUpCoordinator {
         this.leaderBearing = leaderBearing
     }
 
+    /** Drops only the target (leader went inactive) — leaves the bootstrap gate and speed/bearing alone. */
+    fun clearTarget() {
+        target.set(null)
+    }
+
     fun clear() {
         target.set(null)
         speedMs = 0f

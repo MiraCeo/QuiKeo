@@ -93,7 +93,8 @@ class FollowerSyncClient
                                         val nowMs = System.currentTimeMillis()
                                         val stale =
                                             nowMs - update.timestamp > AppConstants.SyncConstants.POSITION_STALE_THRESHOLD_MS
-                                        if (!stale && update.seq > lastSeq) {
+                                        // An inactive leader's last record keeps its old timestamp forever — never drop the pause as stale.
+                                        if ((!stale || !update.active) && update.seq > lastSeq) {
                                             lastSeq = update.seq
                                             onPosition(
                                                 FollowerPositionUpdate(
