@@ -65,7 +65,7 @@ class GroupRepositoryTest {
                 assertEquals("xyz", state.groupId)
                 assertEquals("10.0.0.5", state.leaderHost)
                 assertEquals(4001, state.leaderPort)
-                assertFalse(state.followerModeEnabled)
+                assertTrue(state.followerModeEnabled)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -110,13 +110,13 @@ class GroupRepositoryTest {
         }
 
     @Test
-    fun `setFollowerModeEnabled updates followerModeEnabled`() =
+    fun `setFollowerModeEnabled false turns off following`() =
         runTest {
             repository.joinGroup(GroupInvite("h", 1, "id"))
-            repository.setFollowerModeEnabled(true)
+            repository.setFollowerModeEnabled(false)
             repository.groupState.test {
                 val state = awaitItem()
-                assertTrue(state.followerModeEnabled)
+                assertFalse(state.followerModeEnabled)
                 cancelAndIgnoreRemainingEvents()
             }
         }

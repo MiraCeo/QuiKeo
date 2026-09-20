@@ -78,7 +78,7 @@ class GroupRepository
                 prefs[Keys.GROUP_ID] = invite.groupId
                 prefs[Keys.GROUP_LEADER_HOST] = invite.host
                 prefs[Keys.GROUP_LEADER_PORT] = invite.port
-                prefs[Keys.GROUP_FOLLOWER_MODE_ENABLED] = false
+                prefs[Keys.GROUP_FOLLOWER_MODE_ENABLED] = true
                 prefs[Keys.GROUP_SHARING_ENABLED] = false
             }
         }

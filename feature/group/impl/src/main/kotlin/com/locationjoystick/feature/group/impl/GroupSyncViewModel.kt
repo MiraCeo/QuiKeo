@@ -113,6 +113,11 @@ class GroupSyncViewModel
                 var followerExistenceChecked = false
                 groupRepository.groupState.collect { state ->
                     _groupState.value = state
+                    if (state.role != GroupRole.FOLLOWER) {
+                        // Leaving the group must re-arm the one-shot follower checks below so a rejoin starts following.
+                        followerRestoreSent = false
+                        followerExistenceChecked = false
+                    }
                     val host = state.leaderHost
                     val port = state.leaderPort
                     val id = state.groupId
