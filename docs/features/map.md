@@ -93,3 +93,17 @@ map screen only, not the floating map.
 
 - Forward all lifecycle events to `MapView`.
 - Never call MapLibre APIs before `onMapReady`.
+- Use `MapLibreLifecycleBridge` (`:core:map`) rather than a hand-written
+  `DisposableEffect`. It observes the host lifecycle and keeps `onStart`/`onStop`
+  balanced via an internal started flag, so an `ON_START` replayed at attach time
+  is absorbed instead of double-starting the view.
+- `ON_START`/`ON_STOP` must be forwarded on *every* foreground/background
+  transition, not only the first and last. In MapLibre 13.x `onPause()`/`onResume()`
+  are no-op stubs for the renderer: `onStop()` is what pauses the render thread and
+  deactivates `FileSource`/`ConnectivityReceiver`. Skipping it leaves the map
+  rendering and holding GPU memory while the app sits in the background.
+- `callCreateOnAttach = true` when the `MapView` is built inside `remember {}` and
+  needs `onCreate(null)` + `onStart()` at attach time (main map screen, floating
+  map). Pass `false` when the view must only be driven by later lifecycle events
+  (favourites picker, route creator). The flag controls attach-time behaviour
+  only - `ON_START`/`ON_STOP` forwarding is unconditional either way.
