@@ -139,11 +139,6 @@ fun MapRoute(
             snackbarHostState.showSnackbar(msg)
         }
     }
-    LaunchedEffect(Unit) {
-        viewModel.cameraMessages.collect { msg ->
-            snackbarHostState.showSnackbar(msg)
-        }
-    }
     MapScreen(
         uiState = uiState,
         recentSearches = recentSearches,
