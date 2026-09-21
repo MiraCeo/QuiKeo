@@ -100,6 +100,7 @@ class MapController
         val routingErrors: SharedFlow<String> = routingErrorReporter.errors
 
         private var pendingRoadWalkJob: Job? = null
+        private var restoreJob: Job? = null
 
         init {
             observeLocationState()
@@ -307,19 +308,26 @@ class MapController
         /**
          * Resolves the initial map position on startup:
          * 1. Uses the remembered last location if enabled.
-         * 2. Falls back to the real device hardware location (excluding mock providers) on first launch.
+         * 2. Falls back to the real device hardware location (excluding mock providers) on first launch,
+         *    only when location permission is granted.
+         *
+         * Single-flight: a call while a previous restore is still running is a no-op. A finished restore
+         * that found nothing (e.g. permission missing) lets the next call retry.
          */
+        @Synchronized
         fun restoreLastLocationIfNeeded() {
-            appScope.launch {
-                if (locationRepository.currentPosition.value == null) {
-                    val remember = settingsRepository.getRememberLastLocation().first()
-                    val savedLocation = if (remember) settingsRepository.getLastLocation().first() else null
-                    val initialPos = savedLocation ?: getDeviceLocation()
-                    if (initialPos != null) {
-                        locationRepository.setPositionInternal(initialPos)
+            if (restoreJob?.isActive == true) return
+            restoreJob =
+                appScope.launch {
+                    if (locationRepository.currentPosition.value == null) {
+                        val remember = settingsRepository.getRememberLastLocation().first()
+                        val savedLocation = if (remember) settingsRepository.getLastLocation().first() else null
+                        val initialPos = savedLocation ?: getDeviceLocation()
+                        if (initialPos != null) {
+                            locationRepository.setPositionInternal(initialPos)
+                        }
                     }
                 }
-            }
         }
 
         /** Queries the latest non-mock last-known location across GPS and Network providers. */

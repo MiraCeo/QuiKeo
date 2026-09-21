@@ -470,6 +470,22 @@ class MapControllerTest {
             assertEquals(LatLng(10.0, 20.0), locationRepository.currentPosition.value)
         }
 
+    @Test
+    fun `restoreLastLocation overlapping calls run one lookup and a later call retries`() =
+        runTest {
+            val lm = mockk<LocationManager>()
+            every { lm.getLastKnownLocation(any()) } returns null
+            val controller = buildRestoreController(LocationRepository(), lm, PackageManager.PERMISSION_GRANTED, backgroundScope)
+
+            controller.restoreLastLocationIfNeeded() // overlaps the restore started by init
+            runCurrent()
+            verify(exactly = 1) { lm.getLastKnownLocation(LocationManager.GPS_PROVIDER) }
+
+            controller.restoreLastLocationIfNeeded() // first restore finished with no fix: retry runs
+            runCurrent()
+            verify(exactly = 2) { lm.getLastKnownLocation(LocationManager.GPS_PROVIDER) }
+        }
+
     private fun buildRestoreController(
         locationRepository: LocationRepository,
         lm: LocationManager,
