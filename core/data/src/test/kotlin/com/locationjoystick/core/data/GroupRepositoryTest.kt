@@ -5,6 +5,7 @@ import com.locationjoystick.core.model.GroupInvite
 import com.locationjoystick.core.model.GroupRole
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.testing.FakePreferencesDataStore
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -83,6 +84,19 @@ class GroupRepositoryTest {
                 assertNull(state.leaderPort)
                 cancelAndIgnoreRemainingEvents()
             }
+        }
+
+    @Test
+    fun `followLeaderTeleports defaults true, persists false, and resets after leaving`() =
+        runTest {
+            assertTrue(repository.groupState.first().followLeaderTeleports)
+            repository.joinGroup(GroupInvite("h", 1, "id"))
+            assertTrue(repository.groupState.first().followLeaderTeleports)
+            repository.setFollowLeaderTeleports(false)
+            assertFalse(repository.groupState.first().followLeaderTeleports)
+            repository.leaveGroup()
+            repository.joinGroup(GroupInvite("h", 1, "id"))
+            assertTrue(repository.groupState.first().followLeaderTeleports)
         }
 
     @Test

@@ -59,6 +59,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlin.random.Random
@@ -195,6 +196,14 @@ class MockLocationService : Service() {
 
     /** Role, not the Sharing toggle: the toggle must not decide whether Stop keeps the sync server alive. */
     @Volatile internal var isGroupLeader: Boolean = false
+
+    /** Leader side: bumped on every explicit teleport (see EXTRA_IS_TELEPORT) and pushed to followers. */
+    private val teleportSeq = AtomicLong(0L)
+
+    // Follower-side cache of the toggle and the hide-teleport setting; read from the poll thread.
+    @Volatile private var followLeaderTeleports: Boolean = true
+
+    @Volatile private var hideTeleportFeatures: Boolean = false
 
     // Per-tick realism state
 
@@ -574,7 +583,7 @@ class MockLocationService : Service() {
                 if (speedMs > 0f) {
                     updatePositionWithVector(lat, lon, speedMs, bearing)
                 } else {
-                    updatePosition(lat, lon)
+                    updatePosition(lat, lon, intent.getBooleanExtra(ServiceConstants.EXTRA_IS_TELEPORT, false))
                     if (shouldPushImmediateLocationUpdate(speedMs, locationRepository.currentMode.value)) {
                         pushLocationUpdate()
                     }
@@ -746,8 +755,10 @@ class MockLocationService : Service() {
     fun updatePosition(
         lat: Double,
         lon: Double,
+        isTeleport: Boolean = false,
     ) {
         if (locationRepository.currentMode.value == MockMode.FOLLOWER) return
+        if (isTeleport) teleportSeq.incrementAndGet()
         writeCurrentPosition(lat, lon, syncRepository = true)
         // Teleport (the only caller — see comment below): jump the altitude anchor to the new
         // position's real elevation immediately instead of leaving it to drift from wherever the
@@ -824,6 +835,7 @@ class MockLocationService : Service() {
                 bearing = currentBearing,
                 seq = 0,
                 active = false,
+                teleportSeq = teleportSeq.get(),
             ),
         )
     }
@@ -933,6 +945,7 @@ class MockLocationService : Service() {
                 },
             ) { update ->
                 val (lat, lon, _, bearing, active) = update
+                val leaderTeleported = followerCatchUp.observeTeleportSeq(update.teleportSeq)
                 // An inactive leader's position is stale: keep no target so Teleport to leader
                 // reports "position not yet known" instead of silently moving nowhere.
                 if (active) {
@@ -941,8 +954,14 @@ class MockLocationService : Service() {
                 }
                 when (followerCatchUp.handleLeaderActiveUpdate(active, _state.value)) {
                     FollowerActiveAction.BOOTSTRAP -> {
+                        // Leader stop, move, start again counts as a teleport; the very first bootstrap
+                        // (nothing reported yet) always snaps.
+                        val resumed = followerCatchUp.consumePausedByLeader()
+                        val snapNow = !resumed || shouldSnapToLeader(true, followLeaderTeleports, hideTeleportFeatures)
+                        val startAt = if (snapNow) LatLng(lat, lon) else positionRef.get()
                         serviceScope.launch {
-                            startSpoofing(lat, lon)
+                            startSpoofing(startAt.latitude, startAt.longitude)
+                            if (resumed && snapNow) settingsRepository.setLastTeleportTime(System.currentTimeMillis())
                             // startSpoofing() unconditionally sets mode to TELEPORT — reassert
                             // FOLLOWER so advanceFollowerCatchUp() doesn't no-op on later ticks.
                             locationRepository.setMockMode(MockMode.FOLLOWER)
@@ -956,7 +975,9 @@ class MockLocationService : Service() {
                     }
 
                     FollowerActiveAction.NO_OP -> {
-                        Unit
+                        if (shouldSnapToLeader(leaderTeleported, followLeaderTeleports, hideTeleportFeatures)) {
+                            snapToLeader(LatLng(lat, lon))
+                        }
                     }
                 }
             }
@@ -981,6 +1002,10 @@ class MockLocationService : Service() {
                 groupRepository.emitTeleportUnavailable()
                 return
             }
+        snapToLeader(target)
+    }
+
+    private fun snapToLeader(target: LatLng) {
         writeCurrentPosition(target.latitude, target.longitude, syncRepository = true)
         followerCatchUp.markArrived()
         // Shares the same cooldown clock as every other teleport (Favorites, map long-press) —
@@ -1073,8 +1098,10 @@ class MockLocationService : Service() {
             groupRepository.groupState.collect { state ->
                 isGroupLeader = state.role == GroupRole.LEADER
                 leaderSharingEnabled = isGroupLeader && state.sharingEnabled
+                followLeaderTeleports = state.followLeaderTeleports
             }
         }
+        serviceScope.launch { settingsRepository.getHideTeleportFeatures().collect { hideTeleportFeatures = it } }
     }
 
     private fun handleReplayStart(
@@ -1373,6 +1400,7 @@ class MockLocationService : Service() {
                         bearing = fix.bearing,
                         seq = 0,
                         active = _state.value != MockLocationState.IDLE && _state.value != MockLocationState.ERROR,
+                        teleportSeq = teleportSeq.get(),
                     ),
                 )
             }

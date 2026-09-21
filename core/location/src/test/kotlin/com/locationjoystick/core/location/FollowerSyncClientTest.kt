@@ -77,6 +77,16 @@ class FollowerSyncClientTest {
     }
 
     @Test
+    fun `poll delivers teleportSeq to callback`() {
+        server.push(freshUpdate(lat = 1.0, lon = 2.0).copy(teleportSeq = 3L))
+        val results = LinkedBlockingQueue<Long>()
+
+        client.startPolling("127.0.0.1", serverPort, "test-group") { update -> results.offer(update.teleportSeq) }
+
+        assertEquals(3L, results.poll(3, TimeUnit.SECONDS))
+    }
+
+    @Test
     fun `inactive leader update delivers active false to callback`() {
         server.push(freshUpdate(lat = 1.0, lon = 2.0).copy(active = false))
         val results = LinkedBlockingQueue<Boolean>()

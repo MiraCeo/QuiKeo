@@ -29,8 +29,8 @@ All in `:core:model`. Pure Kotlin — no Android, no Room. Room entities in `:co
 | `ThemeMode` | enum: `DARK`, `LIGHT` |
 | `AppLanguage` | enum (each carries `languageTag: String?`): `SYSTEM_DEFAULT`, `ENGLISH`, `CHINESE_SIMPLIFIED` |
 | `GroupRole` | enum: `NONE`, `LEADER`, `FOLLOWER` |
-| `GroupState` | `role: GroupRole`, `groupId: String?`, `leaderHost: String?`, `leaderPort: Int?`, `followerModeEnabled: Boolean`, `sharingEnabled: Boolean` |
-| `SyncPositionUpdate` | `timestamp: Long`, `latitude: Double`, `longitude: Double`, `speedMs: Float`, `bearing: Float`, `seq: Long`, `active: Boolean` |
+| `GroupState` | `role: GroupRole`, `groupId: String?`, `leaderHost: String?`, `leaderPort: Int?`, `followerModeEnabled: Boolean`, `sharingEnabled: Boolean`, `followLeaderTeleports: Boolean` (default `true`) |
+| `SyncPositionUpdate` | `timestamp: Long`, `latitude: Double`, `longitude: Double`, `speedMs: Float`, `bearing: Float`, `seq: Long`, `active: Boolean`, `teleportSeq: Long` (default `0`) |
 | `GroupInvite` | `host: String`, `port: Int`, `groupId: String` |
 
 ## Mapping

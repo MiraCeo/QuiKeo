@@ -238,6 +238,11 @@ class GroupSyncViewModel
             }
         }
 
+        fun setFollowLeaderTeleports(enabled: Boolean) {
+            if (_groupState.value.role != GroupRole.FOLLOWER) return
+            viewModelScope.launch { groupRepository.setFollowLeaderTeleports(enabled) }
+        }
+
         fun setFollowerModeEnabled(enabled: Boolean) {
             val state = _groupState.value
             if (state.role != GroupRole.FOLLOWER) return

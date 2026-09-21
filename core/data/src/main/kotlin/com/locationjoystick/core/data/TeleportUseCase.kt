@@ -68,6 +68,7 @@ class TeleportUseCase
                         action = AppConstants.ServiceConstants.ACTION_UPDATE_POSITION
                         putExtra(AppConstants.ServiceConstants.EXTRA_LAT, position.latitude)
                         putExtra(AppConstants.ServiceConstants.EXTRA_LON, position.longitude)
+                        putExtra(AppConstants.ServiceConstants.EXTRA_IS_TELEPORT, true)
                     }
                 startMockLocationService(intent)
                 settingsRepository.setLastLocation(position)

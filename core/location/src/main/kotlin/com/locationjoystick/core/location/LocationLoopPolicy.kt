@@ -148,6 +148,13 @@ internal fun computeFollowerActiveAction(
         else -> FollowerActiveAction.NO_OP
     }
 
+/** A follower snaps (instead of walking) to a leader teleport only when it follows teleports and teleporting is not hidden. */
+internal fun shouldSnapToLeader(
+    leaderTeleported: Boolean,
+    followTeleports: Boolean,
+    hideTeleportFeatures: Boolean,
+): Boolean = leaderTeleported && followTeleports && !hideTeleportFeatures
+
 /** Decision for the "Hide floating widget" live-toggle collector in [MockLocationService.observeLocationState]. */
 internal enum class WidgetOverlayAction {
     /** Start (or leave running) the widget overlay service. */

@@ -96,6 +96,10 @@
           <td>On by default when you join a group. When on, the device walks toward the leader's location as it updates. Turn it off to pause following while staying in the group.</td>
         </tr>
         <tr>
+          <td><strong>Follow leader teleports</strong> toggle</td>
+          <td>On by default. When the leader teleports, or stops, moves and starts again somewhere new, your device jumps there too. Turn it off to walk there instead. Hidden when teleport features are hidden in Settings, and your device then always walks.</td>
+        </tr>
+        <tr>
           <td><strong>Teleport to leader now</strong></td>
           <td>Jumps straight to the leader's last known position right away, instead of walking there. Shown while Follow leader is on. This button is also available in the floating widget's panel whenever Follow leader is on, so you don't need to open the app to use it.</td>
         </tr>
@@ -132,7 +136,7 @@
       <li>If the leader's network address changes, for example after its own app restarts, followers try to reconnect automatically for a short while before giving up; if that fails, rejoin by scanning a new QR code or re-entering the join code.</li>
       <li>Some phone hotspots don't allow the join code to find the leader (a Wi-Fi limitation on the hotspot's end) — scanning the QR code works around it, since it doesn't need that discovery step.</li>
       <li>A leader can only run one active group at a time.</li>
-      <li>A follower joining far from the leader walks there at its own speed instead of jumping instantly. Use <strong>Teleport to leader now</strong> for an immediate jump.</li>
+      <li>A follower joining far from the leader walks there at its own speed instead of jumping instantly, though later leader teleports carry followers along unless <strong>Follow leader teleports</strong> is off. Use <strong>Teleport to leader now</strong> for an immediate jump.</li>
     </ul>
   </main>
 
