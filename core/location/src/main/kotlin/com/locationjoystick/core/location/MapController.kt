@@ -294,16 +294,36 @@ class MapController
             }
         }
 
-        private fun restoreLastLocationIfNeeded() {
+        /**
+         * Resolves the initial map position on startup:
+         * 1. Uses the remembered last location if enabled.
+         * 2. Falls back to the real device hardware location (excluding mock providers) on first launch.
+         */
+        fun restoreLastLocationIfNeeded() {
             appScope.launch {
                 if (locationRepository.currentPosition.value == null) {
                     val remember = settingsRepository.getRememberLastLocation().first()
-                    if (remember) {
-                        val last = settingsRepository.getLastLocation().first()
-                        if (last != null) locationRepository.setPositionInternal(last)
+                    val savedLocation = if (remember) settingsRepository.getLastLocation().first() else null
+                    val initialPos = savedLocation ?: getDeviceLocation()
+                    if (initialPos != null) {
+                        locationRepository.setPositionInternal(initialPos)
                     }
                 }
             }
+        }
+
+        /** Queries the latest non-mock last-known location across GPS and Network providers. */
+        @Suppress("DEPRECATION")
+        private fun getDeviceLocation(): LatLng? {
+            val lm = context.getSystemService(Context.LOCATION_SERVICE) as? android.location.LocationManager ?: return null
+            return listOf(
+                android.location.LocationManager.GPS_PROVIDER,
+                android.location.LocationManager.NETWORK_PROVIDER,
+            ).mapNotNull { runCatching { lm.getLastKnownLocation(it) }.getOrNull() }
+                .filter { loc ->
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) !loc.isMock else !loc.isFromMockProvider
+                }.maxByOrNull { it.time }
+                ?.let { LatLng(it.latitude, it.longitude) }
         }
 
         // ── Actions ──────────────────────────────────────────────────────────────
@@ -313,6 +333,7 @@ class MapController
                 val startPos =
                     locationRepository.currentPosition.value
                         ?: settingsRepository.getLastLocation().first()
+                        ?: getDeviceLocation()
                         ?: LatLng(AppConstants.MapConstants.DEFAULT_LAT, AppConstants.MapConstants.DEFAULT_LON)
                 ContextCompat.startForegroundService(
                     context,

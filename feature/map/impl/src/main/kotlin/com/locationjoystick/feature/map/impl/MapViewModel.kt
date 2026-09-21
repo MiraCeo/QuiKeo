@@ -65,6 +65,7 @@ class MapViewModel
         val routingErrors: SharedFlow<String> = mapController.routingErrors
 
         init {
+            mapController.restoreLastLocationIfNeeded()
             observeSharedState()
             observeCooldownForPendingTap()
             observeDeepLinkCoords()
