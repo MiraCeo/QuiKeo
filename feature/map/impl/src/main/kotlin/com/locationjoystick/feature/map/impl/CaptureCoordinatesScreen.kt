@@ -1,5 +1,7 @@
 package com.locationjoystick.feature.map.impl
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -16,12 +18,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.common.util.captureBrowserChoices
 import com.locationjoystick.core.common.util.isCaptureDefaultBrowser
 import com.locationjoystick.core.common.util.launchCaptureDefaultBrowser
 import com.locationjoystick.core.common.util.launchCaptureMapsLinks
 import com.locationjoystick.core.common.util.launchCaptureRestoreDefaultApps
-import com.locationjoystick.core.common.util.launchCaptureThisAppLinks
 import com.locationjoystick.core.common.util.resolvePreferredBrowserPackage
 import com.locationjoystick.core.designsystem.LjTheme
 import com.locationjoystick.core.designsystem.component.CaptureCoordinatesForm
@@ -63,7 +65,6 @@ fun CaptureCoordinatesRoute(
 
     CaptureCoordinatesScreen(
         uiState = uiState,
-        isDefaultBrowser = isDefaultBrowser,
         captureSetup =
             CaptureSetupState(
                 isDefaultBrowser = isDefaultBrowser,
@@ -73,8 +74,10 @@ fun CaptureCoordinatesRoute(
                 onSelectBrowser = viewModel::rememberPreviousBrowser,
                 onRequestDefaultBrowser = { context.launchCaptureDefaultBrowser(viewModel::rememberPreviousBrowser) },
                 onOpenMapsLinks = { context.launchCaptureMapsLinks() },
-                onOpenThisAppLinks = { context.launchCaptureThisAppLinks() },
                 onRestoreDefaultApps = { context.launchCaptureRestoreDefaultApps() },
+                onOpenSetupGuide = {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(AppConstants.AppInfo.CAPTURE_GUIDE_URL)))
+                },
             ),
         isSpoofing = spoofToggle.isSpoofing,
         onToggleSpoofing = spoofToggle.onToggle,
@@ -94,7 +97,6 @@ fun CaptureCoordinatesRoute(
 @Composable
 internal fun CaptureCoordinatesScreen(
     uiState: CaptureCoordinatesUiState,
-    isDefaultBrowser: Boolean,
     captureSetup: CaptureSetupState,
     isSpoofing: Boolean,
     onToggleSpoofing: () -> Unit,
@@ -125,7 +127,6 @@ internal fun CaptureCoordinatesScreen(
                     onCaptureModeEnabledChange = onCaptureModeEnabledChange,
                     onCaptureEnabledChange = onCaptureEnabledChange,
                     onJumpEnabledChange = onJumpEnabledChange,
-                    isDefaultBrowser = isDefaultBrowser,
                 ),
             captureSetup = captureSetup,
             capturePoints =
@@ -167,7 +168,6 @@ private fun CaptureCoordinatesScreenPreview() {
                     points = listOf(LatLng(36.977695, 128.363905), LatLng(36.982194, 128.370129)),
                     routeName = "Mushrooms",
                 ),
-            isDefaultBrowser = true,
             captureSetup =
                 CaptureSetupState(
                     isDefaultBrowser = true,
@@ -177,8 +177,8 @@ private fun CaptureCoordinatesScreenPreview() {
                     onSelectBrowser = {},
                     onRequestDefaultBrowser = {},
                     onOpenMapsLinks = {},
-                    onOpenThisAppLinks = {},
                     onRestoreDefaultApps = {},
+                    onOpenSetupGuide = {},
                 ),
             isSpoofing = false,
             onToggleSpoofing = {},

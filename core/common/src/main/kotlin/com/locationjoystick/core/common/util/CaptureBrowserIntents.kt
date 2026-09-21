@@ -87,10 +87,6 @@ fun Context.launchCaptureDefaultBrowser(onRememberPrevious: (String) -> Unit) {
     startCaptureSetting(captureSetDefaultBrowserIntent())
 }
 
-fun Context.launchCaptureThisAppLinks() {
-    startCaptureSetting(captureAppOpenByDefaultIntent(packageName))
-}
-
 fun Context.launchCaptureMapsLinks() {
     startCaptureSetting(captureAppOpenByDefaultIntent(CaptureBrowserPackages.GOOGLE_MAPS))
 }

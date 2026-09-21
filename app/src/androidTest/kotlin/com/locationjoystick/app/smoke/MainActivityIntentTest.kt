@@ -84,7 +84,7 @@ class MainActivityIntentTest {
         }
         composeRule.waitForIdle()
         composeRule.onNodeWithContentDescription("Open navigation menu").assertIsDisplayed()
-        composeRule.onNodeWithText("Capture mode").assertIsDisplayed()
+        composeRule.onNodeWithText("Default browser").assertIsDisplayed()
     }
 
     @Test

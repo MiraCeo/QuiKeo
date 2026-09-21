@@ -14,18 +14,43 @@ listed on Home and in the navigation drawer next to Map / Routes / Favorites. It
 a map FAB. `shouldSkipIdleRedirect` includes `CAPTURE_ROUTE` so the page stays when the user
 leaves for Android settings or another app.
 
-The Capture screen shows the feature, its one-time OS setup guidance, and its history:
+`CaptureCoordinatesForm` (`:core:designsystem`) renders one of two mutually exclusive views, keyed on
+`CaptureSetupState.isDefaultBrowser` (`isCaptureDefaultBrowser()`, refreshed on `ON_RESUME`). It is the
+only setup fact the app can verify, so it is the only gate. Captured points stay stored while gated
+and reappear after setup; the gate is view-only.
+
+### Setup incomplete (not the default browser)
+
+Only onboarding-style step cards (`LjGuidedStepCard`, shared with @docs/features/onboarding.md's
+permission cards) and a **Setup guide** text button are shown. No Capture mode switch, List/Jump,
+captured list, pass-through row or Save as route.
+
+- **Default browser** — action opens Default apps (`ACTION_MANAGE_DEFAULT_APPS_SETTINGS`) so the
+  user can set **Browser app** to this app. `RoleManager.createRequestRoleIntent(ROLE_BROWSER)` is
+  a no-op on many OEMs (including Samsung) and is not used.
+- **Supported-links hint** — plain text under the default-browser card telling the user to also turn
+  on supported links for this app. The app cannot verify it, so it has no button and never gates.
+- **Turn off Google Maps supported links** — action opens Google Maps' "Open by default" screen.
+  Not checked separately: it completes together with the default-browser step.
+- **Restore your default browser** — advisory reminder to switch the default browser back once
+  done. Android will not assign the previous browser back programmatically; the previous
+  `ROLE_BROWSER` holder is saved in DataStore when the user starts the default-browser step, so this
+  app knows which browser to offer as a pass-through choice even before it's restored.
+- **Setup guide** — opens the wiki Capture page (`AppConstants.AppInfo.CAPTURE_GUIDE_URL`), the same
+  pattern as onboarding's Troubleshooting button.
+
+### Setup complete (this app is the default browser)
+
+The setup cards (including Restore) disappear entirely and the feature UI shows:
 
 - **Capture mode + List / Jump** — one overall DataStore switch followed by two independent
   checkboxes (`CaptureCoordinatesRepository`; not part of `ExportData`). List appends a point; Jump
   teleports immediately through `TeleportUseCase`. Either action, both together, and neither are
   supported. If captured points already exist when the overall mode is enabled, a dialog asks
-  whether to **Clear** (primary/default action) or **Keep** them before enabling.
-- Ready banner when Capture mode and either action are on **and** this app is the default browser
-  (that `isDefaultBrowser` boolean is refreshed on `ON_RESUME`, same as the setup cards
-  below). Its text explains whether links
-  will be listed, jumped to, or both. A concise pass-through banner appears while the overall mode
-  is off or neither action is selected.
+  whether to **Clear** (primary/default action) or **Keep** them before enabling. A concise
+  pass-through banner appears while the overall mode is off or neither action is selected.
+- A **Pass-through** row opens an in-app browser picker, used when a captured link's mode doesn't
+  list or jump it (see the intercept table below).
 - Lists captured points in an orange-outlined read-only box (skip exact duplicate of the last point)
 - Point order defaults to **Optimize proximity** (`orderedCapturedPoints` → `orderByProximity`,
   same nearest-neighbor as paste coordinates). The on-screen list stays in capture order so
@@ -34,27 +59,7 @@ The Capture screen shows the feature, its one-time OS setup guidance, and its hi
   (gap between Copy and the remove actions) and Save as route
 - Save as a straight route via `RouteRepository.insertRoute` when there are ≥2 points
 
-The Capture screen also shows its one-time OS-role setup guidance directly, as onboarding-style
-step cards (`LjGuidedStepCard`, shared with @docs/features/onboarding.md's permission cards —
-icon, title, description, and an action button that hides once the step is verified):
-
-- **Default browser** — action opens Default apps (`ACTION_MANAGE_DEFAULT_APPS_SETTINGS`) so the
-  user can set **Browser app** to this app. `RoleManager.createRequestRoleIntent(ROLE_BROWSER)` is
-  a no-op on many OEMs (including Samsung) and is not used. This is the only one of the four cards
-  that can detect its own state (`isCaptureDefaultBrowser()`) — it shows a checkmark and hides its
-  button once this app is the default browser; the other three below always show their button,
-  since this app cannot detect whether the user has completed them.
-- **Turn off Google Maps supported links** — action opens Google Maps' "Open by default" screen.
-  The same action reopens that screen later if the user wants to turn the setting back on.
-- **Turn on supported links for this app** — action opens this app's own "Open by default" screen.
-- **Restore your default browser** — advisory reminder to switch the default browser back once
-  done, and reverse the two steps above. Android will not assign the previous browser back
-  programmatically; the previous `ROLE_BROWSER` holder is saved in DataStore when the user
-  completes the first card, so this app knows which browser to offer as a pass-through choice
-  (see below) even before it's restored as the system default.
-
-Below the four cards, a **Pass-through** row opens an in-app browser picker, used when a captured
-link's mode doesn't list or jump it (see the intercept table below).
+There is no "Ready" banner or step-number badge.
 
 The floating widget overlay is **not** part of intercept. Link handling depends on the
 overall **Capture mode** switch and List/Jump actions, not overlay visibility.

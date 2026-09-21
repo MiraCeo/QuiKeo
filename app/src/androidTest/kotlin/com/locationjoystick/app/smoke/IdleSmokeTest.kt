@@ -65,7 +65,10 @@ class IdleSmokeTest : BaseSmokeTest() {
     @Test
     fun navigate_to_capture_via_card() {
         composeRule.navigateFromIdle("Capture")
-        composeRule.onNodeWithText("Capture mode").assertIsDisplayed()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithText("Default browser").assertIsDisplayed()
+        composeRule.onNodeWithText("Setup guide").assertExists()
+        composeRule.onNodeWithText("Capture mode").assertDoesNotExist()
     }
 
     @Test
@@ -101,6 +104,7 @@ class IdleSmokeTest : BaseSmokeTest() {
     @Test
     fun navigate_to_capture_via_drawer() {
         composeRule.navigateViaDrawer("Capture")
-        composeRule.onNodeWithText("Capture mode").assertIsDisplayed()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithText("Default browser").assertIsDisplayed()
     }
 }
