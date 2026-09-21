@@ -98,6 +98,7 @@ class MapViewModelTest {
         captureCoordinatesRepository = CaptureCoordinatesRepository(FakePreferencesDataStore())
         realLocationRepository = mockk(relaxed = true)
         coEvery { realLocationRepository.getCurrentPosition() } returns Result.failure(IllegalStateException("No GPS"))
+        every { realLocationRepository.lastKnownRealPosition() } returns null
 
         every { locationRepository.currentPosition } returns MutableStateFlow(null)
         every { locationRepository.mockLocationState } returns MutableStateFlow(MockLocationState.IDLE)
@@ -138,6 +139,7 @@ class MapViewModelTest {
             roamingRepository = roamingRepository,
             walkCoordinator = walkCoordinator,
             teleportUseCase = teleportUseCase,
+            realLocationRepository = realLocationRepository,
             startRouteReplayUseCase = startRouteReplayUseCase,
             ephemeralReplayController = ephemeralReplayController,
             osrmClient = osrmClient,

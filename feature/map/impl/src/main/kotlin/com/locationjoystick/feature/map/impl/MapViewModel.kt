@@ -82,6 +82,7 @@ class MapViewModel
         val cameraMessages: SharedFlow<String> = _cameraMessages.asSharedFlow()
 
         init {
+            mapController.restoreLastLocationIfNeeded()
             observeSharedState()
             observeCooldownForPendingTap()
             observeDeepLinkCoords()

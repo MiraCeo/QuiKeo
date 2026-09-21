@@ -8,6 +8,7 @@ import com.locationjoystick.core.common.di.ApplicationScope
 import com.locationjoystick.core.data.CooldownState
 import com.locationjoystick.core.data.FavoriteRepository
 import com.locationjoystick.core.data.LocationRepository
+import com.locationjoystick.core.data.RealLocationRepository
 import com.locationjoystick.core.data.RoamingRepository
 import com.locationjoystick.core.data.RouteRepository
 import com.locationjoystick.core.data.SettingsRepository
@@ -78,6 +79,7 @@ class MapController
         private val roamingRepository: RoamingRepository,
         private val walkCoordinator: WalkCoordinator,
         private val teleportUseCase: TeleportUseCase,
+        private val realLocationRepository: RealLocationRepository,
         private val startRouteReplayUseCase: StartRouteReplayUseCase,
         private val ephemeralReplayController: EphemeralReplayController,
         private val osrmClient: OsrmClient,
@@ -98,6 +100,7 @@ class MapController
         val routingErrors: SharedFlow<String> = routingErrorReporter.errors
 
         private var pendingRoadWalkJob: Job? = null
+        private var restoreJob: Job? = null
 
         init {
             observeLocationState()
@@ -302,16 +305,46 @@ class MapController
             }
         }
 
-        private fun restoreLastLocationIfNeeded() {
-            appScope.launch {
-                if (locationRepository.currentPosition.value == null) {
-                    val remember = settingsRepository.getRememberLastLocation().first()
-                    if (remember) {
-                        val last = settingsRepository.getLastLocation().first()
-                        if (last != null) locationRepository.setPositionInternal(last)
+        /**
+         * Resolves the initial map position on startup:
+         * 1. Uses the remembered last location if enabled.
+         * 2. Falls back to the real device location (last-known fix, then a fresh fix), excluding mock
+         *    providers, only when location permission is granted.
+         * 3. Falls back to the app default location when permission is granted but no fix arrives, so the
+         *    map always shows a point.
+         *
+         * Single-flight: a call while a previous restore is still running is a no-op. A restore that ran
+         * without permission leaves the position unset so the next call retries.
+         */
+        @Synchronized
+        fun restoreLastLocationIfNeeded() {
+            if (restoreJob?.isActive == true) return
+            restoreJob =
+                appScope.launch {
+                    if (locationRepository.currentPosition.value == null) {
+                        val remember = settingsRepository.getRememberLastLocation().first()
+                        val savedLocation = if (remember) settingsRepository.getLastLocation().first() else null
+                        val known = savedLocation ?: realLocationRepository.lastKnownRealPosition()
+                        val initialPos =
+                            known
+                                ?: if (realLocationRepository.hasFinePermission()) {
+                                    LatLng(AppConstants.MapConstants.DEFAULT_LAT, AppConstants.MapConstants.DEFAULT_LON)
+                                } else {
+                                    null
+                                }
+                        if (initialPos == null) return@launch
+                        locationRepository.setPositionInternal(initialPos)
+                        if (known == null) {
+                            // The default shows at once; the slow fresh fix then moves the map, unless the user
+                            // already moved the position (teleport, start) while it was pending.
+                            realLocationRepository.getCurrentPosition().getOrNull()?.let { fix ->
+                                if (locationRepository.currentPosition.value == initialPos) {
+                                    locationRepository.setPositionInternal(fix)
+                                }
+                            }
+                        }
                     }
                 }
-            }
         }
 
         // ── Actions ──────────────────────────────────────────────────────────────
