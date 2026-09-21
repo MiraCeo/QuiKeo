@@ -80,6 +80,37 @@ class CaptureCoordinatesViewModelTest {
         }
 
     @Test
+    fun `restoreDefaultBrowser turns capture off and sets setupReset`() =
+        runTest {
+            viewModel.setCaptureModeEnabled(true)
+            viewModel.setCaptureEnabled(true)
+            viewModel.setJumpEnabled(true)
+
+            viewModel.restoreDefaultBrowser()
+
+            val state = viewModel.uiState.value
+            assertFalse(state.captureModeEnabled)
+            assertFalse(state.captureEnabled)
+            assertFalse(state.jumpEnabled)
+            assertTrue(state.setupReset)
+        }
+
+    @Test
+    fun `setupReset clears when app is no longer default browser or card is tapped`() =
+        runTest {
+            viewModel.restoreDefaultBrowser()
+            viewModel.onDefaultBrowserChecked(true)
+            assertTrue(viewModel.uiState.value.setupReset)
+
+            viewModel.onDefaultBrowserChecked(false)
+            assertFalse(viewModel.uiState.value.setupReset)
+
+            viewModel.restoreDefaultBrowser()
+            viewModel.clearSetupReset()
+            assertFalse(viewModel.uiState.value.setupReset)
+        }
+
+    @Test
     fun `saveRoute writes straight route from captured points`() =
         runTest {
             captureRepository.appendPoint(mushroom)

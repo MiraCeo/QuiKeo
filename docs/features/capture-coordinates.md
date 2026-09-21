@@ -32,16 +32,12 @@ captured list, pass-through row or Save as route.
   on supported links for this app. The app cannot verify it, so it has no button and never gates.
 - **Turn off Google Maps supported links** — action opens Google Maps' "Open by default" screen.
   Not checked separately: it completes together with the default-browser step.
-- **Restore your default browser** — advisory reminder to switch the default browser back once
-  done. Android will not assign the previous browser back programmatically; the previous
-  `ROLE_BROWSER` holder is saved in DataStore when the user starts the default-browser step, so this
-  app knows which browser to offer as a pass-through choice even before it's restored.
 - **Setup guide** — opens the wiki Capture page (`AppConstants.AppInfo.CAPTURE_GUIDE_URL`), the same
   pattern as onboarding's Troubleshooting button.
 
 ### Setup complete (this app is the default browser)
 
-The setup cards (including Restore) disappear entirely and the feature UI shows:
+The setup cards disappear entirely and the feature UI shows:
 
 - **Capture mode + List / Jump** — one overall DataStore switch followed by two independent
   checkboxes (`CaptureCoordinatesRepository`; not part of `ExportData`). List appends a point; Jump
@@ -60,6 +56,20 @@ The setup cards (including Restore) disappear entirely and the feature UI shows:
 - Save as a straight route via `RouteRepository.insertRoute` when there are ≥2 points
 
 There is no "Ready" banner or step-number badge.
+
+### Top-bar overflow menu and restore
+
+The top bar carries a three-dot menu (`LjOverflowMenu`) with **Setup guide** (opens the wiki page)
+and **Restore default browser**, both always shown. Restore opens a "Restore default browser?" dialog
+whose **Restore** button stays disabled until the user ticks a checkbox acknowledging that Capture
+turns off and the default browser must be set back in Android settings. On confirm,
+`CaptureCoordinatesRepository.resetSetup()` writes Capture mode, List and Jump off and sets a
+per-device `capture_coordinates_setup_reset` flag (DataStore, not part of `ExportData`), then Default
+apps settings opens. While the flag is set the gate treats setup as incomplete, so the setup cards
+return even though this app still holds the browser role. Captured points, the pass-through browser
+and the stored previous `ROLE_BROWSER` holder are kept (Android will not assign the previous browser
+back programmatically, so the app needs them to offer it as a pass-through choice). The flag clears
+when the user taps the default-browser card again or when this app is no longer the default browser.
 
 The floating widget overlay is **not** part of intercept. Link handling depends on the
 overall **Capture mode** switch and List/Jump actions, not overlay visibility.

@@ -26,6 +26,7 @@ data class CaptureCoordinatesUiState(
     val captureModeEnabled: Boolean = false,
     val captureEnabled: Boolean = false,
     val jumpEnabled: Boolean = false,
+    val setupReset: Boolean = false,
     val points: List<LatLng> = emptyList(),
     val pointOrder: CapturePointOrder = CapturePointOrder.PROXIMITY,
     val routeName: String = "",
@@ -70,6 +71,11 @@ class CaptureCoordinatesViewModel
                     _uiState.update { it.copy(jumpEnabled = enabled) }
                 }
             }
+            viewModelScope.launch {
+                captureRepository.setupReset.collect { reset ->
+                    _uiState.update { it.copy(setupReset = reset) }
+                }
+            }
         }
 
         val previousBrowserPackage: StateFlow<String?> =
@@ -80,6 +86,19 @@ class CaptureCoordinatesViewModel
             val trimmed = packageName?.trim().orEmpty()
             if (trimmed.isEmpty()) return
             viewModelScope.launch { captureRepository.setPreviousBrowserPackage(trimmed) }
+        }
+
+        fun restoreDefaultBrowser() {
+            viewModelScope.launch { captureRepository.resetSetup() }
+        }
+
+        fun clearSetupReset() {
+            viewModelScope.launch { captureRepository.clearSetupReset() }
+        }
+
+        /** A reset only holds while this app still owns the browser role; once it does not, setup is due anyway. */
+        fun onDefaultBrowserChecked(isDefault: Boolean) {
+            if (!isDefault && _uiState.value.setupReset) clearSetupReset()
         }
 
         fun setCaptureModeEnabled(enabled: Boolean) {

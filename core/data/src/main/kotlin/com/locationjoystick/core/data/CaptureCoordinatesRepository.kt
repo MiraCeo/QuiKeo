@@ -31,6 +31,7 @@ class CaptureCoordinatesRepository
             val JUMP_ENABLED = booleanPreferencesKey(AppConstants.DataStoreConstants.KEY_CAPTURE_JUMP_ENABLED)
             val CAPTURE_POINTS = stringPreferencesKey(AppConstants.DataStoreConstants.KEY_CAPTURE_POINTS)
             val PREVIOUS_BROWSER = stringPreferencesKey(AppConstants.DataStoreConstants.KEY_CAPTURE_PREVIOUS_BROWSER)
+            val SETUP_RESET = booleanPreferencesKey(AppConstants.DataStoreConstants.KEY_CAPTURE_SETUP_RESET)
             val HELPER_OPEN = booleanPreferencesKey(AppConstants.DataStoreConstants.KEY_CAPTURE_HELPER_OPEN)
         }
 
@@ -74,6 +75,10 @@ class CaptureCoordinatesRepository
         val helperOpen: Flow<Boolean> =
             pref(Keys.HELPER_OPEN, false)
 
+        /** Set by [resetSetup]; closes the setup gate even while this app still holds the browser role. */
+        val setupReset: Flow<Boolean> =
+            pref(Keys.SETUP_RESET, false)
+
         val previousBrowserPackage: Flow<String?> =
             safeData.map { prefs -> prefs[Keys.PREVIOUS_BROWSER]?.takeIf { it.isNotBlank() } }
 
@@ -109,6 +114,20 @@ class CaptureCoordinatesRepository
 
         suspend fun setHelperOpen(open: Boolean) {
             dataStore.edit { prefs -> prefs[Keys.HELPER_OPEN] = open }
+        }
+
+        /** Turns capture off and reopens the setup gate. Keeps points and the stored browsers. */
+        suspend fun resetSetup() {
+            dataStore.edit { prefs ->
+                prefs[Keys.CAPTURE_MODE_ENABLED] = false
+                prefs[Keys.CAPTURE_ENABLED] = false
+                prefs[Keys.JUMP_ENABLED] = false
+                prefs[Keys.SETUP_RESET] = true
+            }
+        }
+
+        suspend fun clearSetupReset() {
+            dataStore.edit { prefs -> prefs[Keys.SETUP_RESET] = false }
         }
 
         suspend fun setPreviousBrowserPackage(packageName: String) {

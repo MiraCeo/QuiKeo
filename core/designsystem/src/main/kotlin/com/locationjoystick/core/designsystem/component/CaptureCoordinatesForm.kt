@@ -90,7 +90,7 @@ data class CaptureRouteSaveState(
 )
 
 /**
- * Capture-mode setup guidance (default-browser role, Google Maps links, restore reminder, guide link) plus the
+ * Capture-mode setup guidance (default-browser role, Google Maps links, guide link) plus the
  * passthrough-browser picker. While `isDefaultBrowser` is false only the setup is shown — see
  * docs/features/capture-coordinates.md.
  */
@@ -102,7 +102,6 @@ data class CaptureSetupState(
     val onSelectBrowser: (String) -> Unit,
     val onRequestDefaultBrowser: () -> Unit,
     val onOpenMapsLinks: () -> Unit,
-    val onRestoreDefaultApps: () -> Unit,
     val onOpenSetupGuide: () -> Unit,
 )
 
@@ -373,14 +372,6 @@ private fun CaptureSetupSteps(
             actionLabel = stringResource(R.string.capture_setup_step_maps_links_action),
             onAction = state.onOpenMapsLinks,
         )
-        LjGuidedStepCard(
-            title = stringResource(R.string.capture_setup_step_restore_title),
-            description = stringResource(R.string.capture_setup_step_restore_desc),
-            isGranted = false,
-            icon = LjIcons.Undo,
-            actionLabel = stringResource(R.string.capture_setup_step_restore_action),
-            onAction = state.onRestoreDefaultApps,
-        )
         TextButton(onClick = state.onOpenSetupGuide, modifier = Modifier.align(Alignment.End)) {
             Text(stringResource(R.string.capture_setup_guide))
         }
@@ -560,7 +551,6 @@ private fun CaptureCoordinatesFormPreview() {
                     onSelectBrowser = {},
                     onRequestDefaultBrowser = {},
                     onOpenMapsLinks = {},
-                    onRestoreDefaultApps = {},
                     onOpenSetupGuide = {},
                 ),
             capturePoints =
@@ -606,7 +596,6 @@ private fun CaptureCoordinatesFormSetupPreview() {
                     onSelectBrowser = {},
                     onRequestDefaultBrowser = {},
                     onOpenMapsLinks = {},
-                    onRestoreDefaultApps = {},
                     onOpenSetupGuide = {},
                 ),
             capturePoints =
@@ -643,7 +632,6 @@ private fun CaptureSetupStepsPreview() {
                     onSelectBrowser = {},
                     onRequestDefaultBrowser = {},
                     onOpenMapsLinks = {},
-                    onRestoreDefaultApps = {},
                     onOpenSetupGuide = {},
                 ),
         )

@@ -19,9 +19,6 @@
     <string name="capture_setup_step_maps_links_action">"Open Google Maps settings"</string>
     <string name="capture_setup_step_this_app_links_hint">"Also turn on supported links for this app in Android's app settings so map links open here."</string>
     <string name="capture_setup_guide">"Setup guide"</string>
-    <string name="capture_setup_step_restore_title">"Restore your default browser"</string>
-    <string name="capture_setup_step_restore_desc">"Once you're done using Capture, switch your default browser back and reverse the two steps above."</string>
-    <string name="capture_setup_step_restore_action">"Restore default apps"</string>
     <string name="capture_coordinates_form_capture_mode">"Capture mode"</string>
     <string name="capture_coordinates_form_list">"List"</string>
     <string name="capture_coordinates_form_add_each_location_to_the_list">"Add each location to the list"</string>

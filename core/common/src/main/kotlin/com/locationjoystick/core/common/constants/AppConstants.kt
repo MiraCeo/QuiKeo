@@ -372,6 +372,7 @@ object AppConstants {
         const val KEY_CAPTURE_JUMP_ENABLED = "capture_coordinates_jump_enabled"
         const val KEY_CAPTURE_POINTS = "capture_coordinates_points"
         const val KEY_CAPTURE_PREVIOUS_BROWSER = "capture_coordinates_previous_browser"
+        const val KEY_CAPTURE_SETUP_RESET = "capture_coordinates_setup_reset"
         const val KEY_CAPTURE_HELPER_OPEN = "capture_coordinates_helper_open"
     }
 

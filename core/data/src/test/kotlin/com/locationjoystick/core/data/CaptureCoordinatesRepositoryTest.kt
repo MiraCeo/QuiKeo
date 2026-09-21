@@ -65,6 +65,29 @@ class CaptureCoordinatesRepositoryTest {
         }
 
     @Test
+    fun `resetSetup turns capture off, flags reset, keeps points and previous browser`() =
+        runTest {
+            assertFalse(repository.setupReset.first())
+            repository.setCaptureModeEnabled(true)
+            repository.setCaptureEnabled(true)
+            repository.setJumpEnabled(true)
+            repository.appendPoint(mushroom)
+            repository.setPreviousBrowserPackage("org.mozilla.firefox")
+
+            repository.resetSetup()
+
+            assertFalse(repository.captureModeEnabled.first())
+            assertFalse(repository.captureEnabled.first())
+            assertFalse(repository.jumpEnabled.first())
+            assertTrue(repository.setupReset.first())
+            assertEquals(listOf(mushroom), repository.points.first())
+            assertEquals("org.mozilla.firefox", repository.previousBrowserPackage.first())
+
+            repository.clearSetupReset()
+            assertFalse(repository.setupReset.first())
+        }
+
+    @Test
     fun `setJumpEnabled round-trips`() =
         runTest {
             repository.setJumpEnabled(true)
