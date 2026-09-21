@@ -337,7 +337,6 @@ class MapController
                 val startPos =
                     locationRepository.currentPosition.value
                         ?: settingsRepository.getLastLocation().first()
-                        ?: realLocationRepository.lastKnownRealPosition()
                         ?: LatLng(AppConstants.MapConstants.DEFAULT_LAT, AppConstants.MapConstants.DEFAULT_LON)
                 ContextCompat.startForegroundService(
                     context,
