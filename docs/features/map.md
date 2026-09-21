@@ -60,7 +60,9 @@ fixes, Nominatim, OSRM, exports — stays WGS-84. Never persist or spoof a GCJ-0
 MapLibre's built-in attribution button is disabled on all surfaces, so each one renders
 `MapAttribution` (`:core:map/ui/MapAttribution.kt`) in the bottom-left corner with a
 per-provider credit line (`map_attribution_osm` / `map_attribution_amap`), which also surfaces the
-GCJ-02 datum to the user.
+GCJ-02 datum to the user. The OSM label is required by the OSM Tile Usage Policy (attribution must be
+clearly visible on the map), so it stays visible on the default source and is never gated to
+non-default sources.
 
 ### OSM tiles
 
