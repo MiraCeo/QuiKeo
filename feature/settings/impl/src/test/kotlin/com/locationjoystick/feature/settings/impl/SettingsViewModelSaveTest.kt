@@ -691,4 +691,16 @@ internal class SaveTestPreferencesDataSource : PreferencesDataSource {
     override suspend fun clearAllExceptOnboarding() {
         clearAllExceptOnboardingCallCount++
     }
+
+    override fun getUpdateCheckLastCheckedAtMs(): Flow<Long> = flowOf(0L)
+
+    override suspend fun setUpdateCheckLastCheckedAtMs(timestampMs: Long) = Unit
+
+    override fun getUpdateCheckCachedLatestVersion(): Flow<String> = flowOf("")
+
+    override suspend fun setUpdateCheckCachedLatestVersion(version: String) = Unit
+
+    override fun getUpdateCheckDismissedVersion(): Flow<String> = flowOf("")
+
+    override suspend fun setUpdateCheckDismissedVersion(version: String) = Unit
 }
