@@ -231,14 +231,15 @@ internal fun MapScreen(
 
     DisposableEffect(lifecycleOwner) {
         mapView.onCreate(null)
-        mapView.onStart()
+        // Stop the renderer with the activity; otherwise its GL thread outlives the window surface
+        // and renders into a destroyed native peer when the map is disposed on resume (SIGSEGV).
         val observer =
             LifecycleEventObserver { _, event ->
                 when (event) {
-                    Lifecycle.Event.ON_RESUME -> {
-                        mapView.onResume()
-                    }
+                    Lifecycle.Event.ON_START -> mapView.onStart()
+                    Lifecycle.Event.ON_RESUME -> mapView.onResume()
                     Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+                    Lifecycle.Event.ON_STOP -> mapView.onStop()
                     else -> Unit
                 }
             }
