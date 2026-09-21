@@ -19,9 +19,11 @@ Key files: `core/common/util/LocaleContextWrapper.kt`, `core/common/constants/Ap
 There is no single central `strings.xml`. Every module that has its own user-facing strings
 (Compose UI or `Context.getString()` call sites) owns its own `res/values/strings.xml` (English,
 source of truth) plus a sibling `res/values-<qualifier>/strings.xml` per supported locale, with
-identical keys: `app`, `core/common`, `core/designsystem`, `core/location`, `core/routing`,
+identical keys: `app`, `core/common`, `core/designsystem`, `core/location`, `core/map`, `core/routing`,
 `feature/favorites/impl`, `feature/group/impl`, `feature/map/impl`, `feature/onboarding/impl`,
-`feature/routes/impl`, `feature/settings/impl`, `feature/widget/impl`.
+`feature/routes/impl`, `feature/settings/impl`, `feature/widget/impl`. A module may split its
+strings across several files in the same `values*/` folders (e.g. `coordinate_workflow_strings.xml`
+in `app`, `core/common` and `core/designsystem`), each with a sibling in every supported locale.
 
 ## Selecting a Display Language
 
