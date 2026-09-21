@@ -2,8 +2,8 @@ package com.locationjoystick.core.location
 
 import android.content.Context
 import android.content.Intent
-import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.common.constants.AppConstants.ServiceConstants
+import com.locationjoystick.core.common.util.clampTeleportBetweenDelaySeconds
 import com.locationjoystick.core.model.LatLng
 
 /**
@@ -56,23 +56,24 @@ object MockLocationIntentBuilder {
         context: Context,
         routeId: String,
         speedMs: Double,
-        isBackward: Boolean = false,
-        followRoadsToStart: Boolean = false,
-        teleportToStart: Boolean = true,
-        isPlanting: Boolean = false,
-        teleportBetweenWaypoints: Boolean = false,
-        teleportBetweenDelaySeconds: Int = AppConstants.RouteConstants.TELEPORT_BETWEEN_DEFAULT_DELAY_SECONDS,
+        config: RouteStartConfig,
+        returnPosition: LatLng? = null,
     ): Intent =
         Intent(context, MockLocationService::class.java).apply {
             action = MockLocationService.ACTION_ROUTE_REPLAY_START
             putExtra(MockLocationService.EXTRA_ROUTE_ID, routeId)
-            putExtra(MockLocationService.EXTRA_IS_BACKWARD, isBackward)
+            putExtra(MockLocationService.EXTRA_IS_BACKWARD, config.isReverse)
             putExtra(MockLocationService.EXTRA_SPEED_MS, speedMs)
-            putExtra(MockLocationService.EXTRA_FOLLOW_ROADS_TO_START, followRoadsToStart)
-            putExtra(MockLocationService.EXTRA_TELEPORT_TO_START, teleportToStart)
-            putExtra(MockLocationService.EXTRA_IS_PLANTING, isPlanting)
-            putExtra(MockLocationService.EXTRA_TELEPORT_BETWEEN_WAYPOINTS, teleportBetweenWaypoints)
-            putExtra(MockLocationService.EXTRA_TELEPORT_BETWEEN_DELAY_SECONDS, teleportBetweenDelaySeconds)
+            putExtra(MockLocationService.EXTRA_IS_LOOPING, config.isLooping)
+            putExtra(MockLocationService.EXTRA_FOLLOW_ROADS_TO_START, config.followRoadsToStart)
+            putExtra(MockLocationService.EXTRA_TELEPORT_TO_START, config.teleportToStart)
+            putExtra(MockLocationService.EXTRA_IS_PLANTING, config.isPlanting)
+            putExtra(MockLocationService.EXTRA_TELEPORT_BETWEEN_WAYPOINTS, config.teleportBetweenWaypoints)
+            putExtra(MockLocationService.EXTRA_TELEPORT_BETWEEN_DELAY_SECONDS, config.teleportBetweenDelaySeconds)
+            if (returnPosition != null) {
+                putExtra(MockLocationService.EXTRA_RETURN_LAT, returnPosition.latitude)
+                putExtra(MockLocationService.EXTRA_RETURN_LON, returnPosition.longitude)
+            }
         }
 
     fun cancelRouteReplay(context: Context): Intent =
@@ -135,4 +136,30 @@ object MockLocationIntentBuilder {
 
     /** Encodes waypoints as a compact string: "lat,lon;lat,lon;..." */
     private fun List<LatLng>.encodeToString(): String = joinToString(";") { "${it.latitude},${it.longitude}" }
+}
+
+/** Reads the route-start extras written by [MockLocationIntentBuilder.startRouteReplay]; defaults come from [RouteStartConfig]. */
+internal fun Intent.toRouteStartConfig(): RouteStartConfig {
+    val d = RouteStartConfig()
+    val teleportToStart = getBooleanExtra(MockLocationService.EXTRA_TELEPORT_TO_START, d.teleportToStart)
+    return RouteStartConfig(
+        isLooping = getBooleanExtra(MockLocationService.EXTRA_IS_LOOPING, d.isLooping),
+        isReverse = getBooleanExtra(MockLocationService.EXTRA_IS_BACKWARD, d.isReverse),
+        followRoadsToStart = getBooleanExtra(MockLocationService.EXTRA_FOLLOW_ROADS_TO_START, d.followRoadsToStart),
+        teleportToStart = teleportToStart,
+        isPlanting = getBooleanExtra(MockLocationService.EXTRA_IS_PLANTING, d.isPlanting),
+        teleportBetweenWaypoints =
+            getBooleanExtra(MockLocationService.EXTRA_TELEPORT_BETWEEN_WAYPOINTS, d.teleportBetweenWaypoints) &&
+                teleportToStart,
+        teleportBetweenDelaySeconds =
+            clampTeleportBetweenDelaySeconds(
+                getIntExtra(MockLocationService.EXTRA_TELEPORT_BETWEEN_DELAY_SECONDS, d.teleportBetweenDelaySeconds),
+            ),
+    )
+}
+
+internal fun Intent.returnPositionOrNull(): LatLng? {
+    val lat = getDoubleExtra(MockLocationService.EXTRA_RETURN_LAT, Double.NaN)
+    val lon = getDoubleExtra(MockLocationService.EXTRA_RETURN_LON, Double.NaN)
+    return if (!lat.isNaN() && !lon.isNaN()) LatLng(lat, lon) else null
 }

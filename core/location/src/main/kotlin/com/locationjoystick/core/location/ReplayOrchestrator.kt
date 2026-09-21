@@ -102,15 +102,9 @@ internal class ReplayOrchestrator(
 
     fun handleStart(
         routeId: String,
-        isBackward: Boolean,
         speedMs: Double,
-        isLoopingOverride: Boolean? = null,
+        config: RouteStartConfig,
         returnPosition: LatLng? = null,
-        followRoadsToStart: Boolean = false,
-        teleportToStart: Boolean = false,
-        isPlanting: Boolean = false,
-        teleportBetweenWaypoints: Boolean = false,
-        teleportBetweenDelaySeconds: Int = AppConstants.RouteConstants.TELEPORT_BETWEEN_DEFAULT_DELAY_SECONDS,
     ) {
         val previous = activeReplayJob
         val generation = startGeneration.get()
@@ -122,9 +116,9 @@ internal class ReplayOrchestrator(
                 teleportRouteEngine.stop()
                 val route = routeRepository.getRouteWithWaypoints(routeId).first() ?: return@launch
                 if (!isStartStillCurrent(generation)) return@launch
-                if (!isPlanting && route.waypoints.size < 2) return@launch
-                val orderedWaypoints = if (isBackward) route.waypoints.reversed() else route.waypoints
-                val isLooping = isPlanting || (isLoopingOverride ?: route.isLooping)
+                if (!config.isPlanting && route.waypoints.size < 2) return@launch
+                val orderedWaypoints = if (config.isReverse) route.waypoints.reversed() else route.waypoints
+                val isLooping = config.isPlanting || config.isLooping
 
                 if (route.routeType == RouteType.TELEPORT) {
                     activeReplayer = teleportRouteEngine
@@ -132,7 +126,7 @@ internal class ReplayOrchestrator(
                         waypoints = orderedWaypoints,
                         isLooping = isLooping,
                         randomizeOrder = route.randomizeTeleportOrder,
-                        persistMetadata = buildPersistMetadata(routeId, isBackward, orderedWaypoints.map { it.position }),
+                        persistMetadata = buildPersistMetadata(routeId, config.isReverse, orderedWaypoints.map { it.position }),
                         onComplete = buildStartOnComplete(returnPosition, speedMs),
                     )
                     return@launch
@@ -141,31 +135,32 @@ internal class ReplayOrchestrator(
                 activeReplayer = routeReplayEngine
                 val latLngs = orderedWaypoints.map { it.position }
                 try {
-                    if (followRoadsToStart) locationRepository.setRoadRouteFetchInFlight(true)
+                    if (config.followRoadsToStart) locationRepository.setRoadRouteFetchInFlight(true)
                     val (replayWaypoints, boundaryIndices) =
                         when {
-                            isPlanting -> expandWaypointsForPlanting(latLngs, followRoadsToStart, teleportBetweenWaypoints)
-                            teleportBetweenWaypoints -> latLngs to null
-                            followRoadsToStart -> expandWaypointsForFollowRoads(latLngs)
+                            config.isPlanting ->
+                                expandWaypointsForPlanting(latLngs, config.followRoadsToStart, config.teleportBetweenWaypoints)
+                            config.teleportBetweenWaypoints -> latLngs to null
+                            config.followRoadsToStart -> expandWaypointsForFollowRoads(latLngs)
                             else -> latLngs to null
                         }
 
                     if (!isStartStillCurrent(generation)) return@launch
                     startReplayWithWaypoints(
                         generation = generation,
-                        teleportToStart = teleportToStart,
-                        teleportBetweenWaypoints = teleportBetweenWaypoints,
-                        teleportBetweenDelaySeconds = teleportBetweenDelaySeconds,
+                        teleportToStart = config.teleportToStart,
+                        teleportBetweenWaypoints = config.teleportBetweenWaypoints,
+                        teleportBetweenDelaySeconds = config.teleportBetweenDelaySeconds,
                         waypoints = replayWaypoints,
                         speedMs = speedMs,
                         isLooping = isLooping,
-                        followRoadsToStart = followRoadsToStart,
+                        followRoadsToStart = config.followRoadsToStart,
                         boundaryIndices = boundaryIndices,
-                        persistMetadata = buildPersistMetadata(routeId, isBackward, replayWaypoints),
+                        persistMetadata = buildPersistMetadata(routeId, config.isReverse, replayWaypoints),
                         onComplete = buildStartOnComplete(returnPosition, speedMs),
                     )
                 } finally {
-                    if (followRoadsToStart) locationRepository.setRoadRouteFetchInFlight(false)
+                    if (config.followRoadsToStart) locationRepository.setRoadRouteFetchInFlight(false)
                 }
             }
     }

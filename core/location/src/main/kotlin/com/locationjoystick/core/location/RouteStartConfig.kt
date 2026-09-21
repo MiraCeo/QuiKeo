@@ -4,12 +4,14 @@ import com.locationjoystick.core.common.constants.AppConstants
 
 /**
  * Bundles the route-start sheet's flags so callers cannot silently swap two adjacent
- * booleans — see docs/features/routes.md, "Start Flow".
+ * booleans — see docs/features/routes.md, "Start Flow". [StartRouteReplayUseCase] derives
+ * [teleportToStart] and [teleportBetweenWaypoints]; callers of the use case do not set them.
  */
 data class RouteStartConfig(
     val isLooping: Boolean = false,
     val isReverse: Boolean = false,
     val isReturnToLocation: Boolean = false,
+    val teleportToStart: Boolean = false,
     val followRoadsToStart: Boolean = false,
     val isPlanting: Boolean = false,
     val teleportBetweenWaypoints: Boolean = false,

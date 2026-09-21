@@ -23,7 +23,6 @@ import com.locationjoystick.core.common.constants.AppConstants.ServiceConstants
 import com.locationjoystick.core.common.util.LocaleContextWrapper
 import com.locationjoystick.core.common.util.NetworkUtils
 import com.locationjoystick.core.common.util.NsdCodeManager
-import com.locationjoystick.core.common.util.clampTeleportBetweenDelaySeconds
 import com.locationjoystick.core.data.DebugStats
 import com.locationjoystick.core.data.ElevationRepository
 import com.locationjoystick.core.data.GroupRepository
@@ -609,37 +608,7 @@ class MockLocationService : Service() {
                     handleEphemeralReplayStart(waypoints, speedMs)
                 } else {
                     val routeId = intent.getStringExtra(EXTRA_ROUTE_ID) ?: return START_STICKY
-                    val isBackward = intent.getBooleanExtra(EXTRA_IS_BACKWARD, false)
-                    val isLoopingOverride =
-                        if (intent.hasExtra(EXTRA_IS_LOOPING)) intent.getBooleanExtra(EXTRA_IS_LOOPING, false) else null
-                    val returnLat = intent.getDoubleExtra(EXTRA_RETURN_LAT, Double.NaN)
-                    val returnLon = intent.getDoubleExtra(EXTRA_RETURN_LON, Double.NaN)
-                    val returnPosition =
-                        if (!returnLat.isNaN() && !returnLon.isNaN()) LatLng(returnLat, returnLon) else null
-                    val followRoadsToStart = intent.getBooleanExtra(EXTRA_FOLLOW_ROADS_TO_START, false)
-                    val teleportToStart = intent.getBooleanExtra(EXTRA_TELEPORT_TO_START, true)
-                    val isPlanting = intent.getBooleanExtra(EXTRA_IS_PLANTING, false)
-                    val teleportBetweenWaypoints =
-                        intent.getBooleanExtra(EXTRA_TELEPORT_BETWEEN_WAYPOINTS, false) && teleportToStart
-                    val teleportBetweenDelaySeconds =
-                        clampTeleportBetweenDelaySeconds(
-                            intent.getIntExtra(
-                                EXTRA_TELEPORT_BETWEEN_DELAY_SECONDS,
-                                AppConstants.RouteConstants.TELEPORT_BETWEEN_DEFAULT_DELAY_SECONDS,
-                            ),
-                        )
-                    handleReplayStart(
-                        routeId,
-                        isBackward,
-                        speedMs,
-                        isLoopingOverride,
-                        returnPosition,
-                        followRoadsToStart,
-                        teleportToStart,
-                        isPlanting,
-                        teleportBetweenWaypoints,
-                        teleportBetweenDelaySeconds,
-                    )
+                    handleReplayStart(routeId, speedMs, intent.toRouteStartConfig(), intent.returnPositionOrNull())
                 }
             }
 
@@ -1115,27 +1084,10 @@ class MockLocationService : Service() {
 
     private fun handleReplayStart(
         routeId: String,
-        isBackward: Boolean,
         speedMs: Double,
-        isLoopingOverride: Boolean? = null,
-        returnPosition: LatLng? = null,
-        followRoadsToStart: Boolean = false,
-        teleportToStart: Boolean = true,
-        isPlanting: Boolean = false,
-        teleportBetweenWaypoints: Boolean = false,
-        teleportBetweenDelaySeconds: Int = AppConstants.RouteConstants.TELEPORT_BETWEEN_DEFAULT_DELAY_SECONDS,
-    ) = replayOrchestrator.handleStart(
-        routeId,
-        isBackward,
-        speedMs,
-        isLoopingOverride,
-        returnPosition,
-        followRoadsToStart,
-        teleportToStart,
-        isPlanting,
-        teleportBetweenWaypoints,
-        teleportBetweenDelaySeconds,
-    )
+        config: RouteStartConfig,
+        returnPosition: LatLng?,
+    ) = replayOrchestrator.handleStart(routeId, speedMs, config, returnPosition)
 
     private fun handleEphemeralReplayStart(
         waypoints: List<LatLng>,

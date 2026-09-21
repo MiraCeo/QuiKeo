@@ -440,13 +440,7 @@ class ReplayOrchestratorTest {
                 osrmClient.resolveRoute(any(), LatLng(2.0, 2.0), LatLng(3.0, 3.0), true, any())
             } returns listOf(LatLng(2.0, 2.0), LatLng(3.0, 3.0))
 
-            orchestrator.handleStart(
-                "route-1",
-                isBackward = false,
-                speedMs = 1.4,
-                followRoadsToStart = true,
-                teleportToStart = false,
-            )
+            orchestrator.handleStart("route-1", 1.4, RouteStartConfig(followRoadsToStart = true, teleportToStart = false))
 
             coVerify { walkToEngine.walkToOnce(LatLng(0.0, 0.0), LatLng(1.0, 1.0), 1.4, any()) }
             coVerify { walkToEngine.walkToOnce(LatLng(1.0, 1.0), LatLng(2.0, 2.0), 1.4, any()) }
@@ -482,7 +476,7 @@ class ReplayOrchestratorTest {
                 listOf(LatLng(0.0, 0.0), LatLng(2.0, 2.0))
             }
 
-            orchestrator.handleStart("route-1", isBackward = false, speedMs = 1.4, followRoadsToStart = true)
+            orchestrator.handleStart("route-1", 1.4, RouteStartConfig(followRoadsToStart = true))
 
             assertFalse(locationRepository.isRoadRouteFetchInFlight.value)
         }
@@ -505,7 +499,7 @@ class ReplayOrchestratorTest {
                 )
             coEvery { routeRepository.getRouteWithWaypoints("route-1") } returns kotlinx.coroutines.flow.flowOf(route)
 
-            orchestrator.handleStart("route-1", isBackward = false, speedMs = 1.4, followRoadsToStart = false)
+            orchestrator.handleStart("route-1", 1.4, RouteStartConfig(followRoadsToStart = false))
 
             assertFalse(locationRepository.isRoadRouteFetchInFlight.value)
         }
@@ -532,7 +526,7 @@ class ReplayOrchestratorTest {
                 routeReplayEngine.start(any(), any(), any(), any(), capture(onCompleteSlot), any(), any(), any())
             } returns Unit
 
-            orchestrator.handleStart("route-1", isBackward = false, speedMs = 1.4)
+            orchestrator.handleStart("route-1", 1.4, RouteStartConfig())
             speedChanges.clear()
             onCompleteSlot.captured.invoke()
 
@@ -557,7 +551,7 @@ class ReplayOrchestratorTest {
                 )
             coEvery { routeRepository.getRouteWithWaypoints("route-1") } returns kotlinx.coroutines.flow.flowOf(route)
 
-            orchestrator.handleStart("route-1", isBackward = false, speedMs = 1.4)
+            orchestrator.handleStart("route-1", 1.4, RouteStartConfig())
 
             coVerify(exactly = 0) { osrmClient.resolveRoute(any(), any(), any(), any(), any()) }
         }
@@ -590,7 +584,7 @@ class ReplayOrchestratorTest {
             coEvery { osrmClient.resolveRoute(any(), w1, w2, true, any()) } returns betweenLeg1
             coEvery { osrmClient.resolveRoute(any(), w2, w3, true, any()) } returns betweenLeg2
 
-            orchestrator.handleStart("route-1", isBackward = false, speedMs = 1.4, followRoadsToStart = true)
+            orchestrator.handleStart("route-1", 1.4, RouteStartConfig(followRoadsToStart = true))
 
             val expected = listOf(w1, LatLng(2.5, 2.5), w2, LatLng(3.5, 3.5), w3)
             verify {
@@ -636,7 +630,7 @@ class ReplayOrchestratorTest {
             coEvery { osrmClient.resolveRoute(any(), w1, w2, true, any()) } returns betweenLeg1
             coEvery { osrmClient.resolveRoute(any(), w2, w3, true, any()) } returns betweenLeg2
 
-            orchestrator.handleStart("route-1", isBackward = false, speedMs = 1.4, followRoadsToStart = true)
+            orchestrator.handleStart("route-1", 1.4, RouteStartConfig(followRoadsToStart = true))
 
             val expected = listOf(w1, LatLng(2.5, 2.5), w2, LatLng(3.5, 3.5), w3)
             assertEquals(expected, locationRepository.routeWaypoints.value)
@@ -665,7 +659,7 @@ class ReplayOrchestratorTest {
                 )
             coEvery { routeRepository.getRouteWithWaypoints("route-1") } returns kotlinx.coroutines.flow.flowOf(route)
 
-            orchestrator.handleStart("route-1", isBackward = false, speedMs = 1.4, followRoadsToStart = false)
+            orchestrator.handleStart("route-1", 1.4, RouteStartConfig(followRoadsToStart = false))
 
             assertEquals(listOf(w1, w2), locationRepository.routeWaypoints.value)
         }
@@ -702,7 +696,7 @@ class ReplayOrchestratorTest {
                 listOf(w2, w3)
             }
 
-            orchestrator.handleStart("route-1", isBackward = false, speedMs = 1.4, followRoadsToStart = true)
+            orchestrator.handleStart("route-1", 1.4, RouteStartConfig(followRoadsToStart = true))
 
             verify { routingErrorReporter.reportRoadFollowingFallbacks(1, 2) }
         }
@@ -732,7 +726,7 @@ class ReplayOrchestratorTest {
                     AppConstants.RouteConstants.PLANTING_DEFAULT_RADIUS_METERS,
                 )
 
-            orchestrator.handleStart("route-1", isBackward = false, speedMs = 1.4, isPlanting = true, teleportToStart = true)
+            orchestrator.handleStart("route-1", 1.4, RouteStartConfig(isPlanting = true, teleportToStart = true))
 
             assertEquals(expected.first.first(), locationRepository.currentPosition.value)
             assertEquals(expected.first, locationRepository.routeWaypoints.value)
@@ -771,7 +765,7 @@ class ReplayOrchestratorTest {
                     AppConstants.RouteConstants.PLANTING_DEFAULT_RADIUS_METERS,
                 )
 
-            orchestrator.handleStart("route-1", isBackward = false, speedMs = 1.4, isPlanting = true, teleportToStart = true)
+            orchestrator.handleStart("route-1", 1.4, RouteStartConfig(isPlanting = true, teleportToStart = true))
 
             assertEquals(expected.first.first(), locationRepository.currentPosition.value)
             assertNotEquals(center, locationRepository.currentPosition.value)
@@ -812,7 +806,7 @@ class ReplayOrchestratorTest {
                     AppConstants.RouteConstants.PLANTING_DEFAULT_RADIUS_METERS,
                 )
 
-            orchestrator.handleStart("route-1", isBackward = true, speedMs = 1.4, isPlanting = true, teleportToStart = true)
+            orchestrator.handleStart("route-1", 1.4, RouteStartConfig(isReverse = true, isPlanting = true, teleportToStart = true))
 
             assertEquals(expected.first.first(), locationRepository.currentPosition.value)
             verify {
@@ -854,14 +848,7 @@ class ReplayOrchestratorTest {
             coEvery { osrmClient.resolveRoute(any(), from, to, true, any()) } returns connector
             val expected = stitchRingsWithConnectorsAndBoundaries(rings, listOf(connector))
 
-            orchestrator.handleStart(
-                "route-1",
-                isBackward = false,
-                speedMs = 1.4,
-                followRoadsToStart = true,
-                isPlanting = true,
-                teleportToStart = true,
-            )
+            orchestrator.handleStart("route-1", 1.4, RouteStartConfig(followRoadsToStart = true, isPlanting = true, teleportToStart = true))
 
             coVerify(exactly = 0) { osrmClient.resolveRoute(any(), w1, w2, true, any()) }
             coVerify(exactly = 1) { osrmClient.resolveRoute(any(), from, to, true, any()) }
@@ -900,11 +887,8 @@ class ReplayOrchestratorTest {
 
             orchestrator.handleStart(
                 "route-1",
-                isBackward = false,
-                speedMs = 1.4,
-                followRoadsToStart = true,
-                teleportBetweenWaypoints = true,
-                teleportToStart = true,
+                1.4,
+                RouteStartConfig(followRoadsToStart = true, teleportBetweenWaypoints = true, teleportToStart = true),
             )
 
             coVerify(exactly = 0) { osrmClient.resolveRoute(any(), any(), any(), any(), any()) }
@@ -947,12 +931,8 @@ class ReplayOrchestratorTest {
 
             orchestrator.handleStart(
                 "route-1",
-                isBackward = false,
-                speedMs = 1.4,
-                followRoadsToStart = true,
-                isPlanting = true,
-                teleportBetweenWaypoints = true,
-                teleportToStart = true,
+                1.4,
+                RouteStartConfig(followRoadsToStart = true, isPlanting = true, teleportBetweenWaypoints = true, teleportToStart = true),
             )
 
             coVerify(exactly = 0) { osrmClient.resolveRoute(any(), any(), any(), any(), any()) }
@@ -989,14 +969,7 @@ class ReplayOrchestratorTest {
                 )
             coEvery { routeRepository.getRouteWithWaypoints("route-1") } returns kotlinx.coroutines.flow.flowOf(route)
 
-            orchestrator.handleStart(
-                "route-1",
-                isBackward = false,
-                speedMs = 1.4,
-                isLoopingOverride = false,
-                isPlanting = true,
-                teleportToStart = true,
-            )
+            orchestrator.handleStart("route-1", 1.4, RouteStartConfig(isPlanting = true, teleportToStart = true))
 
             verify {
                 routeReplayEngine.start(
@@ -1105,7 +1078,7 @@ class ReplayOrchestratorTest {
         runTest {
             coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
 
-            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+            orchestrator.handleStart("teleport-1", 1.4, RouteStartConfig())
 
             verify {
                 teleportRouteEngine.start(
@@ -1128,7 +1101,7 @@ class ReplayOrchestratorTest {
         runTest {
             coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
 
-            orchestrator.handleStart("teleport-1", isBackward = true, speedMs = 1.4)
+            orchestrator.handleStart("teleport-1", 1.4, RouteStartConfig(isReverse = true))
 
             verify {
                 teleportRouteEngine.start(
@@ -1148,7 +1121,7 @@ class ReplayOrchestratorTest {
     fun handlePause_whileTeleportReplayActive_pausesTeleportEngineNotReplayEngine() =
         runTest {
             coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
-            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+            orchestrator.handleStart("teleport-1", 1.4, RouteStartConfig())
 
             orchestrator.handlePause()
 
@@ -1160,7 +1133,7 @@ class ReplayOrchestratorTest {
     fun handleResume_whileTeleportReplayActive_resumesTeleportEngineNotReplayEngine() =
         runTest {
             coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
-            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+            orchestrator.handleStart("teleport-1", 1.4, RouteStartConfig())
 
             orchestrator.handleResume(1.4)
 
@@ -1172,7 +1145,7 @@ class ReplayOrchestratorTest {
     fun handleStop_whileTeleportReplayActive_stopsTeleportEngineNotReplayEngine() =
         runTest {
             coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
-            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+            orchestrator.handleStart("teleport-1", 1.4, RouteStartConfig())
 
             orchestrator.handleStop()
 
@@ -1187,7 +1160,7 @@ class ReplayOrchestratorTest {
     fun handleCancel_whileTeleportReplayActive_stopsTeleportEngineNotReplayEngine() =
         runTest {
             coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
-            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+            orchestrator.handleStart("teleport-1", 1.4, RouteStartConfig())
 
             orchestrator.handleCancel()
 
@@ -1199,7 +1172,7 @@ class ReplayOrchestratorTest {
     fun handleJumpToNextWaypoint_whileTeleportReplayActive_callsTeleportEngine() =
         runTest {
             coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
-            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+            orchestrator.handleStart("teleport-1", 1.4, RouteStartConfig())
 
             orchestrator.handleJumpToNextWaypoint()
 
@@ -1211,7 +1184,7 @@ class ReplayOrchestratorTest {
     fun handleJumpToPreviousWaypoint_whileTeleportReplayActive_callsTeleportEngine() =
         runTest {
             coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
-            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+            orchestrator.handleStart("teleport-1", 1.4, RouteStartConfig())
 
             orchestrator.handleJumpToPreviousWaypoint()
 
@@ -1227,12 +1200,12 @@ class ReplayOrchestratorTest {
             every {
                 teleportRouteEngine.start(any(), any(), any(), any(), capture(onCompleteSlot))
             } returns Unit
-            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+            orchestrator.handleStart("teleport-1", 1.4, RouteStartConfig())
             onCompleteSlot.captured.invoke()
 
             val straightRoute = Route(id = "straight-1", name = "S", waypoints = teleportRoute().waypoints)
             coEvery { routeRepository.getRouteWithWaypoints("straight-1") } returns flowOf(straightRoute)
-            orchestrator.handleStart("straight-1", isBackward = false, speedMs = 1.4)
+            orchestrator.handleStart("straight-1", 1.4, RouteStartConfig())
 
             orchestrator.handlePause()
 
@@ -1243,7 +1216,7 @@ class ReplayOrchestratorTest {
     fun updateSpeed_whileTeleportReplayActive_skipsEngineCallButReportsZero() =
         runTest {
             coEvery { routeRepository.getRouteWithWaypoints("teleport-1") } returns flowOf(teleportRoute())
-            orchestrator.handleStart("teleport-1", isBackward = false, speedMs = 1.4)
+            orchestrator.handleStart("teleport-1", 1.4, RouteStartConfig())
             speedChanges.clear()
 
             orchestrator.updateSpeed(5.0)

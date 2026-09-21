@@ -32,31 +32,16 @@ class StartRouteReplayUseCase
             // Walking to the first waypoint is the default (docs/features/routes.md "Start Flow").
             // Teleport between waypoints requires teleporting to the start too, since MockLocationService
             // only honors the hop mode when teleportToStart is also set.
-            val teleportToStart = config.teleportBetweenWaypoints && !settingsRepository.getHideTeleportFeatures().first()
-            val teleportBetween = teleportToStart
-            val hopDelaySeconds = clampTeleportBetweenDelaySeconds(config.teleportBetweenDelaySeconds)
-            if (teleportToStart) {
+            val hop = config.teleportBetweenWaypoints && !settingsRepository.getHideTeleportFeatures().first()
+            val effective =
+                config.copy(
+                    teleportToStart = hop,
+                    teleportBetweenWaypoints = hop,
+                    teleportBetweenDelaySeconds = clampTeleportBetweenDelaySeconds(config.teleportBetweenDelaySeconds),
+                )
+            if (hop) {
                 route?.startWaypoint(config.isReverse)?.let { teleportUseCase.execute(it.position, resetMovement = false) }
             }
-            val intent =
-                MockLocationIntentBuilder
-                    .startRouteReplay(
-                        context,
-                        routeId,
-                        speedMs,
-                        config.isReverse,
-                        config.followRoadsToStart,
-                        teleportToStart,
-                        config.isPlanting,
-                        teleportBetween,
-                        hopDelaySeconds,
-                    ).apply {
-                        putExtra(MockLocationService.EXTRA_IS_LOOPING, config.isLooping)
-                        if (returnPosition != null) {
-                            putExtra(MockLocationService.EXTRA_RETURN_LAT, returnPosition.latitude)
-                            putExtra(MockLocationService.EXTRA_RETURN_LON, returnPosition.longitude)
-                        }
-                    }
-            context.startService(intent)
+            context.startService(MockLocationIntentBuilder.startRouteReplay(context, routeId, speedMs, effective, returnPosition))
         }
     }

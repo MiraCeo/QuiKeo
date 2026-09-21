@@ -248,13 +248,14 @@ without dragging the sheet up. Settings checkboxes keep the 48.dp target.
   the current position to the first replay point (the first rim vertex when
   Planting is on), then begins replay.
 
-Implemented via a `teleportToStart: Boolean` flag (default `true`), a
+Implemented via `RouteStartConfig` fields: `teleportToStart` (default `false`, derived by
+`StartRouteReplayUseCase` from Teleport between waypoints and `hideTeleportFeatures`), a
 `followRoadsToStart: Boolean` flag (name unchanged, scope
 widened), an `isPlanting: Boolean` flag (default `false`), a
 `teleportBetweenWaypoints: Boolean` flag (default `false`), and a
-`teleportBetweenDelaySeconds: Int` (default 8, clamp 0–600) threaded through
-`StartRouteReplayUseCase` / `RoutesViewModel.startReplay()`
-into `ReplayOrchestrator.handleStart()`. `handleStart()` expands the route's
+`teleportBetweenDelaySeconds: Int` (default 8, clamp 0–600). They are threaded through
+`StartRouteReplayUseCase` / `RoutesViewModel.startReplay()` as intent extras, rebuilt once into a
+`RouteStartConfig` in `MockLocationService`, and passed into `ReplayOrchestrator.handleStart()`. `handleStart()` expands the route's
 waypoint list into a road-resolved path (`expandWaypointsForFollowRoads`,
 via `OsrmClient.resolveRoute()` per leg) before handing it to
 `RouteReplayEngine` when Follow roads is on, Planting is off, and Teleport
