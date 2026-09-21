@@ -196,6 +196,7 @@ object AppConstants {
         /** Street-level camera when jumping to a favorite. Preview tiles cover the wait for z18. */
         const val FAVORITE_CAMERA_ZOOM = 18.0
         const val TILE_USER_AGENT_APP = "locationjoystick"
+        const val OSM_TILE_HOST = "tile.openstreetmap.org"
 
         /** Marker file in cacheDir; bump the suffix to wipe MapLibre's HTTP cache once more. */
         const val OSM_TILE_CACHE_BUST_MARKER = "osm_ua_cache_bust_4"

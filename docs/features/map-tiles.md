@@ -27,7 +27,8 @@ These must all stay true. Breaking any one of them blanks or crawls the map.
    and set `Referer` to the docs URL. Use both an application interceptor
    **and** a network interceptor. Target UA:
    `locationjoystick/<version> (+<docs url>; Android <release>)`
-   (`mapTileUserAgent()`).
+   (`mapTileUserAgent()`). The rewrite is scoped to `tile.openstreetmap.org`
+   (`OSM_TILE_HOST`); Amap and other providers keep MapLibre's own headers.
 3. **Overwrite `HttpRequestImpl` statics.** After `setOkHttpClient`, write
    `client` and `userAgentString` on `HttpRequestImpl` so R8 cannot leave
    executeRequest talking to `DEFAULT_CLIENT`.
@@ -97,6 +98,7 @@ cache wipes.
 ## Do not
 
 - Remove `MapTileHttp.install()` from `LjApplication.onCreate`
+- Apply the OSM User-Agent/Referer to non-OSM hosts
 - Construct `MapView` without `createMapView` / `rememberMapView`
 - Set User-Agent only as an OkHttp default header — MapLibre overwrites it
 - Use interceptor `addHeader` instead of `header()` (must replace)

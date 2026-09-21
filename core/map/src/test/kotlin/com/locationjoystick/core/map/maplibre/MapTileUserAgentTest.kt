@@ -64,7 +64,7 @@ class MapTileUserAgentTest {
                         .build()
                 }.build()
 
-        client.newCall(Request.Builder().url("http://127.0.0.1/").build()).execute().close()
+        client.newCall(Request.Builder().url("https://tile.openstreetmap.org/0/0/0.png").build()).execute().close()
         assertEquals(expected, seen)
     }
 
@@ -98,13 +98,47 @@ class MapTileUserAgentTest {
             .newCall(
                 Request
                     .Builder()
-                    .url("http://127.0.0.1/")
+                    .url("https://tile.openstreetmap.org/0/0/0.png")
                     .header("User-Agent", "okhttp/4.12.0")
                     .build(),
             ).execute()
             .close()
         assertEquals(expected, seenUa)
         assertEquals("https://example.org", seenReferer)
+    }
+
+    @Test
+    fun `interceptor leaves non-OSM hosts untouched`() {
+        var seenUa: String? = null
+        var seenReferer: String? = null
+        val client =
+            OkHttpClient
+                .Builder()
+                .addInterceptor(MapTileUserAgentInterceptor("locationjoystick/1.0", "https://example.org"))
+                .addInterceptor { chain ->
+                    seenUa = chain.request().header("User-Agent")
+                    seenReferer = chain.request().header("Referer")
+                    okhttp3.Response
+                        .Builder()
+                        .request(chain.request())
+                        .protocol(okhttp3.Protocol.HTTP_1_1)
+                        .code(200)
+                        .message("OK")
+                        .body(ByteArray(0).toResponseBody(null))
+                        .build()
+                }.build()
+
+        client
+            .newCall(
+                Request
+                    .Builder()
+                    .url("https://webrd01.is.autonavi.com/appmaptile")
+                    .header("User-Agent", "okhttp/4.12.0")
+                    .build(),
+            ).execute()
+            .close()
+        assertEquals("okhttp/4.12.0", seenUa)
+        assertEquals(null, seenReferer)
     }
 
     @Test
@@ -131,7 +165,7 @@ class MapTileUserAgentTest {
             .newCall(
                 Request
                     .Builder()
-                    .url("http://127.0.0.1/")
+                    .url("https://tile.openstreetmap.org/0/0/0.png")
                     .header("User-Agent", "")
                     .build(),
             ).execute()

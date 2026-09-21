@@ -30,6 +30,9 @@ import java.io.File
  * The OkHttp client is built once per process with MapLibre's per-host concurrency
  * ([AppConstants.MapConstants.OSM_MAX_REQUESTS_PER_HOST], not OkHttp's default of 5).
  * Call it again from every map screen — it is idempotent.
+ *
+ * The User-Agent/Referer rewrite is OSM policy and applies to [AppConstants.MapConstants.OSM_TILE_HOST]
+ * only; other providers (Amap) share the client and concurrency cap but are left untouched.
  */
 fun mapTileUserAgent(
     versionName: String = AppConstants.AppInfo.VERSION_NAME,
@@ -45,8 +48,10 @@ fun mapTileUserAgent(
 internal class MapTileUserAgentInterceptor(
     private val userAgent: String = mapTileUserAgent(),
     private val referer: String = AppConstants.AppInfo.DOCS_URL.trimEnd('/'),
+    private val host: String = AppConstants.MapConstants.OSM_TILE_HOST,
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
+        if (chain.request().url.host != host) return chain.proceed(chain.request())
         val request =
             chain
                 .request()
