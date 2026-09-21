@@ -1,6 +1,9 @@
 package com.locationjoystick.core.location
 
 import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.data.FavoriteRepository
 import com.locationjoystick.core.data.LocationRepository
@@ -22,6 +25,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
+import io.mockk.verify
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -428,4 +432,90 @@ class MapControllerTest {
                 locationRepository.isRoadRouteFetchInFlight.value,
             )
         }
+
+    @Test
+    fun `restoreLastLocation returns no position and never queries LocationManager without fine location permission`() =
+        runTest {
+            val lm = mockk<LocationManager>(relaxed = true)
+            val locationRepository = LocationRepository()
+            val controller = buildRestoreController(locationRepository, lm, PackageManager.PERMISSION_DENIED, backgroundScope)
+
+            controller.restoreLastLocationIfNeeded()
+            runCurrent()
+
+            assertNull(locationRepository.currentPosition.value)
+            verify(exactly = 0) { lm.getLastKnownLocation(any()) }
+        }
+
+    @Test
+    fun `restoreLastLocation still uses the other provider when one provider throws`() =
+        runTest {
+            val lm = mockk<LocationManager>()
+            every { lm.getLastKnownLocation(LocationManager.GPS_PROVIDER) } throws SecurityException("boom")
+            val networkFix =
+                mockk<Location>(relaxed = true) {
+                    every { latitude } returns 10.0
+                    every { longitude } returns 20.0
+                    every { time } returns 1L
+                    every { isFromMockProvider } returns false
+                    every { isMock } returns false
+                }
+            every { lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) } returns networkFix
+            val locationRepository = LocationRepository()
+            val controller = buildRestoreController(locationRepository, lm, PackageManager.PERMISSION_GRANTED, backgroundScope)
+
+            controller.restoreLastLocationIfNeeded()
+            runCurrent()
+
+            assertEquals(LatLng(10.0, 20.0), locationRepository.currentPosition.value)
+        }
+
+    private fun buildRestoreController(
+        locationRepository: LocationRepository,
+        lm: LocationManager,
+        permission: Int,
+        scope: kotlinx.coroutines.CoroutineScope,
+    ): MapController {
+        val settingsRepository =
+            mockk<SettingsRepository>(relaxed = true) {
+                every { getActiveSpeedProfile() } returns flowOf(walkProfile)
+                every { getRoutesSortMode() } returns flowOf(com.locationjoystick.core.model.SavedItemSortMode.NEWEST_FIRST)
+                every { getFavoritesSortMode() } returns flowOf(com.locationjoystick.core.model.SavedItemSortMode.NEWEST_FIRST)
+                every { getSpeedUnit() } returns flowOf(SpeedUnit.KMH)
+                every { getRecentSearches() } returns flowOf(emptyList())
+                every { getRoamingDefaults() } returns flowOf(RoamingDefaults())
+                every { getSettingsSnapshot() } returns emptyFlow()
+                every { getRememberLastLocation() } returns flowOf(false)
+            }
+        val osrmClient = mockk<OsrmClient>(relaxed = true)
+        val walkCoordinator = WalkCoordinator(locationRepository, WalkToEngine(settingsRepository, locationRepository))
+        val routingErrorReporter = RoutingErrorReporter(mockk<Context>(relaxed = true))
+        val context =
+            mockk<Context>(relaxed = true) {
+                every { checkPermission(any(), any(), any()) } returns permission
+                every { getSystemService(Context.LOCATION_SERVICE) } returns lm
+            }
+        val roamingRepository =
+            mockk<RoamingRepository>(relaxed = true) {
+                every { isRoaming } returns MutableStateFlow(false)
+                every { isRoamingPaused } returns MutableStateFlow(false)
+            }
+        return MapController(
+            context = context,
+            locationRepository = locationRepository,
+            routeRepository = mockk<RouteRepository>(relaxed = true) { every { getRoutes() } returns emptyFlow() },
+            favoriteRepository =
+                mockk<FavoriteRepository>(relaxed = true) { every { getFavorites() } returns flowOf(emptyList()) },
+            settingsRepository = settingsRepository,
+            roamingRepository = roamingRepository,
+            walkCoordinator = walkCoordinator,
+            teleportUseCase = mockk<TeleportUseCase>(relaxed = true) { every { cooldownsFor(any()) } returns emptyFlow() },
+            startRouteReplayUseCase = mockk<StartRouteReplayUseCase>(relaxed = true),
+            ephemeralReplayController =
+                EphemeralReplayController(locationRepository, settingsRepository, walkCoordinator, osrmClient, routingErrorReporter),
+            osrmClient = osrmClient,
+            routingErrorReporter = routingErrorReporter,
+            appScope = scope,
+        )
+    }
 }

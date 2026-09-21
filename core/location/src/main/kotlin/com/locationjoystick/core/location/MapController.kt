@@ -1,6 +1,8 @@
 package com.locationjoystick.core.location
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.locationjoystick.core.common.constants.AppConstants
@@ -321,16 +323,27 @@ class MapController
         }
 
         /** Queries the latest non-mock last-known location across GPS and Network providers. */
-        @Suppress("DEPRECATION")
+        @Suppress("DEPRECATION", "MissingPermission")
         private fun getDeviceLocation(): LatLng? {
             val lm = context.getSystemService(Context.LOCATION_SERVICE) as? android.location.LocationManager ?: return null
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                return null
+            }
             return listOf(
                 android.location.LocationManager.GPS_PROVIDER,
                 android.location.LocationManager.NETWORK_PROVIDER,
-            ).mapNotNull { runCatching { lm.getLastKnownLocation(it) }.getOrNull() }
-                .filter { loc ->
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) !loc.isMock else !loc.isFromMockProvider
-                }.maxByOrNull { it.time }
+            ).mapNotNull { provider ->
+                try {
+                    lm.getLastKnownLocation(provider)
+                } catch (e: Exception) {
+                    Log.e(TAG, "getLastKnownLocation failed for $provider", e)
+                    null
+                }
+            }.filter { loc ->
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) !loc.isMock else !loc.isFromMockProvider
+            }.maxByOrNull { it.time }
                 ?.let { LatLng(it.latitude, it.longitude) }
         }
 
