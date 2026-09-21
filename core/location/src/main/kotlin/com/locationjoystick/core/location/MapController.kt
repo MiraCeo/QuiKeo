@@ -1,8 +1,6 @@
 package com.locationjoystick.core.location
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.locationjoystick.core.common.constants.AppConstants
@@ -10,6 +8,7 @@ import com.locationjoystick.core.common.di.ApplicationScope
 import com.locationjoystick.core.data.CooldownState
 import com.locationjoystick.core.data.FavoriteRepository
 import com.locationjoystick.core.data.LocationRepository
+import com.locationjoystick.core.data.RealLocationRepository
 import com.locationjoystick.core.data.RoamingRepository
 import com.locationjoystick.core.data.RouteRepository
 import com.locationjoystick.core.data.SettingsRepository
@@ -80,6 +79,7 @@ class MapController
         private val roamingRepository: RoamingRepository,
         private val walkCoordinator: WalkCoordinator,
         private val teleportUseCase: TeleportUseCase,
+        private val realLocationRepository: RealLocationRepository,
         private val startRouteReplayUseCase: StartRouteReplayUseCase,
         private val ephemeralReplayController: EphemeralReplayController,
         private val osrmClient: OsrmClient,
@@ -322,37 +322,12 @@ class MapController
                     if (locationRepository.currentPosition.value == null) {
                         val remember = settingsRepository.getRememberLastLocation().first()
                         val savedLocation = if (remember) settingsRepository.getLastLocation().first() else null
-                        val initialPos = savedLocation ?: getDeviceLocation()
+                        val initialPos = savedLocation ?: realLocationRepository.lastKnownRealPosition()
                         if (initialPos != null) {
                             locationRepository.setPositionInternal(initialPos)
                         }
                     }
                 }
-        }
-
-        /** Queries the latest non-mock last-known location across GPS and Network providers. */
-        @Suppress("DEPRECATION", "MissingPermission")
-        private fun getDeviceLocation(): LatLng? {
-            val lm = context.getSystemService(Context.LOCATION_SERVICE) as? android.location.LocationManager ?: return null
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED
-            ) {
-                return null
-            }
-            return listOf(
-                android.location.LocationManager.GPS_PROVIDER,
-                android.location.LocationManager.NETWORK_PROVIDER,
-            ).mapNotNull { provider ->
-                try {
-                    lm.getLastKnownLocation(provider)
-                } catch (e: Exception) {
-                    Log.e(TAG, "getLastKnownLocation failed for $provider", e)
-                    null
-                }
-            }.filter { loc ->
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) !loc.isMock else !loc.isFromMockProvider
-            }.maxByOrNull { it.time }
-                ?.let { LatLng(it.latitude, it.longitude) }
         }
 
         // ── Actions ──────────────────────────────────────────────────────────────
@@ -362,7 +337,7 @@ class MapController
                 val startPos =
                     locationRepository.currentPosition.value
                         ?: settingsRepository.getLastLocation().first()
-                        ?: getDeviceLocation()
+                        ?: realLocationRepository.lastKnownRealPosition()
                         ?: LatLng(AppConstants.MapConstants.DEFAULT_LAT, AppConstants.MapConstants.DEFAULT_LON)
                 ContextCompat.startForegroundService(
                     context,
