@@ -29,10 +29,11 @@ point.
 | `OSM` (default) | `tile.openstreetmap.org` | WGS-84 | 0–19 | Paris | Unchanged behaviour. |
 | `AMAP` | `webrd0{1-4}.is.autonavi.com` (style 8, zh labels) | GCJ-02 | 3–18 | Beijing | Community raster endpoint, no API key. Fast from mainland China where OSM tiles are throttled. Coverage is mainland China only. |
 
-Each source carries `minZoom`/`maxZoom`/`defaultCenter`. Every surface calls
-`MapLibreMap.applyZoomBounds(tileSource)` when it applies a style, which clamps the camera to the
-served range — otherwise Amap shows blank tiles when zoomed out past z3 or in past z18 and looks
-broken. `defaultCenter` is used as the first-open camera when there is no position yet, and by
+Each source carries `minZoom`/`maxZoom`/`clampCamera`/`defaultCenter`. Every surface calls
+`MapLibreMap.applyZoomBounds(tileSource)` when it applies a style. Only sources with `clampCamera`
+(Amap) clamp the camera to the served range — otherwise Amap shows blank tiles when zoomed out past
+z3 or in past z18 and looks broken. OSM keeps MapLibre's default camera range (tiles overzoom past
+z19, as before). `defaultCenter` is used as the first-open camera when there is no position yet, and by
 `MapController.startSpoofing` as the very first mock fix, so a fresh install on Amap starts inside
 its coverage instead of over Paris.
 

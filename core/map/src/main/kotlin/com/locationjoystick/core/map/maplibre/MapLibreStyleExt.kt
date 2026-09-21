@@ -5,6 +5,7 @@ import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.designsystem.LjMapColors
 import com.locationjoystick.core.map.geojson.emptyGeoJson
 import com.locationjoystick.core.model.MapTileSource
+import org.maplibre.android.constants.MapLibreConstants
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.Style
 import org.maplibre.android.style.layers.CircleLayer
@@ -43,13 +44,25 @@ private fun rasterLayer(
 private fun previewMaxZoom(tileSource: MapTileSource) = minOf(AppConstants.MapConstants.OSM_PREVIEW_MAX_ZOOM, tileSource.maxZoom)
 
 /**
- * Clamps the camera to the zoom range [tileSource] actually serves. Call whenever the style is
- * (re)applied — MapLibre snaps an out-of-range camera back into bounds immediately, so switching
- * providers never leaves the user staring at blank tiles.
+ * Camera zoom range for [tileSource]: its served tile range when it opts in via
+ * [MapTileSource.clampCamera], otherwise MapLibre's own defaults (so OSM can overzoom past 19).
+ */
+internal fun cameraZoomBounds(tileSource: MapTileSource): ClosedFloatingPointRange<Float> =
+    if (tileSource.clampCamera) {
+        tileSource.minZoom..tileSource.maxZoom
+    } else {
+        MapLibreConstants.MINIMUM_ZOOM.toFloat()..MapLibreConstants.MAXIMUM_ZOOM.toFloat()
+    }
+
+/**
+ * Applies [cameraZoomBounds]. Call whenever the style is (re)applied — MapLibre snaps an
+ * out-of-range camera back into bounds immediately, and always setting both ends means switching
+ * from a clamped provider back to OSM releases the clamp.
  */
 fun MapLibreMap.applyZoomBounds(tileSource: MapTileSource) {
-    setMinZoomPreference(tileSource.minZoom.toDouble())
-    setMaxZoomPreference(tileSource.maxZoom.toDouble())
+    val bounds = cameraZoomBounds(tileSource)
+    setMinZoomPreference(bounds.start.toDouble())
+    setMaxZoomPreference(bounds.endInclusive.toDouble())
 }
 
 /**

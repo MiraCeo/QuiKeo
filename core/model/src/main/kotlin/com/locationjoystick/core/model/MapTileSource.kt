@@ -16,14 +16,16 @@ enum class MapCoordinateSystem {
  * [tileUrlTemplates] are XYZ templates in MapLibre `{z}/{x}/{y}` syntax; several entries mean
  * the provider shards across subdomains and MapLibre should round-robin between them.
  *
- * [minZoom]/[maxZoom] bound the zoom range the provider actually serves — the camera is clamped to
- * it so the user can never zoom into a blank map. [defaultCenter] is where a map opens when there
+ * [minZoom]/[maxZoom] bound the zoom range the provider actually serves. The camera is clamped to
+ * it only when [clampCamera] is true (providers that return blank tiles outside their range);
+ * otherwise the camera keeps MapLibre's default range and tiles overzoom. [defaultCenter] is where a map opens when there
  * is no position yet; it should sit inside the provider's coverage area.
  */
 enum class MapTileSource(
     val tileUrlTemplates: List<String>,
     val minZoom: Float,
     val maxZoom: Float,
+    val clampCamera: Boolean,
     val coordinateSystem: MapCoordinateSystem,
     val defaultCenter: LatLng,
 ) {
@@ -31,6 +33,7 @@ enum class MapTileSource(
         tileUrlTemplates = listOf("https://tile.openstreetmap.org/{z}/{x}/{y}.png"),
         minZoom = 0f,
         maxZoom = 19f,
+        clampCamera = false,
         coordinateSystem = MapCoordinateSystem.WGS84,
         // Paris — the app's historical default.
         defaultCenter = LatLng(latitude = 48.8566, longitude = 2.3522),
@@ -50,6 +53,7 @@ enum class MapTileSource(
             },
         minZoom = 3f,
         maxZoom = 18f,
+        clampCamera = true,
         coordinateSystem = MapCoordinateSystem.GCJ02,
         // Beijing, centre of Tian'anmen Square (Monument to the People's Heroes), WGS-84.
         defaultCenter = LatLng(latitude = 39.9033, longitude = 116.3915),
