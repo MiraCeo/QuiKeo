@@ -5,6 +5,7 @@ import android.content.Intent
 import com.locationjoystick.core.common.constants.AppConstants.ServiceConstants
 import com.locationjoystick.core.common.util.clampTeleportBetweenDelaySeconds
 import com.locationjoystick.core.model.LatLng
+import com.locationjoystick.core.model.RouteStartConfig
 
 /**
  * Compile-safe factory for all intents targeting [MockLocationService].

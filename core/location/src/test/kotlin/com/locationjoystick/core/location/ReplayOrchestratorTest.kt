@@ -16,6 +16,7 @@ import com.locationjoystick.core.model.MockLocationState
 import com.locationjoystick.core.model.MockMode
 import com.locationjoystick.core.model.Route
 import com.locationjoystick.core.model.RouteProgress
+import com.locationjoystick.core.model.RouteStartConfig
 import com.locationjoystick.core.model.RouteType
 import com.locationjoystick.core.model.Waypoint
 import com.locationjoystick.core.routing.OsrmClient

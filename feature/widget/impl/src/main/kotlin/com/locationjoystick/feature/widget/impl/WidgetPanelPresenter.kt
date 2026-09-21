@@ -22,7 +22,6 @@ import com.locationjoystick.core.data.RouteRepository
 import com.locationjoystick.core.data.SettingsRepository
 import com.locationjoystick.core.designsystem.LjTheme
 import com.locationjoystick.core.location.MapController
-import com.locationjoystick.core.location.RouteStartConfig
 import com.locationjoystick.core.location.ephemeralWaypoints
 import com.locationjoystick.core.location.walkStart
 import com.locationjoystick.core.location.walkTarget
@@ -32,6 +31,7 @@ import com.locationjoystick.core.model.MockLocationState
 import com.locationjoystick.core.model.MockMode
 import com.locationjoystick.core.model.RoamingDefaults
 import com.locationjoystick.core.model.Route
+import com.locationjoystick.core.model.RouteStartConfig
 import com.locationjoystick.core.model.RouteType
 import com.locationjoystick.core.model.ThemeMode
 import com.locationjoystick.core.model.Waypoint
@@ -357,29 +357,8 @@ internal class WidgetPanelPresenter(
                 },
                 onSaveFavorite = { name, pos -> callbacks.saveFavorite(name, pos) },
                 onSaveRoute = { name, points -> mapController.savePastedRoute(name, points) },
-                onStartRoute = {
-                    points,
-                    loop,
-                    reverse,
-                    returnToLocation,
-                    followRoads,
-                    planting,
-                    teleportBetweenWaypoints,
-                    delaySeconds,
-                    ->
-                    mapController.startPastedRouteReplay(
-                        points = points,
-                        config =
-                            RouteStartConfig(
-                                isLooping = loop,
-                                isReverse = reverse,
-                                isReturnToLocation = returnToLocation,
-                                followRoadsToStart = followRoads,
-                                isPlanting = planting,
-                                teleportBetweenWaypoints = teleportBetweenWaypoints,
-                                teleportBetweenDelaySeconds = delaySeconds,
-                            ),
-                    )
+                onStartRoute = { points, config ->
+                    mapController.startPastedRouteReplay(points, config)
                     hidePanelView()
                 },
                 hideTeleport = hideTeleportFeatures,
@@ -554,29 +533,8 @@ internal class WidgetPanelPresenter(
                 },
                 onSaveFavorite = { name, pos -> callbacks.saveFavorite(name, pos) },
                 onSavePastedRoute = { name, points -> mapController.savePastedRoute(name, points) },
-                onStartPastedRoute = {
-                    points,
-                    loop,
-                    reverse,
-                    returnToLocation,
-                    followRoads,
-                    planting,
-                    teleportBetweenWaypoints,
-                    delaySeconds,
-                    ->
-                    mapController.startPastedRouteReplay(
-                        points = points,
-                        config =
-                            RouteStartConfig(
-                                isLooping = loop,
-                                isReverse = reverse,
-                                isReturnToLocation = returnToLocation,
-                                followRoadsToStart = followRoads,
-                                isPlanting = planting,
-                                teleportBetweenWaypoints = teleportBetweenWaypoints,
-                                teleportBetweenDelaySeconds = delaySeconds,
-                            ),
-                    )
+                onStartPastedRoute = { points, config ->
+                    mapController.startPastedRouteReplay(points, config)
                 },
                 quickWalk = quickWalk,
                 hideTeleportFeatures = hideTeleportFeatures,

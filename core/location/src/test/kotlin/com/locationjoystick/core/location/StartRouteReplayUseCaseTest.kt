@@ -1,12 +1,14 @@
 package com.locationjoystick.core.location
 
 import android.content.Context
+import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.data.LocationRepository
 import com.locationjoystick.core.data.RouteRepository
 import com.locationjoystick.core.data.SettingsRepository
 import com.locationjoystick.core.data.TeleportUseCase
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.Route
+import com.locationjoystick.core.model.RouteStartConfig
 import com.locationjoystick.core.model.Waypoint
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -15,6 +17,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -113,4 +116,12 @@ class StartRouteReplayUseCaseTest {
             coVerify { settingsRepository.activateSessionSpeed("bike") }
             verify { context.startService(any()) }
         }
+
+    @Test
+    fun routeStartConfig_defaultDelay_matchesAppConstant() {
+        assertEquals(
+            AppConstants.RouteConstants.TELEPORT_BETWEEN_DEFAULT_DELAY_SECONDS,
+            RouteStartConfig().teleportBetweenDelaySeconds,
+        )
+    }
 }

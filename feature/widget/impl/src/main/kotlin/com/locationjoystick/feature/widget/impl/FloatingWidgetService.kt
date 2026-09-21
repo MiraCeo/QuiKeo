@@ -31,7 +31,6 @@ import com.locationjoystick.core.designsystem.LjTheme
 import com.locationjoystick.core.location.CompassHeadingSource
 import com.locationjoystick.core.location.MapController
 import com.locationjoystick.core.location.MockLocationService
-import com.locationjoystick.core.location.RouteStartConfig
 import com.locationjoystick.core.model.AppFeature
 import com.locationjoystick.core.model.FavoriteLocation
 import com.locationjoystick.core.model.GroupRole
@@ -40,6 +39,7 @@ import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.MockLocationState
 import com.locationjoystick.core.model.MockMode
 import com.locationjoystick.core.model.RoamingDefaults
+import com.locationjoystick.core.model.RouteStartConfig
 import com.locationjoystick.core.model.ThemeMode
 import com.locationjoystick.core.model.isRoutePlaying
 import com.locationjoystick.core.model.shouldIgnoreJoystickInput

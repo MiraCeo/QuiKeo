@@ -62,8 +62,8 @@ import com.locationjoystick.core.designsystem.component.RouteStartSheetContent
 import com.locationjoystick.core.designsystem.component.SavedItemSortMenu
 import com.locationjoystick.core.designsystem.component.WideContentClamp
 import com.locationjoystick.core.designsystem.component.rememberLjSheetState
-import com.locationjoystick.core.location.RouteStartConfig
 import com.locationjoystick.core.location.rememberSpoofToggleState
+import com.locationjoystick.core.model.RouteStartConfig
 import com.locationjoystick.core.model.RouteType
 import com.locationjoystick.core.model.distanceTo
 import com.locationjoystick.core.model.matchesSearch

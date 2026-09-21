@@ -15,7 +15,6 @@ import com.locationjoystick.core.data.TeleportUseCase
 import com.locationjoystick.core.data.WalkCoordinator
 import com.locationjoystick.core.location.EphemeralReplayController
 import com.locationjoystick.core.location.MapController
-import com.locationjoystick.core.location.RouteStartConfig
 import com.locationjoystick.core.location.StartRouteReplayUseCase
 import com.locationjoystick.core.model.FavoriteLocation
 import com.locationjoystick.core.model.LatLng
@@ -23,6 +22,7 @@ import com.locationjoystick.core.model.MockLocationState
 import com.locationjoystick.core.model.MockMode
 import com.locationjoystick.core.model.Route
 import com.locationjoystick.core.model.RouteProgress
+import com.locationjoystick.core.model.RouteStartConfig
 import com.locationjoystick.core.model.SpeedProfile
 import com.locationjoystick.core.routing.OsrmClient
 import com.locationjoystick.core.routing.RoutingErrorReporter
@@ -1334,13 +1334,8 @@ class MapViewModelTest {
             viewModel.onAction(MapAction.OpenPasteCoordinates)
 
             viewModel.startPastedRoute(
-                points = points,
-                loop = true,
-                reverse = false,
-                returnToLocation = false,
-                followRoads = true,
-                planting = false,
-                teleportBetweenWaypoints = true,
+                points,
+                RouteStartConfig(isLooping = true, followRoadsToStart = true, teleportBetweenWaypoints = true),
             )
             testDispatcher.scheduler.advanceUntilIdle()
 
@@ -1366,14 +1361,7 @@ class MapViewModelTest {
     @Test
     fun `startPastedRoute ignores a single point`() =
         runTest {
-            viewModel.startPastedRoute(
-                points = listOf(LatLng(11.0, 79.0)),
-                loop = false,
-                reverse = false,
-                returnToLocation = false,
-                followRoads = false,
-                planting = false,
-            )
+            viewModel.startPastedRoute(listOf(LatLng(11.0, 79.0)), RouteStartConfig())
             testDispatcher.scheduler.advanceUntilIdle()
 
             coVerify(exactly = 0) { routeRepository.upsertPasteTempRoute(any()) }

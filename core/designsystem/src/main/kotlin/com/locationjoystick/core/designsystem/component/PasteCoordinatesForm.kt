@@ -48,6 +48,7 @@ import com.locationjoystick.core.designsystem.LjSpacing
 import com.locationjoystick.core.designsystem.LjTheme
 import com.locationjoystick.core.designsystem.R
 import com.locationjoystick.core.model.LatLng
+import com.locationjoystick.core.model.RouteStartConfig
 
 private enum class PasteNamePrompt { Favorite, Route }
 
@@ -67,16 +68,7 @@ fun PasteCoordinatesForm(
     onWalkViaRoads: (LatLng) -> Unit,
     onSaveFavorite: (name: String, position: LatLng) -> Unit,
     onSaveRoute: (name: String, points: List<LatLng>) -> Unit,
-    onStartRoute: (
-        points: List<LatLng>,
-        loop: Boolean,
-        reverse: Boolean,
-        returnToLocation: Boolean,
-        followRoads: Boolean,
-        planting: Boolean,
-        teleportBetweenWaypoints: Boolean,
-        teleportBetweenDelaySeconds: Int,
-    ) -> Unit,
+    onStartRoute: (points: List<LatLng>, config: RouteStartConfig) -> Unit,
     modifier: Modifier = Modifier,
     hideTeleportFeatures: Boolean = false,
     showTitle: Boolean = true,
@@ -390,13 +382,16 @@ fun PasteCoordinatesForm(
                         onClick = {
                             onStartRoute(
                                 points,
-                                loop || planting,
-                                reverse,
-                                returnToLocation && !loop && !planting,
-                                followRoads,
-                                planting,
-                                teleportBetweenWaypoints && !hideTeleportFeatures,
-                                parseTeleportBetweenDelaySeconds(teleportBetweenDelaySecondsText),
+                                RouteStartConfig(
+                                    isLooping = loop || planting,
+                                    isReverse = reverse,
+                                    isReturnToLocation = returnToLocation && !loop && !planting,
+                                    followRoadsToStart = followRoads,
+                                    isPlanting = planting,
+                                    teleportBetweenWaypoints = teleportBetweenWaypoints && !hideTeleportFeatures,
+                                    teleportBetweenDelaySeconds =
+                                        parseTeleportBetweenDelaySeconds(teleportBetweenDelaySecondsText),
+                                ),
                             )
                             onDismiss()
                         },
@@ -462,7 +457,7 @@ private fun PasteCoordinatesFormPreview() {
             onWalkViaRoads = {},
             onSaveFavorite = { _, _ -> },
             onSaveRoute = { _, _ -> },
-            onStartRoute = { _, _, _, _, _, _, _, _ -> },
+            onStartRoute = { _, _ -> },
         )
     }
 }
@@ -478,7 +473,7 @@ private fun PasteCoordinatesFormHideTeleportPreview() {
             onWalkViaRoads = {},
             onSaveFavorite = { _, _ -> },
             onSaveRoute = { _, _ -> },
-            onStartRoute = { _, _, _, _, _, _, _, _ -> },
+            onStartRoute = { _, _ -> },
             hideTeleportFeatures = true,
         )
     }

@@ -57,6 +57,7 @@ import com.locationjoystick.core.map.maplibre.rememberMapView
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.MockLocationState
 import com.locationjoystick.core.model.RecentSearch
+import com.locationjoystick.core.model.RouteStartConfig
 import com.locationjoystick.feature.map.api.MAP_ROUTE
 import com.locationjoystick.feature.map.impl.R
 import org.maplibre.android.camera.CameraPosition
@@ -171,16 +172,7 @@ internal fun MapScreen(
     onWalkViaRoadsPastedCoordinates: (LatLng) -> Unit = {},
     onSavePastedFavorite: (String, LatLng) -> Unit = { _, _ -> },
     onSavePastedRoute: (String, List<LatLng>) -> Unit = { _, _ -> },
-    onStartPastedRoute: (
-        List<LatLng>,
-        Boolean,
-        Boolean,
-        Boolean,
-        Boolean,
-        Boolean,
-        Boolean,
-        Int,
-    ) -> Unit = { _, _, _, _, _, _, _, _ -> },
+    onStartPastedRoute: (List<LatLng>, RouteStartConfig) -> Unit = { _, _ -> },
     onNavigateToRoutes: () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },

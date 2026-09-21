@@ -8,6 +8,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.designsystem.component.PasteCoordinatesForm
 import com.locationjoystick.core.model.LatLng
+import com.locationjoystick.core.model.RouteStartConfig
 import com.locationjoystick.feature.widget.impl.R
 
 @Composable
@@ -18,16 +19,7 @@ internal fun PasteCoordinatesFloatingView(
     onWalkViaRoads: (LatLng) -> Unit,
     onSaveFavorite: (name: String, position: LatLng) -> Unit,
     onSaveRoute: (name: String, points: List<LatLng>) -> Unit,
-    onStartRoute: (
-        points: List<LatLng>,
-        loop: Boolean,
-        reverse: Boolean,
-        returnToLocation: Boolean,
-        followRoads: Boolean,
-        planting: Boolean,
-        teleportBetweenWaypoints: Boolean,
-        teleportBetweenDelaySeconds: Int,
-    ) -> Unit,
+    onStartRoute: (points: List<LatLng>, config: RouteStartConfig) -> Unit,
     hideTeleport: Boolean = false,
     minimized: Boolean = false,
     onToggleMinimize: () -> Unit = {},

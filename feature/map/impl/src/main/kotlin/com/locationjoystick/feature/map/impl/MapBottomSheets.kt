@@ -44,6 +44,7 @@ import com.locationjoystick.core.designsystem.component.RouteStartSheetContent
 import com.locationjoystick.core.designsystem.component.RoutesPickerList
 import com.locationjoystick.core.designsystem.component.rememberLjSheetState
 import com.locationjoystick.core.model.LatLng
+import com.locationjoystick.core.model.RouteStartConfig
 import com.locationjoystick.core.model.RouteType
 import com.locationjoystick.core.model.startWaypoint
 import com.locationjoystick.feature.map.impl.R
@@ -188,16 +189,7 @@ internal fun PasteCoordinatesSheet(
     onWalkViaRoads: (LatLng) -> Unit,
     onSaveFavorite: (name: String, position: LatLng) -> Unit,
     onSaveRoute: (name: String, points: List<LatLng>) -> Unit,
-    onStartRoute: (
-        points: List<LatLng>,
-        loop: Boolean,
-        reverse: Boolean,
-        returnToLocation: Boolean,
-        followRoads: Boolean,
-        planting: Boolean,
-        teleportBetweenWaypoints: Boolean,
-        teleportBetweenDelaySeconds: Int,
-    ) -> Unit,
+    onStartRoute: (points: List<LatLng>, config: RouteStartConfig) -> Unit,
     hideTeleportFeatures: Boolean = false,
     title: String? = null,
     initialText: String = "",

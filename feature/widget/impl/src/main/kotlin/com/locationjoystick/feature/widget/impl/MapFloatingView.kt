@@ -81,6 +81,7 @@ import com.locationjoystick.core.model.RecentSearch
 import com.locationjoystick.core.model.RoamingConfig
 import com.locationjoystick.core.model.RoamingDefaults
 import com.locationjoystick.core.model.RouteProgress
+import com.locationjoystick.core.model.RouteStartConfig
 import com.locationjoystick.core.model.SavedItemSortMode
 import com.locationjoystick.core.model.SpeedUnit
 import com.locationjoystick.core.model.isRoutePlaying
@@ -144,18 +145,7 @@ internal fun MapFloatingView(
     onDeleteFavorite: (FavoriteLocation) -> Unit = {},
     onSaveFavorite: ((name: String, position: LatLng) -> Unit)? = null,
     onSavePastedRoute: ((name: String, points: List<LatLng>) -> Unit)? = null,
-    onStartPastedRoute: (
-        (
-            points: List<LatLng>,
-            loop: Boolean,
-            reverse: Boolean,
-            returnToLocation: Boolean,
-            followRoads: Boolean,
-            planting: Boolean,
-            teleportBetweenWaypoints: Boolean,
-            teleportBetweenDelaySeconds: Int,
-        ) -> Unit
-    )? = null,
+    onStartPastedRoute: ((points: List<LatLng>, config: RouteStartConfig) -> Unit)? = null,
     quickWalk: Boolean = false,
     hideTeleportFeatures: Boolean = false,
     showRouteJumpButtons: Boolean = AppConstants.ProfileConstants.SHOW_ROUTE_JUMP_BUTTONS_DEFAULT,
@@ -599,27 +589,7 @@ internal fun MapFloatingView(
                 onWalkViaRoads = onWalkViaRoads,
                 onSaveFavorite = { name, point -> saveFavoriteAt?.invoke(name, point) },
                 onSaveRoute = { name, points -> savePastedRoute?.invoke(name, points) },
-                onStartRoute = {
-                    points,
-                    loop,
-                    reverse,
-                    returnToLocation,
-                    followRoads,
-                    planting,
-                    teleportBetweenWaypoints,
-                    delaySeconds,
-                    ->
-                    startPastedRoute?.invoke(
-                        points,
-                        loop,
-                        reverse,
-                        returnToLocation,
-                        followRoads,
-                        planting,
-                        teleportBetweenWaypoints,
-                        delaySeconds,
-                    )
-                },
+                onStartRoute = { points, config -> startPastedRoute?.invoke(points, config) },
                 hideTeleportFeatures = hideTeleportFeatures,
             )
         }
@@ -782,16 +752,7 @@ private fun BoxScope.OverlayPasteCoordinatesSheet(
     onWalkViaRoads: (LatLng) -> Unit,
     onSaveFavorite: (name: String, position: LatLng) -> Unit,
     onSaveRoute: (name: String, points: List<LatLng>) -> Unit,
-    onStartRoute: (
-        points: List<LatLng>,
-        loop: Boolean,
-        reverse: Boolean,
-        returnToLocation: Boolean,
-        followRoads: Boolean,
-        planting: Boolean,
-        teleportBetweenWaypoints: Boolean,
-        teleportBetweenDelaySeconds: Int,
-    ) -> Unit,
+    onStartRoute: (points: List<LatLng>, config: RouteStartConfig) -> Unit,
     hideTeleportFeatures: Boolean = false,
 ) {
     Box(modifier = Modifier.fillMaxSize().clickable { onDismiss() })
