@@ -42,6 +42,7 @@ import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.map.geojson.buildMarkerGeoJson
 import com.locationjoystick.core.map.maplibre.addPickerLayers
 import com.locationjoystick.core.map.maplibre.applyZoomBounds
+import com.locationjoystick.core.map.maplibre.rememberMapView
 import com.locationjoystick.core.map.projection.projection
 import com.locationjoystick.core.map.ui.MapAttribution
 import com.locationjoystick.core.model.LatLng
@@ -52,11 +53,9 @@ import com.locationjoystick.feature.favorites.impl.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.maps.MapLibreMap
-import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
 import org.maplibre.android.style.sources.GeoJsonSource
 import java.net.HttpURLConnection
@@ -119,11 +118,7 @@ internal fun MapPickerScreen(
         lon: Double,
     ): String = proj.toMap(LatLng(lat, lon)).let { buildMarkerGeoJson(it.latitude, it.longitude) }
 
-    val mapView =
-        remember {
-            MapLibre.getInstance(context)
-            MapView(context)
-        }
+    val mapView = rememberMapView()
     val mapRef = remember { mutableStateOf<MapLibreMap?>(null) }
     val markerSource = remember { mutableStateOf<GeoJsonSource?>(null) }
     val selectedPosition = remember { mutableStateOf<Pair<Double, Double>?>(null) }
@@ -261,8 +256,7 @@ internal fun MapPickerScreen(
                     .padding(bottom = paddingValues.calculateBottomPadding()),
         ) {
             AndroidView(
-                factory = { ctx ->
-                    MapLibre.getInstance(ctx)
+                factory = { _ ->
                     mapView.apply {
                         getMapAsync { map ->
                             mapRef.value = map
@@ -308,9 +302,8 @@ internal fun MapPickerScreen(
                         selectedPosition.value = lat to lon
                         showSearchBar = false
                         val map = mapRef.value ?: return@NominatimSearchBar
-                        map.animateCamera(
+                        map.moveCamera(
                             CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon).toMapLatLng(), AppConstants.MapConstants.DEFAULT_ZOOM),
-                            500,
                         )
                         val src = markerSource.value ?: return@NominatimSearchBar
                         src.setGeoJson(markerGeoJson(lat, lon))

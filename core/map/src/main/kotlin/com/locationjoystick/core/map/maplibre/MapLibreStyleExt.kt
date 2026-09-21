@@ -18,19 +18,29 @@ import org.maplibre.android.style.sources.TileSet
 
 private const val RASTER_TILE_SIZE_PX = 256
 
-/** Builds the MapLibre [RasterSource] for [tileSource] under [sourceId]. */
+/** Builds the MapLibre [RasterSource] for [tileSource] under [sourceId], capped at [maxZoom]. */
 private fun rasterSource(
     tileSource: MapTileSource,
     sourceId: String,
+    maxZoom: Float,
 ): RasterSource =
     RasterSource(
         sourceId,
         TileSet(AppConstants.MapConstants.TILESET_VERSION, *tileSource.tileUrlTemplates.toTypedArray()).apply {
             minZoom = tileSource.minZoom
-            maxZoom = tileSource.maxZoom
+            this.maxZoom = maxZoom
         },
         RASTER_TILE_SIZE_PX,
     )
+
+private fun rasterLayer(
+    layerId: String,
+    sourceId: String,
+) = RasterLayer(layerId, sourceId).withProperties(
+    PropertyFactory.rasterFadeDuration(0f),
+)
+
+private fun previewMaxZoom(tileSource: MapTileSource) = minOf(AppConstants.MapConstants.OSM_PREVIEW_MAX_ZOOM, tileSource.maxZoom)
 
 /**
  * Clamps the camera to the zoom range [tileSource] actually serves. Call whenever the style is
@@ -43,24 +53,32 @@ fun MapLibreMap.applyZoomBounds(tileSource: MapTileSource) {
 }
 
 /**
- * Adds the base-map raster tiles for [tileSource] as the bottom-most layer.
+ * Adds the base-map raster tiles for [tileSource] as the bottom-most layers: a low-zoom preview
+ * (overzooms) under the full-detail layer. A teleport to an uncached area can paint a few
+ * preview tiles immediately while the detail layer fills in on top.
  *
  * Anything drawn on top of these tiles must be projected into [MapTileSource.coordinateSystem]
  * first — see `MapProjection` in `core/map/projection`.
  */
 fun Style.addRasterTiles(
     tileSource: MapTileSource,
-    sourceId: String = MapLibreSourceIds.OSM,
-    layerId: String = MapLibreLayerIds.OSM,
+    detailSourceId: String = MapLibreSourceIds.OSM,
+    detailLayerId: String = MapLibreLayerIds.OSM,
+    previewSourceId: String = MapLibreSourceIds.OSM_PREVIEW,
+    previewLayerId: String = MapLibreLayerIds.OSM_PREVIEW,
 ) {
-    addSource(rasterSource(tileSource, sourceId))
-    addLayer(RasterLayer(layerId, sourceId))
+    addSource(rasterSource(tileSource, previewSourceId, previewMaxZoom(tileSource)))
+    addLayer(rasterLayer(previewLayerId, previewSourceId))
+    addSource(rasterSource(tileSource, detailSourceId, tileSource.maxZoom))
+    addLayer(rasterLayer(detailLayerId, detailSourceId))
 }
 
 /** [Style.Builder] variant of [Style.addRasterTiles]. */
 fun Style.Builder.addRasterTiles(tileSource: MapTileSource): Style.Builder {
-    withSource(rasterSource(tileSource, MapLibreSourceIds.OSM))
-    withLayer(RasterLayer(MapLibreLayerIds.OSM, MapLibreSourceIds.OSM))
+    withSource(rasterSource(tileSource, MapLibreSourceIds.OSM_PREVIEW, previewMaxZoom(tileSource)))
+    withLayer(rasterLayer(MapLibreLayerIds.OSM_PREVIEW, MapLibreSourceIds.OSM_PREVIEW))
+    withSource(rasterSource(tileSource, MapLibreSourceIds.OSM, tileSource.maxZoom))
+    withLayer(rasterLayer(MapLibreLayerIds.OSM, MapLibreSourceIds.OSM))
     return this
 }
 
@@ -93,10 +111,12 @@ fun Style.addLocationLayers(
     tileSource: MapTileSource = MapTileSource.DEFAULT,
     osmSourceId: String = MapLibreSourceIds.OSM,
     osmLayerId: String = MapLibreLayerIds.OSM,
+    osmPreviewSourceId: String = MapLibreSourceIds.OSM_PREVIEW,
+    osmPreviewLayerId: String = MapLibreLayerIds.OSM_PREVIEW,
     lineWidth: Float = 4f,
     includeSearchMarker: Boolean = false,
 ): LocationLayerSources {
-    addRasterTiles(tileSource, osmSourceId, osmLayerId)
+    addRasterTiles(tileSource, osmSourceId, osmLayerId, osmPreviewSourceId, osmPreviewLayerId)
 
     val jitterRadiusSrc = GeoJsonSource(MapLibreSourceIds.JITTER_RADIUS, emptyGeoJson())
     addSource(jitterRadiusSrc)

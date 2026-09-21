@@ -2,6 +2,7 @@
   "version": "0.22.0",
   "date": "2026-09-16",
   "entries": [
+    { "category": "feat", "scope": "Group Sync", "summary": "When the group leader teleports, followers now jump there too. Turn off Follow leader teleports to walk instead." },
     { "category": "feat", "scope": "Localization", "summary": "Added a Simplified Chinese translation for the app's interface." },
     { "category": "fix", "scope": "Localization", "summary": "Speed profile names and a few remaining screens now show in the chosen display language instead of falling back to English." },
     { "category": "fix", "scope": "Localization", "summary": "The floating joystick, floating widget, and background notification now follow the chosen display language on Android 9-12, matching the rest of the app." },
