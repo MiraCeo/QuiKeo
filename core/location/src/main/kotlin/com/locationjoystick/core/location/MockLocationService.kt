@@ -514,19 +514,13 @@ class MockLocationService : Service() {
             null -> {
                 // Service restarted by OS (START_STICKY). A parked widget must not resume mock GPS.
                 serviceScope.launch {
-                    when (computeStickyNullIntentAction(settingsRepository.getKeepWidgetOnIdle().first())) {
-                        StickyNullIntentAction.KEEP_PARKED -> {
-                            Log.i(TAG, "OS restart: parked — keeping widget, not resuming spoofing")
-                            val hideWidget = settingsRepository.getHideWidgetOverlay().first()
-                            if (Settings.canDrawOverlays(this@MockLocationService) && !hideWidget) {
-                                startService(Intent().setClassName(packageName, WIDGET_SERVICE_CLASS))
-                            }
-                            return@launch
+                    if (settingsRepository.getKeepWidgetOnIdle().first()) {
+                        Log.i(TAG, "OS restart: parked — keeping widget, not resuming spoofing")
+                        val hideWidget = settingsRepository.getHideWidgetOverlay().first()
+                        if (Settings.canDrawOverlays(this@MockLocationService) && !hideWidget) {
+                            startService(Intent().setClassName(packageName, WIDGET_SERVICE_CLASS))
                         }
-
-                        StickyNullIntentAction.RESUME_SESSION -> {
-                            Unit
-                        }
+                        return@launch
                     }
                     val groupState = groupRepository.groupState.first()
                     if (groupState.role == GroupRole.LEADER) {

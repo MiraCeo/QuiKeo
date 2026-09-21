@@ -202,16 +202,6 @@ class LocationLoopActionTest {
     }
 
     @Test
-    fun `sticky restart stays parked instead of resuming spoofing`() {
-        assertEquals(StickyNullIntentAction.KEEP_PARKED, computeStickyNullIntentAction(keepWidgetOnIdle = true))
-    }
-
-    @Test
-    fun `sticky restart resumes the session when not parked`() {
-        assertEquals(StickyNullIntentAction.RESUME_SESSION, computeStickyNullIntentAction(keepWidgetOnIdle = false))
-    }
-
-    @Test
     fun `widget overlay starts while running and not hidden`() {
         val action = computeWidgetOverlayAction(state = MockLocationState.RUNNING, hideWidgetOverlay = false)
         assertEquals(WidgetOverlayAction.START, action)

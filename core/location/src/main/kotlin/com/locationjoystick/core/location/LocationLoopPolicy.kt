@@ -200,24 +200,6 @@ internal fun computeOverlayStopAction(
         OverlayStopTrigger.STATE_IDLE -> computeIdleOverlayStopAction(keepWidgetOverlay)
     }
 
-/** Decision for [MockLocationService.onStartCommand] when the OS restarts the service with a null intent. */
-internal enum class StickyNullIntentAction {
-    /** Widget Pause: stay idle, keep (or restart) the widget, do not resume mock GPS. */
-    KEEP_PARKED,
-
-    /** Default START_STICKY path: restore group sync or the remembered location. */
-    RESUME_SESSION,
-}
-
-/**
- * Pure decision for a START_STICKY null-intent restart.
- *
- * Pause persists [keepWidgetOnIdle] so a process kill while parked does not silently resume
- * spoofing (the default remembered-location path).
- */
-internal fun computeStickyNullIntentAction(keepWidgetOnIdle: Boolean): StickyNullIntentAction =
-    if (keepWidgetOnIdle) StickyNullIntentAction.KEEP_PARKED else StickyNullIntentAction.RESUME_SESSION
-
 /**
  * Pure decision for whether the widget overlay service should be started or stopped when the
  * "Hide floating widget" setting changes mid-session (not just at the RUNNING transition).
