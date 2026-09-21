@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -217,54 +216,28 @@ internal fun FavoritesFloatingView(
         }
     }
     renamingFavorite?.let { favorite ->
-        AlertDialog(
-            onDismissRequest = { renamingFavorite = null },
-            title = { Text(stringResource(R.string.widget_panel_content_rename_favorite)) },
-            text = {
-                OutlinedTextField(
-                    value = renameText,
-                    onValueChange = { renameText = it },
-                    label = { Text(stringResource(R.string.widget_panel_content_name)) },
-                    singleLine = true,
-                )
+        WidgetRenameDialog(
+            title = stringResource(R.string.widget_panel_content_rename_favorite),
+            text = renameText,
+            onTextChange = { renameText = it },
+            onConfirm = { name ->
+                onRename(favorite, name)
+                selectedFavorite = favorite.copy(name = name)
+                renamingFavorite = null
             },
-            confirmButton = {
-                TextButton(
-                    enabled = renameText.isNotBlank(),
-                    onClick = {
-                        val name = renameText.trim()
-                        onRename(favorite, name)
-                        selectedFavorite = favorite.copy(name = name)
-                        renamingFavorite = null
-                    },
-                ) { Text(stringResource(R.string.widget_panel_content_save)) }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { renamingFavorite = null },
-                ) { Text(stringResource(R.string.widget_panel_content_cancel)) }
-            },
+            onDismiss = { renamingFavorite = null },
         )
     }
     deletingFavorite?.let { favorite ->
-        AlertDialog(
-            onDismissRequest = { deletingFavorite = null },
-            title = { Text(stringResource(R.string.widget_panel_content_delete_favorite)) },
-            text = { Text(favorite.name) },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        onDelete(favorite)
-                        selectedFavorite = null
-                        deletingFavorite = null
-                    },
-                ) { Text(stringResource(R.string.widget_panel_content_delete)) }
+        WidgetDeleteDialog(
+            title = stringResource(R.string.widget_panel_content_delete_favorite),
+            itemName = favorite.name,
+            onConfirm = {
+                onDelete(favorite)
+                selectedFavorite = null
+                deletingFavorite = null
             },
-            dismissButton = {
-                TextButton(
-                    onClick = { deletingFavorite = null },
-                ) { Text(stringResource(R.string.widget_panel_content_cancel)) }
-            },
+            onDismiss = { deletingFavorite = null },
         )
     }
 }

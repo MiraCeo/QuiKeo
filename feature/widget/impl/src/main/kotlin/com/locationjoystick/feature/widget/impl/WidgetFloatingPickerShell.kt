@@ -17,12 +17,15 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -278,4 +281,54 @@ private fun FloatingPickerTitleRow(
             }
         }
     }
+}
+
+@Composable
+internal fun WidgetRenameDialog(
+    title: String,
+    text: String,
+    onTextChange: (String) -> Unit,
+    onConfirm: (trimmedName: String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            OutlinedTextField(
+                value = text,
+                onValueChange = onTextChange,
+                label = { Text(stringResource(R.string.widget_panel_content_name)) },
+                singleLine = true,
+            )
+        },
+        confirmButton = {
+            TextButton(enabled = text.isNotBlank(), onClick = { onConfirm(text.trim()) }) {
+                Text(stringResource(R.string.widget_panel_content_save))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.widget_panel_content_cancel)) }
+        },
+    )
+}
+
+@Composable
+internal fun WidgetDeleteDialog(
+    title: String,
+    itemName: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = { Text(itemName) },
+        confirmButton = {
+            TextButton(onClick = onConfirm) { Text(stringResource(R.string.widget_panel_content_delete)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.widget_panel_content_cancel)) }
+        },
+    )
 }

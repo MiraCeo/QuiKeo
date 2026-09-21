@@ -6,12 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -189,52 +185,27 @@ internal fun RoutesFloatingView(
         }
     }
     renamingRoute?.let { route ->
-        AlertDialog(
-            onDismissRequest = { renamingRoute = null },
-            title = { Text(stringResource(R.string.widget_panel_content_rename_route)) },
-            text = {
-                OutlinedTextField(
-                    value = renameText,
-                    onValueChange = { renameText = it },
-                    label = { Text(stringResource(R.string.widget_panel_content_name)) },
-                    singleLine = true,
-                )
+        WidgetRenameDialog(
+            title = stringResource(R.string.widget_panel_content_rename_route),
+            text = renameText,
+            onTextChange = { renameText = it },
+            onConfirm = { name ->
+                onRename(route, name)
+                renamingRoute = null
             },
-            confirmButton = {
-                TextButton(
-                    enabled = renameText.isNotBlank(),
-                    onClick = {
-                        onRename(route, renameText.trim())
-                        renamingRoute = null
-                    },
-                ) { Text(stringResource(R.string.widget_panel_content_save)) }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { renamingRoute = null },
-                ) { Text(stringResource(R.string.widget_panel_content_cancel)) }
-            },
+            onDismiss = { renamingRoute = null },
         )
     }
     deletingRoute?.let { route ->
-        AlertDialog(
-            onDismissRequest = { deletingRoute = null },
-            title = { Text(stringResource(R.string.widget_delete_route_title)) },
-            text = { Text(route.name) },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        onDelete(route)
-                        selectedRouteId = null
-                        deletingRoute = null
-                    },
-                ) { Text(stringResource(R.string.widget_panel_content_delete)) }
+        WidgetDeleteDialog(
+            title = stringResource(R.string.widget_delete_route_title),
+            itemName = route.name,
+            onConfirm = {
+                onDelete(route)
+                selectedRouteId = null
+                deletingRoute = null
             },
-            dismissButton = {
-                TextButton(
-                    onClick = { deletingRoute = null },
-                ) { Text(stringResource(R.string.widget_panel_content_cancel)) }
-            },
+            onDismiss = { deletingRoute = null },
         )
     }
 }
