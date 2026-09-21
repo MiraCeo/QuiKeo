@@ -12,7 +12,9 @@ import com.locationjoystick.core.common.util.parsePastedCoordinates
 import com.locationjoystick.core.common.util.plantingRings
 import com.locationjoystick.core.common.util.stitchRingsWithConnectors
 import com.locationjoystick.core.data.RouteRepository
+import com.locationjoystick.core.data.SettingsRepository
 import com.locationjoystick.core.model.LatLng
+import com.locationjoystick.core.model.MapTileSource
 import com.locationjoystick.core.model.Route
 import com.locationjoystick.core.model.RouteType
 import com.locationjoystick.core.model.Waypoint
@@ -21,8 +23,10 @@ import com.locationjoystick.core.routing.RoutingErrorReporter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -105,10 +109,16 @@ class PasteCoordinatesViewModel
         private val routeRepository: RouteRepository,
         private val osrmClient: OsrmClient,
         private val routingErrorReporter: RoutingErrorReporter,
+        private val settingsRepository: SettingsRepository,
         @param:ApplicationContext private val context: Context,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(PasteCoordinatesUiState())
         val uiState: StateFlow<PasteCoordinatesUiState> = _uiState.asStateFlow()
+
+        val mapTileSource: StateFlow<MapTileSource> =
+            settingsRepository
+                .getMapTileSource()
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), MapTileSource.DEFAULT)
 
         fun onPasteTextChange(text: String) {
             _uiState.update { it.copy(pasteText = text, loadError = null) }

@@ -19,8 +19,8 @@ MapLibre Android SDK 13.2. Not osmdroid, not Google Maps.
 
 Settings → Menus → Map → **Map source** (`AppSettings.mapTileSource`, `MapTileSource` enum in
 `:core:model`) picks the raster provider for **every** map surface: main map, floating widget
-map (`MapFloatingView`), favorites picker (`MapPickerScreen`) and route creator
-(`RouteCreatorScreen`). Each surface collects the setting from `SettingsRepository.getMapTileSource()`
+map (`MapFloatingView`), favorites picker (`MapPickerScreen`), route creator
+(`RouteCreatorScreen`) and Routes-menu paste coordinates (`PasteCoordinatesScreen`). Each surface collects the setting from `SettingsRepository.getMapTileSource()`
 and re-applies its MapLibre style when it changes, re-anchoring the camera on the same real-world
 point.
 

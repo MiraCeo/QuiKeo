@@ -3,7 +3,9 @@ package com.locationjoystick.feature.routes.impl
 import android.content.Context
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.data.RouteRepository
+import com.locationjoystick.core.data.SettingsRepository
 import com.locationjoystick.core.model.LatLng
+import com.locationjoystick.core.model.MapTileSource
 import com.locationjoystick.core.model.RouteType
 import com.locationjoystick.core.routing.OsrmClient
 import com.locationjoystick.core.routing.RoutingErrorReporter
@@ -15,6 +17,8 @@ import io.mockk.slot
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -33,6 +37,7 @@ class PasteCoordinatesViewModelTest {
     private val routeRepository: RouteRepository = mockk(relaxed = true)
     private val osrmClient: OsrmClient = mockk(relaxed = true)
     private val routingErrorReporter: RoutingErrorReporter = mockk(relaxed = true)
+    private val settingsRepository: SettingsRepository = mockk(relaxed = true)
     private val context: Context = mockk(relaxed = true)
     private lateinit var viewModel: PasteCoordinatesViewModel
 
@@ -47,13 +52,21 @@ class PasteCoordinatesViewModelTest {
             "Need at least 2 points for this mode."
         every { context.getString(R.string.route_paste_could_not_build_route) } returns
             "Could not build a route from those points."
-        viewModel = PasteCoordinatesViewModel(routeRepository, osrmClient, routingErrorReporter, context)
+        viewModel = PasteCoordinatesViewModel(routeRepository, osrmClient, routingErrorReporter, settingsRepository, context)
     }
 
     @After
     fun teardown() {
         Dispatchers.resetMain()
     }
+
+    @Test
+    fun `mapTileSource follows the selected setting`() =
+        runTest {
+            every { settingsRepository.getMapTileSource() } returns flowOf(MapTileSource.AMAP)
+            val vm = PasteCoordinatesViewModel(routeRepository, osrmClient, routingErrorReporter, settingsRepository, context)
+            assertEquals(MapTileSource.AMAP, vm.mapTileSource.first { it == MapTileSource.AMAP })
+        }
 
     @Test
     fun `empty paste reports no valid coordinates`() {

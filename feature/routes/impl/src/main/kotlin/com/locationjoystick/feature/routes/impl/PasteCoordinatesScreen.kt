@@ -2,6 +2,7 @@ package com.locationjoystick.feature.routes.impl
 
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -59,7 +60,12 @@ import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.map.geojson.buildSegmentsGeoJson
 import com.locationjoystick.core.map.geojson.buildWaypointsGeoJson
 import com.locationjoystick.core.map.maplibre.addCreatorLayers
+import com.locationjoystick.core.map.maplibre.applyZoomBounds
 import com.locationjoystick.core.map.maplibre.rememberMapView
+import com.locationjoystick.core.map.projection.projection
+import com.locationjoystick.core.map.ui.MapAttribution
+import com.locationjoystick.core.model.LatLng
+import com.locationjoystick.core.model.MapTileSource
 import com.locationjoystick.core.overlay.OverlayService
 import com.locationjoystick.feature.routes.impl.R
 import kotlinx.coroutines.launch
@@ -81,6 +87,7 @@ fun PasteCoordinatesRoute(
     val viewModel: PasteCoordinatesViewModel = hiltViewModel()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val spoofToggle = rememberSpoofToggleState()
+    val tileSource by viewModel.mapTileSource.collectAsStateWithLifecycle()
 
     LaunchedEffect(state.saved) {
         if (state.saved) onRouteSaved()
@@ -102,6 +109,7 @@ fun PasteCoordinatesRoute(
         onToggleSpoofing = spoofToggle.onToggle,
         locationLabel = spoofToggle.locationLabel,
         bottomBar = bottomBar,
+        tileSource = tileSource,
     )
 }
 
@@ -140,6 +148,7 @@ internal fun PasteCoordinatesScreen(
     onToggleSpoofing: () -> Unit = {},
     locationLabel: String? = null,
     bottomBar: @Composable () -> Unit = {},
+    tileSource: MapTileSource = MapTileSource.DEFAULT,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -151,10 +160,40 @@ internal fun PasteCoordinatesScreen(
     var mapReady by remember { mutableStateOf(false) }
     var clipboardMessage by remember { mutableStateOf<String?>(null) }
 
+    // WGS-84 <-> map-tile CRS boundary; view-model state always stays WGS-84.
+    val proj = tileSource.projection
+    val appliedTileSource = remember { mutableStateOf<MapTileSource?>(null) }
+
+    fun LatLng.toMapLatLng(): MapLatLng = proj.toMap(this).let { MapLatLng(it.latitude, it.longitude) }
+
     val mapView = rememberMapView()
     val mapRef = remember { mutableStateOf<MapLibreMap?>(null) }
     val segmentsSource = remember { mutableStateOf<GeoJsonSource?>(null) }
     val waypointsSource = remember { mutableStateOf<GeoJsonSource?>(null) }
+
+    val applyStyle: (MapLibreMap) -> Unit = { map ->
+        appliedTileSource.value = tileSource
+        map.applyZoomBounds(tileSource)
+        map.setStyle(Style.Builder().fromUri(AppConstants.MapConstants.EMPTY_MAP_STYLE_URI)) { style ->
+            val layers = style.addCreatorLayers(tileSource = tileSource)
+            segmentsSource.value = layers.segmentsSource
+            waypointsSource.value = layers.waypointsSource
+            layers.segmentsSource.setGeoJson(
+                buildSegmentsGeoJson(listOf(proj.toMap(state.previewWaypoints)).filter { it.size >= 2 }),
+            )
+            layers.waypointsSource.setGeoJson(buildWaypointsGeoJson(proj.toMap(state.cleanedPoints)))
+            mapReady = true
+        }
+    }
+
+    LaunchedEffect(tileSource) {
+        val map = mapRef.value ?: return@LaunchedEffect
+        val previous = appliedTileSource.value ?: return@LaunchedEffect
+        if (previous == tileSource) return@LaunchedEffect
+        val centerWgs = map.cameraPosition.target?.let { previous.projection.fromMap(LatLng(it.latitude, it.longitude)) }
+        applyStyle(map)
+        if (centerWgs != null) map.moveCamera(CameraUpdateFactory.newLatLng(centerWgs.toMapLatLng()))
+    }
 
     LaunchedEffect(clipboardMessage) {
         val message = clipboardMessage ?: return@LaunchedEffect
@@ -192,7 +231,7 @@ internal fun PasteCoordinatesScreen(
         }
     }
 
-    LaunchedEffect(state.cleanedPoints, state.previewWaypoints, mapReady) {
+    LaunchedEffect(state.cleanedPoints, state.previewWaypoints, mapReady, tileSource) {
         val map = mapRef.value ?: return@LaunchedEffect
         if (!mapReady) return@LaunchedEffect
         val fitPoints = state.previewWaypoints.ifEmpty { state.cleanedPoints }
@@ -200,7 +239,7 @@ internal fun PasteCoordinatesScreen(
         if (fitPoints.size == 1) {
             map.moveCamera(
                 CameraUpdateFactory.newLatLngZoom(
-                    MapLatLng(fitPoints[0].latitude, fitPoints[0].longitude),
+                    fitPoints[0].toMapLatLng(),
                     AppConstants.MapConstants.DEFAULT_ZOOM,
                 ),
             )
@@ -209,7 +248,7 @@ internal fun PasteCoordinatesScreen(
                 LatLngBounds
                     .Builder()
                     .apply {
-                        fitPoints.forEach { include(MapLatLng(it.latitude, it.longitude)) }
+                        fitPoints.forEach { include(it.toMapLatLng()) }
                     }.build()
             map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 72))
         }
@@ -233,50 +272,41 @@ internal fun PasteCoordinatesScreen(
                     .fillMaxSize()
                     .padding(paddingValues),
         ) {
-            AndroidView(
-                factory = { _ ->
-                    mapView.apply {
-                        getMapAsync { map ->
-                            mapRef.value = map
-                            map.uiSettings.isAttributionEnabled = false
-                            map.uiSettings.isLogoEnabled = false
-                            map.cameraPosition =
-                                CameraPosition
-                                    .Builder()
-                                    .target(
-                                        MapLatLng(
-                                            AppConstants.MapConstants.DEFAULT_LAT,
-                                            AppConstants.MapConstants.DEFAULT_LON,
-                                        ),
-                                    ).zoom(AppConstants.MapConstants.DEFAULT_ZOOM)
-                                    .build()
-                            map.setStyle(Style.Builder().fromUri(AppConstants.MapConstants.EMPTY_MAP_STYLE_URI)) { style ->
-                                val layers = style.addCreatorLayers()
-                                segmentsSource.value = layers.segmentsSource
-                                waypointsSource.value = layers.waypointsSource
-                                mapReady = true
+            Box(modifier = Modifier.fillMaxWidth().height(220.dp)) {
+                AndroidView(
+                    factory = { _ ->
+                        mapView.apply {
+                            getMapAsync { map ->
+                                mapRef.value = map
+                                map.uiSettings.isAttributionEnabled = false
+                                map.uiSettings.isLogoEnabled = false
+                                map.cameraPosition =
+                                    CameraPosition
+                                        .Builder()
+                                        .target(tileSource.defaultCenter.toMapLatLng())
+                                        .zoom(AppConstants.MapConstants.DEFAULT_ZOOM)
+                                        .build()
+                                applyStyle(map)
                             }
                         }
-                    }
-                },
-                update = { _ ->
-                    val segSrc = segmentsSource.value ?: return@AndroidView
-                    val wpSrc = waypointsSource.value ?: return@AndroidView
-                    val preview = state.previewWaypoints
-                    segSrc.setGeoJson(
-                        if (preview.size >= 2) {
-                            buildSegmentsGeoJson(listOf(preview))
-                        } else {
-                            buildSegmentsGeoJson(emptyList())
-                        },
-                    )
-                    wpSrc.setGeoJson(buildWaypointsGeoJson(state.cleanedPoints))
-                },
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(220.dp),
-            )
+                    },
+                    update = { _ ->
+                        val segSrc = segmentsSource.value ?: return@AndroidView
+                        val wpSrc = waypointsSource.value ?: return@AndroidView
+                        val preview = state.previewWaypoints
+                        segSrc.setGeoJson(
+                            if (preview.size >= 2) {
+                                buildSegmentsGeoJson(listOf(proj.toMap(preview)))
+                            } else {
+                                buildSegmentsGeoJson(emptyList())
+                            },
+                        )
+                        wpSrc.setGeoJson(buildWaypointsGeoJson(proj.toMap(state.cleanedPoints)))
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                )
+                MapAttribution(tileSource, Modifier.align(Alignment.BottomStart).padding(4.dp))
+            }
 
             Column(
                 modifier =
