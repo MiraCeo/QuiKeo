@@ -1,6 +1,6 @@
 # Map (MapLibre)
 
-Main screen. OSM centered on `AppConstants.MapConstants.DEFAULT_LAT` / `AppConstants.MapConstants.DEFAULT_LON` first load. Scroll on by default.
+Main screen. OSM centered on the initial position on first load: remembered location, then real device location, then `AppConstants.MapConstants.DEFAULT_LAT` / `AppConstants.MapConstants.DEFAULT_LON` (see @docs/features/last-location.md). Scroll on by default.
 
 Key files: `:feature:map:impl/MapScreen.kt`, `:feature:map:impl/MapViewModel.kt`
 

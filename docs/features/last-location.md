@@ -12,10 +12,12 @@ On app restart, restores the last spoofed position. No manual re-entry needed.
 
 ## Behaviour
 
-- On service start: if `REMEMBER_LAST_LOCATION` is `true` and valid coordinates exist, seed initial position from `LAST_LATITUDE`/`LAST_LONGITUDE`.
+- On startup, with no position set yet: seed the initial position from `LAST_LATITUDE`/`LAST_LONGITUDE` when `REMEMBER_LAST_LOCATION` is `true` and valid coordinates exist; otherwise from the phone's real location (below); otherwise the map falls back to `DEFAULT_LAT`/`DEFAULT_LON`.
+- Real-location fallback (`RealLocationRepository.lastKnownRealPosition()`): the newest non-mock last-known fix across GPS and network providers. Read-only: not persisted, no cooldown, no teleport. It applies whether `REMEMBER_LAST_LOCATION` is on or off (the toggle gates only the saved position) and is skipped silently without location permission.
+- The Start button begins from the current position, then the stored last location (read directly, not gated by the toggle), then `DEFAULT_LAT`/`DEFAULT_LON`.
 - The startup restore (`MapController.restoreLastLocationIfNeeded()`, called from `MapController.init` and
   the map screen) is single-flight: an overlapping call is a no-op, a call after a restore that found nothing
-  retries. The real-device fallback runs only when location permission is granted.
+  retries.
 - While spoofing runs, `MockLocationService.pushLocationUpdate()` — the single 1 Hz tick every mode
   (joystick, walk-to, route replay, roaming, follower catch-up) routes through — writes the current
   position to DataStore, throttled to `AppConstants.LocationConstants.LAST_LOCATION_PERSIST_INTERVAL_MS`

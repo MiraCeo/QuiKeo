@@ -8,6 +8,7 @@
     { "category": "fix", "scope": "Localization", "summary": "The floating joystick, floating widget, and background notification now follow the chosen display language on Android 9-12, matching the rest of the app." },
     { "category": "fix", "scope": "Localization", "summary": "Android 13 and up can now list this app's available languages in its own language-picker Settings screen." },
     { "category": "fix", "scope": "Localization", "summary": "Play Store downloads now include every supported language instead of only the one matching the device's system locale at install time." },
+    { "category": "feat", "scope": "Last Remembered Location", "summary": "On first launch, the map now opens at your phone's real location instead of a default city. Your remembered position still wins when you have one." },
     { "category": "feat", "scope": "Localization", "summary": "Added a Language row to onboarding and Settings so you can pick English or Simplified Chinese without changing your phone's system language." }
   ]
 }
