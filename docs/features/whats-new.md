@@ -45,8 +45,12 @@ an empty string. It is not exported as app data.
 
 ## Maintaining the Changelog
 
-1. Author the release's JSON with one entry per user-visible change.
-2. Run `make wiki-changelog` to generate `docs/wiki/changelog.html`. Do not edit generated HTML.
-3. Verify the running version has a nonempty entries array; tests cover parsing and packaged reads.
+1. Pick the target version. It is the **next** release, not `AppInfo.VERSION_NAME`: release-please
+   bumps that constant only when it merges the release PR, so until then it names the version
+   already shipped. Never edit the JSON of a version that has a git tag (`git tag --list 'v*'`).
+   If `docs/wiki/changelog/<next>.json` does not exist, create it.
+2. Author that JSON with one entry per user-visible change.
+3. Run `make wiki-changelog` to generate `docs/wiki/changelog.html`. Do not edit generated HTML.
+4. Verify the target version has a nonempty entries array; tests cover parsing and packaged reads.
 
 Release tooling controls version bumps. No app-side list or URL needs updating for a new release.
