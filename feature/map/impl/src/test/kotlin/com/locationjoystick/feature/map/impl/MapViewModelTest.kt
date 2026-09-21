@@ -157,8 +157,6 @@ class MapViewModelTest {
             teleportUseCase = teleportUseCase,
             settingsRepository = settingsRepository,
             captureCoordinatesRepository = captureCoordinatesRepository,
-            realLocationRepository = realLocationRepository,
-            context = context,
         )
     }
 
@@ -706,53 +704,43 @@ class MapViewModelTest {
         }
 
     @Test
-    fun `RecenterCamera while stopped targets real GPS without replacing mock position`() =
+    fun `RecenterCamera while stopped jumps to the marker at once without a GPS query`() =
         runTest {
-            val cachedMock = LatLng(1.0, 2.0)
-            val realGps = LatLng(51.5, -0.1)
-            every { locationRepository.currentPosition } returns MutableStateFlow(cachedMock)
-            coEvery { realLocationRepository.getCurrentPosition() } returns Result.success(realGps)
+            val marker = LatLng(1.0, 2.0)
+            every { locationRepository.currentPosition } returns MutableStateFlow(marker)
             viewModel = createViewModel()
             advanceUntilIdle()
 
             viewModel.onAction(MapAction.RecenterCamera())
-            advanceUntilIdle()
 
-            assertEquals(realGps, viewModel.uiState.value.pendingCameraTarget)
-            assertEquals(cachedMock, viewModel.uiState.value.currentPosition)
+            assertEquals(marker, viewModel.uiState.value.pendingCameraTarget)
             assertEquals(true, viewModel.uiState.value.isUserPanning)
+            coVerify(exactly = 0) { realLocationRepository.getCurrentPosition() }
         }
 
     @Test
-    fun `RecenterCamera while stopped falls back to fallbackPosition when GPS fails`() =
+    fun `RecenterCamera while stopped falls back to fallbackPosition when no marker`() =
         runTest {
             val fallback = LatLng(10.0, 20.0)
             every { locationRepository.currentPosition } returns MutableStateFlow(null)
-            coEvery { realLocationRepository.getCurrentPosition() } returns
-                Result.failure(RuntimeException("no fix"))
             viewModel = createViewModel()
             advanceUntilIdle()
 
             viewModel.onAction(MapAction.RecenterCamera(fallback))
-            advanceUntilIdle()
 
             assertEquals(fallback, viewModel.uiState.value.pendingCameraTarget)
-            assertEquals(true, viewModel.uiState.value.isUserPanning)
         }
 
     @Test
-    fun `RecenterCamera while stopped emits error when GPS fails and no fallback given`() =
+    fun `RecenterCamera while stopped does nothing without marker or fallback`() =
         runTest {
             every { locationRepository.currentPosition } returns MutableStateFlow(null)
-            coEvery { realLocationRepository.getCurrentPosition() } returns
-                Result.failure(RuntimeException("no fix"))
             viewModel = createViewModel()
             advanceUntilIdle()
 
             viewModel.onAction(MapAction.RecenterCamera())
-            advanceUntilIdle()
 
-            assertEquals(null, viewModel.uiState.value.pendingCameraTarget)
+            assertNull(viewModel.uiState.value.pendingCameraTarget)
         }
 
     @Test

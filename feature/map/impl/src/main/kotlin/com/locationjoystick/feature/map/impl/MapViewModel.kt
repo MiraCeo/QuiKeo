@@ -1,6 +1,5 @@
 package com.locationjoystick.feature.map.impl
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.locationjoystick.core.common.util.formatCapturedPointsForClipboard
@@ -9,7 +8,6 @@ import com.locationjoystick.core.data.CaptureCoordinatesRepository
 import com.locationjoystick.core.data.CooldownState
 import com.locationjoystick.core.data.DeepLinkRepository
 import com.locationjoystick.core.data.GpxOpenRepository
-import com.locationjoystick.core.data.RealLocationRepository
 import com.locationjoystick.core.data.RoamingRepository
 import com.locationjoystick.core.data.SettingsRepository
 import com.locationjoystick.core.data.TeleportUseCase
@@ -23,16 +21,12 @@ import com.locationjoystick.core.model.RecentSearch
 import com.locationjoystick.core.model.RoamingDefaults
 import com.locationjoystick.core.model.RouteStartConfig
 import com.locationjoystick.core.model.toConfig
-import com.locationjoystick.feature.map.impl.R
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -59,11 +53,20 @@ class MapViewModel
         private val teleportUseCase: TeleportUseCase,
         private val settingsRepository: SettingsRepository,
         private val captureCoordinatesRepository: CaptureCoordinatesRepository,
-        private val realLocationRepository: RealLocationRepository,
-        @param:ApplicationContext private val context: Context,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(MapUiState())
         val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
+
+        private fun moveCameraTo(position: LatLng) {
+            _uiState.update {
+                it.copy(
+                    isUserPanning = true,
+                    pendingCameraTarget = position,
+                    pendingTapPosition = null,
+                    isPendingTapSheetOpen = false,
+                )
+            }
+        }
 
         // Shared state flows through as separate StateFlows to preserve MapScreen API surface
         val recentSearches: StateFlow<List<RecentSearch>> =
@@ -78,8 +81,6 @@ class MapViewModel
 
         val completionMessages: SharedFlow<String> = mapController.completionMessages
         val routingErrors: SharedFlow<String> = mapController.routingErrors
-        private val _cameraMessages = MutableSharedFlow<String>(extraBufferCapacity = 1)
-        val cameraMessages: SharedFlow<String> = _cameraMessages.asSharedFlow()
 
         init {
             mapController.restoreLastLocationIfNeeded()
@@ -324,49 +325,21 @@ class MapViewModel
                 // Camera
                 is MapAction.RecenterCamera -> {
                     val state = _uiState.value.mockLocationState
-                    if (state != com.locationjoystick.core.model.MockLocationState.IDLE &&
-                        state != com.locationjoystick.core.model.MockLocationState.ERROR
-                    ) {
-                        _uiState.update {
-                            it.copy(
-                                isUserPanning = false,
-                                pendingCameraTarget = it.currentPosition,
-                                pendingTapPosition = null,
-                                isPendingTapSheetOpen = false,
-                            )
-                        }
-                    } else {
-                        viewModelScope.launch {
-                            realLocationRepository
-                                .getCurrentPosition()
-                                .onSuccess { position ->
-                                    _uiState.update {
-                                        it.copy(
-                                            isUserPanning = true,
-                                            pendingCameraTarget = position,
-                                            pendingTapPosition = null,
-                                            isPendingTapSheetOpen = false,
-                                        )
-                                    }
-                                }.onFailure { error ->
-                                    val fallback = action.fallbackPosition
-                                    if (fallback != null) {
-                                        _uiState.update {
-                                            it.copy(
-                                                isUserPanning = true,
-                                                pendingCameraTarget = fallback,
-                                                pendingTapPosition = null,
-                                                isPendingTapSheetOpen = false,
-                                            )
-                                        }
-                                    } else {
-                                        _cameraMessages.emit(
-                                            error.message
-                                                ?: context.getString(R.string.map_recenter_gps_fallback_error),
-                                        )
-                                    }
-                                }
-                        }
+                    val target = _uiState.value.currentPosition ?: action.fallbackPosition
+                    when {
+                        state != com.locationjoystick.core.model.MockLocationState.IDLE &&
+                            state != com.locationjoystick.core.model.MockLocationState.ERROR ->
+                            _uiState.update {
+                                it.copy(
+                                    isUserPanning = false,
+                                    pendingCameraTarget = target,
+                                    pendingTapPosition = null,
+                                    isPendingTapSheetOpen = false,
+                                )
+                            }
+
+                        // Idle: jump to the marker synchronously. A GPS query here made the button lag and stack.
+                        target != null -> moveCameraTo(target)
                     }
                 }
 
