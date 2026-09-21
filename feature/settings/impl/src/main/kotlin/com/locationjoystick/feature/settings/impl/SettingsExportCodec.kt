@@ -228,7 +228,7 @@ internal object SettingsExportCodec {
                 AppConstants.RealismConstants.SUSPENDED_MOCKING_ENABLED_DEFAULT,
             )
         val hideTeleportFeatures = settingsObj.optBoolean("hideTeleportFeatures", false)
-        val mapTileSource = MapTileSource.fromName(settingsObj.optString("mapTileSource", null))
+        val mapTileSource = MapTileSource.fromName(settingsObj.optString("mapTileSource"))
         val hideWidgetOverlay = settingsObj.optBoolean("hideWidgetOverlay", false)
         val hideForegroundNotification = settingsObj.optBoolean("hideForegroundNotification", false)
         val showRouteJumpButtons =

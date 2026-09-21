@@ -4,6 +4,7 @@ import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.model.AppFeature
 import com.locationjoystick.core.model.FavoriteLocation
 import com.locationjoystick.core.model.LatLng
+import com.locationjoystick.core.model.MapTileSource
 import com.locationjoystick.core.model.RoamingDefaults
 import com.locationjoystick.core.model.RoamingKind
 import com.locationjoystick.core.model.Route
@@ -273,6 +274,17 @@ class SettingsExportCodecEdgeCaseTest {
         val parsed = SettingsExportCodec.parseExportData(json)
 
         assertEquals(SpeedUnit.KMH, parsed.settings.speedUnit)
+    }
+
+    @Test
+    fun `missing mapTileSource falls back to OSM`() {
+        val json =
+            """{"schemaVersion":1,"exportedAt":0,"settings":{"speedUnit":"KMH"},""" +
+                """"speedProfiles":[],"routes":[],"favoriteLocations":[]}"""
+
+        val parsed = SettingsExportCodec.parseExportData(json)
+
+        assertEquals(MapTileSource.OSM, parsed.settings.mapTileSource)
     }
 
     @Test
