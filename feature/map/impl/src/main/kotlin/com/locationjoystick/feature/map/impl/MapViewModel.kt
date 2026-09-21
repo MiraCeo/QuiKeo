@@ -65,6 +65,20 @@ class MapViewModel
         private val _uiState = MutableStateFlow(MapUiState())
         val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
 
+        // Bumped on every user pan so an in-flight recenter can tell whether the user moved the map since the tap.
+        private var panCount = 0
+
+        private fun moveCameraTo(position: LatLng) {
+            _uiState.update {
+                it.copy(
+                    isUserPanning = true,
+                    pendingCameraTarget = position,
+                    pendingTapPosition = null,
+                    isPendingTapSheetOpen = false,
+                )
+            }
+        }
+
         // Shared state flows through as separate StateFlows to preserve MapScreen API surface
         val recentSearches: StateFlow<List<RecentSearch>> =
             mapController.sharedState
@@ -331,33 +345,25 @@ class MapViewModel
                         }
                     } else {
                         viewModelScope.launch {
+                            // Last-known fix moves the camera at once; the fresh fix (slow when cold) follows
+                            // unless the user panned meanwhile. Read-only: never touches LocationRepository.
+                            val lastKnown = realLocationRepository.lastKnownRealPosition()
+                            val panCountAtTap = panCount
+                            if (lastKnown != null) moveCameraTo(lastKnown)
                             realLocationRepository
                                 .getCurrentPosition()
                                 .onSuccess { position ->
-                                    _uiState.update {
-                                        it.copy(
-                                            isUserPanning = true,
-                                            pendingCameraTarget = position,
-                                            pendingTapPosition = null,
-                                            isPendingTapSheetOpen = false,
-                                        )
-                                    }
+                                    if (lastKnown == null || panCount == panCountAtTap) moveCameraTo(position)
                                 }.onFailure { error ->
                                     val fallback = action.fallbackPosition
-                                    if (fallback != null) {
-                                        _uiState.update {
-                                            it.copy(
-                                                isUserPanning = true,
-                                                pendingCameraTarget = fallback,
-                                                pendingTapPosition = null,
-                                                isPendingTapSheetOpen = false,
+                                    when {
+                                        lastKnown != null -> Unit // already centered on a real fix
+                                        fallback != null -> moveCameraTo(fallback)
+                                        else ->
+                                            _cameraMessages.emit(
+                                                error.message
+                                                    ?: context.getString(R.string.map_recenter_gps_fallback_error),
                                             )
-                                        }
-                                    } else {
-                                        _cameraMessages.emit(
-                                            error.message
-                                                ?: context.getString(R.string.map_recenter_gps_fallback_error),
-                                        )
                                     }
                                 }
                         }
@@ -365,6 +371,7 @@ class MapViewModel
                 }
 
                 MapAction.UserStartedPanning -> {
+                    panCount++
                     _uiState.update { it.copy(isUserPanning = true) }
                 }
 

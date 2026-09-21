@@ -32,6 +32,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -721,6 +722,68 @@ class MapViewModelTest {
             assertEquals(realGps, viewModel.uiState.value.pendingCameraTarget)
             assertEquals(cachedMock, viewModel.uiState.value.currentPosition)
             assertEquals(true, viewModel.uiState.value.isUserPanning)
+        }
+
+    @Test
+    fun `RecenterCamera while stopped moves to last-known fix at once then to the fresh fix`() =
+        runTest {
+            val cachedMock = LatLng(1.0, 2.0)
+            val lastKnown = LatLng(51.5, -0.1)
+            val fresh = LatLng(51.6, -0.2)
+            val fix = CompletableDeferred<Result<LatLng>>()
+            every { locationRepository.currentPosition } returns MutableStateFlow(cachedMock)
+            every { realLocationRepository.lastKnownRealPosition() } returns lastKnown
+            coEvery { realLocationRepository.getCurrentPosition() } coAnswers { fix.await() }
+            viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onAction(MapAction.RecenterCamera())
+            advanceUntilIdle()
+
+            assertEquals(lastKnown, viewModel.uiState.value.pendingCameraTarget)
+            assertEquals(cachedMock, viewModel.uiState.value.currentPosition)
+
+            fix.complete(Result.success(fresh))
+            advanceUntilIdle()
+
+            assertEquals(fresh, viewModel.uiState.value.pendingCameraTarget)
+            assertEquals(cachedMock, viewModel.uiState.value.currentPosition)
+        }
+
+    @Test
+    fun `RecenterCamera while stopped skips fresh fix when user panned after the tap`() =
+        runTest {
+            val lastKnown = LatLng(51.5, -0.1)
+            val fix = CompletableDeferred<Result<LatLng>>()
+            every { realLocationRepository.lastKnownRealPosition() } returns lastKnown
+            coEvery { realLocationRepository.getCurrentPosition() } coAnswers { fix.await() }
+            viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onAction(MapAction.RecenterCamera())
+            advanceUntilIdle()
+            viewModel.onAction(MapAction.CameraTargetConsumed)
+            viewModel.onAction(MapAction.UserStartedPanning)
+            fix.complete(Result.success(LatLng(51.6, -0.2)))
+            advanceUntilIdle()
+
+            assertNull(viewModel.uiState.value.pendingCameraTarget)
+        }
+
+    @Test
+    fun `RecenterCamera while stopped keeps last-known target when fresh fix fails`() =
+        runTest {
+            val lastKnown = LatLng(51.5, -0.1)
+            every { realLocationRepository.lastKnownRealPosition() } returns lastKnown
+            coEvery { realLocationRepository.getCurrentPosition() } returns
+                Result.failure(RuntimeException("no fix"))
+            viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onAction(MapAction.RecenterCamera(LatLng(10.0, 20.0)))
+            advanceUntilIdle()
+
+            assertEquals(lastKnown, viewModel.uiState.value.pendingCameraTarget)
         }
 
     @Test
