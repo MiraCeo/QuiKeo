@@ -308,11 +308,13 @@ class MapController
         /**
          * Resolves the initial map position on startup:
          * 1. Uses the remembered last location if enabled.
-         * 2. Falls back to the real device hardware location (excluding mock providers) on first launch,
-         *    only when location permission is granted.
+         * 2. Falls back to the real device location (last-known fix, then a fresh fix), excluding mock
+         *    providers, only when location permission is granted.
+         * 3. Falls back to the app default location when permission is granted but no fix arrives, so the
+         *    map always shows a point.
          *
-         * Single-flight: a call while a previous restore is still running is a no-op. A finished restore
-         * that found nothing (e.g. permission missing) lets the next call retry.
+         * Single-flight: a call while a previous restore is still running is a no-op. A restore that ran
+         * without permission leaves the position unset so the next call retries.
          */
         @Synchronized
         fun restoreLastLocationIfNeeded() {
@@ -322,7 +324,15 @@ class MapController
                     if (locationRepository.currentPosition.value == null) {
                         val remember = settingsRepository.getRememberLastLocation().first()
                         val savedLocation = if (remember) settingsRepository.getLastLocation().first() else null
-                        val initialPos = savedLocation ?: realLocationRepository.lastKnownRealPosition()
+                        val initialPos =
+                            savedLocation
+                                ?: realLocationRepository.lastKnownRealPosition()
+                                ?: if (realLocationRepository.hasFinePermission()) {
+                                    realLocationRepository.getCurrentPosition().getOrNull()
+                                        ?: LatLng(AppConstants.MapConstants.DEFAULT_LAT, AppConstants.MapConstants.DEFAULT_LON)
+                                } else {
+                                    null
+                                }
                         if (initialPos != null) {
                             locationRepository.setPositionInternal(initialPos)
                         }

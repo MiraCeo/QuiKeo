@@ -118,7 +118,11 @@ class MapControllerRoamingSpeedTest {
             walkCoordinator = mockk<WalkCoordinator>(relaxed = true),
             teleportUseCase =
                 mockk<TeleportUseCase>(relaxed = true) { every { cooldownsFor(any()) } returns emptyFlow() },
-            realLocationRepository = mockk<RealLocationRepository> { every { lastKnownRealPosition() } returns null },
+            realLocationRepository =
+                mockk<RealLocationRepository> {
+                    every { lastKnownRealPosition() } returns null
+                    every { hasFinePermission() } returns false
+                },
             startRouteReplayUseCase = mockk<StartRouteReplayUseCase>(relaxed = true),
             ephemeralReplayController = ephemeral,
             osrmClient = mockk<OsrmClient>(relaxed = true),

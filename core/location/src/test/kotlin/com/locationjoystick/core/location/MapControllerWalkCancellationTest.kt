@@ -120,7 +120,11 @@ class MapControllerWalkCancellationTest {
                     roamingRepository = roamingRepository,
                     walkCoordinator = walkCoordinator,
                     teleportUseCase = teleportUseCase,
-                    realLocationRepository = mockk<RealLocationRepository> { every { lastKnownRealPosition() } returns null },
+                    realLocationRepository =
+                        mockk<RealLocationRepository> {
+                            every { lastKnownRealPosition() } returns null
+                            every { hasFinePermission() } returns false
+                        },
                     startRouteReplayUseCase = startRouteReplayUseCase,
                     ephemeralReplayController = ephemeralController,
                     osrmClient = osrmClient,

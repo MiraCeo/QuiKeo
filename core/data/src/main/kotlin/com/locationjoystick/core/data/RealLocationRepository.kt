@@ -51,7 +51,7 @@ class RealLocationRepository
                 LatLng(location.latitude, location.longitude)
             }
 
-        private fun hasFinePermission(): Boolean =
+        fun hasFinePermission(): Boolean =
             context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
         /**
