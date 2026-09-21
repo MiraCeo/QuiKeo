@@ -5,6 +5,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import com.locationjoystick.core.data.FavoriteRepository
 import com.locationjoystick.core.data.LocationRepository
+import com.locationjoystick.core.data.RealLocationRepository
 import com.locationjoystick.core.data.RoamingRepository
 import com.locationjoystick.core.data.RouteRepository
 import com.locationjoystick.core.data.SettingsRepository
@@ -97,6 +98,11 @@ class WidgetPanelPresenterTest {
                 roamingRepository = roamingRepository,
                 walkCoordinator = mockk<WalkCoordinator>(relaxed = true),
                 teleportUseCase = mockk<TeleportUseCase>(relaxed = true),
+                realLocationRepository =
+                    mockk<RealLocationRepository> {
+                        every { lastKnownRealPosition() } returns null
+                        every { hasFinePermission() } returns false
+                    },
                 startRouteReplayUseCase = mockk<StartRouteReplayUseCase>(relaxed = true),
                 ephemeralReplayController = ephemeralReplayController,
                 osrmClient = mockk<OsrmClient>(relaxed = true),

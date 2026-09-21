@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.CancellationSignal
 import android.os.Looper
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.locationjoystick.core.model.LatLng
@@ -20,7 +21,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
 
-/** Reads the phone's GPS for camera positioning without changing the cached mock location. */
+/**
+ * Reads the phone's real GPS (fresh fix or newest non-mock last-known fix) without changing the cached mock
+ * location.
+ */
 @Singleton
 class RealLocationRepository
     @Inject
@@ -32,10 +36,7 @@ class RealLocationRepository
         @Suppress("MissingPermission")
         suspend fun getCurrentPosition(): Result<LatLng> =
             runCatching {
-                check(
-                    ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                        PackageManager.PERMISSION_GRANTED,
-                ) { "Location permission is required" }
+                check(hasFinePermission()) { "Location permission is required" }
 
                 val fresh =
                     withTimeoutOrNull(CURRENT_LOCATION_TIMEOUT_MS) {
@@ -49,6 +50,31 @@ class RealLocationRepository
                 checkNotNull(location) { "No real GPS fix is available yet" }
                 LatLng(location.latitude, location.longitude)
             }
+
+        fun hasFinePermission(): Boolean =
+            context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+        /**
+         * Newest non-mock last-known fix across GPS and Network providers, or null without fine-location
+         * permission or any fix. Does not touch the cached mock position. `isFromMockProvider` is deprecated on
+         * API 31+ (`isMock` replaces it) but still needed below it.
+         */
+        @Suppress("DEPRECATION", "MissingPermission")
+        fun lastKnownRealPosition(): LatLng? {
+            if (!hasFinePermission()) return null
+            return listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
+                .mapNotNull { provider ->
+                    try {
+                        locationManager?.getLastKnownLocation(provider)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "getLastKnownLocation failed for $provider", e)
+                        null
+                    }
+                }.filter { loc ->
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) !loc.isMock else !loc.isFromMockProvider
+                }.maxByOrNull { it.time }
+                ?.let { LatLng(it.latitude, it.longitude) }
+        }
 
         @Suppress("DEPRECATION", "MissingPermission")
         private suspend fun awaitLegacyCurrentGps(): Location? =
@@ -96,6 +122,7 @@ class RealLocationRepository
             }
 
         private companion object {
+            const val TAG = "RealLocationRepository"
             const val CURRENT_LOCATION_TIMEOUT_MS = 10_000L
         }
     }

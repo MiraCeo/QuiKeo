@@ -3,6 +3,7 @@ package com.locationjoystick.core.location
 import android.content.Context
 import com.locationjoystick.core.data.FavoriteRepository
 import com.locationjoystick.core.data.LocationRepository
+import com.locationjoystick.core.data.RealLocationRepository
 import com.locationjoystick.core.data.RoamingRepository
 import com.locationjoystick.core.data.RouteRepository
 import com.locationjoystick.core.data.SettingsRepository
@@ -117,6 +118,11 @@ class MapControllerRoamingSpeedTest {
             walkCoordinator = mockk<WalkCoordinator>(relaxed = true),
             teleportUseCase =
                 mockk<TeleportUseCase>(relaxed = true) { every { cooldownsFor(any()) } returns emptyFlow() },
+            realLocationRepository =
+                mockk<RealLocationRepository> {
+                    every { lastKnownRealPosition() } returns null
+                    every { hasFinePermission() } returns false
+                },
             startRouteReplayUseCase = mockk<StartRouteReplayUseCase>(relaxed = true),
             ephemeralReplayController = ephemeral,
             osrmClient = mockk<OsrmClient>(relaxed = true),
