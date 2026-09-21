@@ -105,7 +105,7 @@ class PasteCoordinatesViewModel
         private val routeRepository: RouteRepository,
         private val osrmClient: OsrmClient,
         private val routingErrorReporter: RoutingErrorReporter,
-        @ApplicationContext private val context: Context,
+        @param:ApplicationContext private val context: Context,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(PasteCoordinatesUiState())
         val uiState: StateFlow<PasteCoordinatesUiState> = _uiState.asStateFlow()

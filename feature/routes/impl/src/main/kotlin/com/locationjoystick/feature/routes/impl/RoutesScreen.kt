@@ -36,13 +36,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -62,6 +62,7 @@ import com.locationjoystick.core.designsystem.component.RouteStartSheetContent
 import com.locationjoystick.core.designsystem.component.SavedItemSortMenu
 import com.locationjoystick.core.designsystem.component.WideContentClamp
 import com.locationjoystick.core.designsystem.component.rememberLjSheetState
+import com.locationjoystick.core.designsystem.component.writePlainText
 import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.model.RouteStartConfig
 import com.locationjoystick.core.model.RouteType
@@ -69,6 +70,7 @@ import com.locationjoystick.core.model.distanceTo
 import com.locationjoystick.core.model.matchesSearch
 import com.locationjoystick.core.model.startWaypoint
 import com.locationjoystick.feature.routes.impl.R
+import kotlinx.coroutines.launch
 
 @Composable
 fun RoutesRoute(
@@ -545,7 +547,8 @@ private fun RouteShareDialog(
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
-    val clipboard = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
     val copiedMessage = stringResource(R.string.routes_copied_coordinates)
     val coordText =
         remember(route.waypoints) {
@@ -570,7 +573,7 @@ private fun RouteShareDialog(
             Row {
                 TextButton(
                     onClick = {
-                        clipboard.setText(AnnotatedString(coordText))
+                        scope.launch { clipboard.writePlainText(coordText) }
                         Toast.makeText(context, copiedMessage, Toast.LENGTH_SHORT).show()
                     },
                 ) {

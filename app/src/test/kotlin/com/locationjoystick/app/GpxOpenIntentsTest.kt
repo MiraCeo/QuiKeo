@@ -32,6 +32,8 @@ class GpxOpenIntentsTest {
         every { intent.action } returns Intent.ACTION_VIEW
         every { intent.type } returns mime
         every { intent.data } returns uri
+        // Unit tests run with SDK_INT 0, so extraStreamUri takes the legacy branch.
+        @Suppress("DEPRECATION")
         every { intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM) } returns null
         return intent
     }
@@ -60,6 +62,8 @@ class GpxOpenIntentsTest {
         every { intent.action } returns Intent.ACTION_SEND
         every { intent.type } returns "application/gpx+xml"
         every { intent.data } returns null
+        // Unit tests run with SDK_INT 0, so extraStreamUri takes the legacy branch.
+        @Suppress("DEPRECATION")
         every { intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM) } returns uri
         every { intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java) } returns uri
         assertTrue(shouldHandleAsGpxOpen(intent))
@@ -78,6 +82,8 @@ class GpxOpenIntentsTest {
         every { intent.action } returns Intent.ACTION_SEND
         every { intent.type } returns "text/plain"
         every { intent.data } returns null
+        // Unit tests run with SDK_INT 0, so extraStreamUri takes the legacy branch.
+        @Suppress("DEPRECATION")
         every { intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM) } returns null
         assertFalse(shouldHandleAsGpxOpen(intent))
         assertFalse(shouldTryOpenAsGpx(intent))

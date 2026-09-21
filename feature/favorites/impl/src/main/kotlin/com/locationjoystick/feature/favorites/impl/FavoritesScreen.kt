@@ -33,14 +33,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -66,11 +66,14 @@ import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.designsystem.component.LjTextButton
 import com.locationjoystick.core.designsystem.component.SavedItemSortMenu
 import com.locationjoystick.core.designsystem.component.WideContentClamp
+import com.locationjoystick.core.designsystem.component.readPlainText
 import com.locationjoystick.core.designsystem.component.rememberLjSheetState
+import com.locationjoystick.core.designsystem.component.writePlainText
 import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.matchesSearch
 import com.locationjoystick.feature.favorites.impl.R
+import kotlinx.coroutines.launch
 
 @Composable
 fun FavoritesRoute(
@@ -393,7 +396,8 @@ private fun FavoriteCard(
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val clipboard = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
     val coordText = formatCapturedPoint(favorite.position)
     val copiedCoordinatesMessage = stringResource(R.string.favorites_screen_copied_coordinates, coordText)
 
@@ -420,7 +424,7 @@ private fun FavoriteCard(
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.favorites_screen_copy_coordinates)) },
                         onClick = {
-                            clipboard.setText(AnnotatedString(coordText))
+                            scope.launch { clipboard.writePlainText(coordText) }
                             Toast.makeText(context, copiedCoordinatesMessage, Toast.LENGTH_SHORT).show()
                             menuExpanded = false
                         },
@@ -565,7 +569,8 @@ private fun PasteFavoriteSheet(
     val invalidMessage = stringResource(R.string.favorites_no_coordinates)
     var pasteText by rememberSaveable { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
-    val clipboard = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier =
@@ -609,10 +614,12 @@ private fun PasteFavoriteSheet(
             trailingIcon = {
                 IconButton(
                     onClick = {
-                        val text = clipboard.getText()?.text
-                        if (!text.isNullOrBlank()) {
-                            pasteText = text
-                            error = null
+                        scope.launch {
+                            val text = clipboard.readPlainText()
+                            if (!text.isNullOrBlank()) {
+                                pasteText = text
+                                error = null
+                            }
                         }
                     },
                 ) {

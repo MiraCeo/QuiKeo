@@ -23,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -31,7 +32,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -49,6 +50,7 @@ import com.locationjoystick.core.designsystem.LjTheme
 import com.locationjoystick.core.designsystem.R
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.RouteStartConfig
+import kotlinx.coroutines.launch
 
 private enum class PasteNamePrompt { Favorite, Route }
 
@@ -98,7 +100,8 @@ fun PasteCoordinatesForm(
         }
     }
     val noCoordinatesMessage = stringResource(R.string.paste_no_coordinates)
-    val clipboard = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
     val pasteText = fieldValue.text
     val points = remember(pasteText) { parsePastedCoordinates(pasteText) }
     val showScrollFade =
@@ -165,10 +168,12 @@ fun PasteCoordinatesForm(
             trailingIcon = {
                 IconButton(
                     onClick = {
-                        val text = clipboard.getText()?.text
-                        if (!text.isNullOrBlank()) {
-                            fieldValue = TextFieldValue(mergeClipboardIntoPasteText(fieldValue.text, text))
-                            error = null
+                        scope.launch {
+                            val text = clipboard.readPlainText()
+                            if (!text.isNullOrBlank()) {
+                                fieldValue = TextFieldValue(mergeClipboardIntoPasteText(fieldValue.text, text))
+                                error = null
+                            }
                         }
                     },
                 ) {

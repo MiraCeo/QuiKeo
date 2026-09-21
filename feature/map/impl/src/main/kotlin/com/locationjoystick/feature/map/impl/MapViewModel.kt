@@ -60,7 +60,7 @@ class MapViewModel
         private val settingsRepository: SettingsRepository,
         private val captureCoordinatesRepository: CaptureCoordinatesRepository,
         private val realLocationRepository: RealLocationRepository,
-        @ApplicationContext private val context: Context,
+        @param:ApplicationContext private val context: Context,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(MapUiState())
         val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()

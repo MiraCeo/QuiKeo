@@ -28,10 +28,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -53,6 +54,7 @@ import com.locationjoystick.core.designsystem.component.LjOutlinedButton
 import com.locationjoystick.core.designsystem.component.LjPrimaryButton
 import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.designsystem.component.LjSegmentedControl
+import com.locationjoystick.core.designsystem.component.readPlainText
 import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.map.geojson.buildSegmentsGeoJson
 import com.locationjoystick.core.map.geojson.buildWaypointsGeoJson
@@ -60,6 +62,7 @@ import com.locationjoystick.core.map.maplibre.addCreatorLayers
 import com.locationjoystick.core.map.maplibre.rememberMapView
 import com.locationjoystick.core.overlay.OverlayService
 import com.locationjoystick.feature.routes.impl.R
+import kotlinx.coroutines.launch
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLngBounds
@@ -141,7 +144,8 @@ internal fun PasteCoordinatesScreen(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val emptyClipboardMessage = stringResource(R.string.paste_empty_clipboard)
-    val clipboard = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var showSaveDialog by remember { mutableStateOf(false) }
     var mapReady by remember { mutableStateOf(false) }
@@ -310,11 +314,13 @@ internal fun PasteCoordinatesScreen(
                 ) {
                     LjOutlinedButton(
                         onClick = {
-                            val text = clipboard.getText()?.text
-                            if (text.isNullOrBlank()) {
-                                clipboardMessage = emptyClipboardMessage
-                            } else {
-                                onPasteTextChange(text)
+                            scope.launch {
+                                val text = clipboard.readPlainText()
+                                if (text.isNullOrBlank()) {
+                                    clipboardMessage = emptyClipboardMessage
+                                } else {
+                                    onPasteTextChange(text)
+                                }
                             }
                         },
                         modifier = Modifier.weight(1f),
