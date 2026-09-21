@@ -534,6 +534,33 @@ class MapControllerTest {
         }
 
     @Test
+    fun `restoreLastLocation shows the default at once and keeps a position moved before the fix arrives`() =
+        runTest {
+            val fix = CompletableDeferred<Result<LatLng>>()
+            val real =
+                mockk<RealLocationRepository> {
+                    every { lastKnownRealPosition() } returns null
+                    every { hasFinePermission() } returns true
+                    coEvery { getCurrentPosition() } coAnswers { fix.await() }
+                }
+            val locationRepository = LocationRepository()
+            val controller = buildRestoreController(locationRepository, real, backgroundScope)
+
+            controller.restoreLastLocationIfNeeded()
+            runCurrent()
+            assertEquals(
+                LatLng(AppConstants.MapConstants.DEFAULT_LAT, AppConstants.MapConstants.DEFAULT_LON),
+                locationRepository.currentPosition.value,
+            )
+
+            locationRepository.setPositionInternal(LatLng(7.0, 8.0))
+            fix.complete(Result.success(LatLng(5.0, 6.0)))
+            runCurrent()
+
+            assertEquals(LatLng(7.0, 8.0), locationRepository.currentPosition.value)
+        }
+
+    @Test
     fun `restoreLastLocation overlapping calls run one lookup and a later call retries`() =
         runTest {
             val real =

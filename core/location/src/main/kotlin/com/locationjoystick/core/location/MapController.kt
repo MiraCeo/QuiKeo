@@ -324,17 +324,24 @@ class MapController
                     if (locationRepository.currentPosition.value == null) {
                         val remember = settingsRepository.getRememberLastLocation().first()
                         val savedLocation = if (remember) settingsRepository.getLastLocation().first() else null
+                        val known = savedLocation ?: realLocationRepository.lastKnownRealPosition()
                         val initialPos =
-                            savedLocation
-                                ?: realLocationRepository.lastKnownRealPosition()
+                            known
                                 ?: if (realLocationRepository.hasFinePermission()) {
-                                    realLocationRepository.getCurrentPosition().getOrNull()
-                                        ?: LatLng(AppConstants.MapConstants.DEFAULT_LAT, AppConstants.MapConstants.DEFAULT_LON)
+                                    LatLng(AppConstants.MapConstants.DEFAULT_LAT, AppConstants.MapConstants.DEFAULT_LON)
                                 } else {
                                     null
                                 }
-                        if (initialPos != null) {
-                            locationRepository.setPositionInternal(initialPos)
+                        if (initialPos == null) return@launch
+                        locationRepository.setPositionInternal(initialPos)
+                        if (known == null) {
+                            // The default shows at once; the slow fresh fix then moves the map, unless the user
+                            // already moved the position (teleport, start) while it was pending.
+                            realLocationRepository.getCurrentPosition().getOrNull()?.let { fix ->
+                                if (locationRepository.currentPosition.value == initialPos) {
+                                    locationRepository.setPositionInternal(fix)
+                                }
+                            }
                         }
                     }
                 }
