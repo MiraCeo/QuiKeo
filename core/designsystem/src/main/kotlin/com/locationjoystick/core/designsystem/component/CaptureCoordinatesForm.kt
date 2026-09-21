@@ -1,8 +1,6 @@
 package com.locationjoystick.core.designsystem.component
 
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -27,7 +24,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -54,7 +50,6 @@ import com.locationjoystick.core.designsystem.LjAccent
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.LjSpacing
 import com.locationjoystick.core.designsystem.LjTheme
-import com.locationjoystick.core.designsystem.LjWarning
 import com.locationjoystick.core.designsystem.R
 import com.locationjoystick.core.model.LatLng
 import kotlinx.coroutines.launch
@@ -176,26 +171,19 @@ fun CaptureCoordinatesForm(
             )
         }
         if (captureSetup.isDefaultBrowser) {
-            Column(verticalArrangement = Arrangement.spacedBy(LjSpacing.sm)) {
-                CaptureToggleStep(
-                    captureModeEnabled = captureMode.captureModeEnabled,
-                    captureEnabled = captureMode.captureEnabled,
-                    jumpEnabled = captureMode.jumpEnabled,
-                    onCaptureModeEnabledChange = ::requestCaptureMode,
-                    onCaptureEnabledChange = captureMode.onCaptureEnabledChange,
-                    onJumpEnabledChange = captureMode.onJumpEnabledChange,
-                )
-                if (!captureMode.captureModeEnabled || !captureMode.captureEnabled && !captureMode.jumpEnabled) {
-                    CaptureOffBanner(
-                        text =
-                            if (!captureMode.captureModeEnabled) {
-                                stringResource(R.string.capture_off_message)
-                            } else {
-                                stringResource(R.string.capture_passthrough_message)
-                            },
-                    )
-                }
-            }
+            Text(
+                text = stringResource(R.string.capture_intro),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            CaptureToggleStep(
+                captureModeEnabled = captureMode.captureModeEnabled,
+                captureEnabled = captureMode.captureEnabled,
+                jumpEnabled = captureMode.jumpEnabled,
+                onCaptureModeEnabledChange = ::requestCaptureMode,
+                onCaptureEnabledChange = captureMode.onCaptureEnabledChange,
+                onJumpEnabledChange = captureMode.onJumpEnabledChange,
+            )
             CapturePassThroughRow(state = captureSetup)
             Column(verticalArrangement = Arrangement.spacedBy(LjSpacing.sm)) {
                 Text(
@@ -239,11 +227,6 @@ fun CaptureCoordinatesForm(
                     selected = capturePoints.optimizeProximity,
                     onSelect = capturePoints.onOptimizeProximityChange,
                     modifier = Modifier.fillMaxWidth(),
-                )
-                Text(
-                    stringResource(R.string.capture_point_order_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             Column(verticalArrangement = Arrangement.spacedBy(LjSpacing.sm)) {
@@ -442,26 +425,6 @@ private fun CaptureFunctionToggle(
             Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Checkbox(checked = checked, enabled = enabled, onCheckedChange = onCheckedChange)
-    }
-}
-
-@Composable
-private fun CaptureOffBanner(
-    text: String,
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp),
-        color = LjWarning.copy(alpha = 0.12f),
-        border = BorderStroke(1.dp, LjWarning.copy(alpha = 0.4f)),
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-        )
     }
 }
 

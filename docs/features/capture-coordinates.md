@@ -37,14 +37,14 @@ captured list, pass-through row or Save as route.
 
 ### Setup complete (this app is the default browser)
 
-The setup cards disappear entirely and the feature UI shows:
+The setup cards disappear entirely and the feature UI shows a one-line intro (`capture_intro`,
+which also says links pass through when neither List nor Jump is on) and:
 
 - **Capture mode + List / Jump** — one overall DataStore switch followed by two independent
   checkboxes (`CaptureCoordinatesRepository`; not part of `ExportData`). List appends a point; Jump
   teleports immediately through `TeleportUseCase`. Either action, both together, and neither are
   supported. If captured points already exist when the overall mode is enabled, a dialog asks
-  whether to **Clear** (primary/default action) or **Keep** them before enabling. A concise
-  pass-through banner appears while the overall mode is off or neither action is selected.
+  whether to **Clear** (primary/default action) or **Keep** them before enabling.
 - A **Pass-through** row opens an in-app browser picker, used when a captured link's mode doesn't
   list or jump it (see the intercept table below).
 - Lists captured points in an orange-outlined read-only box (skip exact duplicate of the last point)
@@ -55,7 +55,7 @@ The setup cards disappear entirely and the feature UI shows:
   (gap between Copy and the remove actions) and Save as route
 - Save as a straight route via `RouteRepository.insertRoute` when there are ≥2 points
 
-There is no "Ready" banner or step-number badge.
+There is no "Ready" banner, pass-through banner, point-order hint, or step-number badge.
 
 ### Top-bar overflow menu and restore
 
