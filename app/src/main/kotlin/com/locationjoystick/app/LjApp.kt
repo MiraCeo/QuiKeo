@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -26,6 +27,8 @@ import androidx.navigation.compose.rememberNavController
 import com.locationjoystick.app.R
 import com.locationjoystick.app.navigation.LjDrawerContent
 import com.locationjoystick.app.navigation.LjNavHost
+import com.locationjoystick.app.navigation.NavGateViewModel
+import com.locationjoystick.app.navigation.entryRouteFor
 import com.locationjoystick.core.model.RouteType
 import com.locationjoystick.feature.favorites.api.FAVORITES_ROUTE
 import com.locationjoystick.feature.map.api.CAPTURE_ROUTE
@@ -50,6 +53,7 @@ fun LjApp(
     gpxOpenFailedFlow: Flow<Unit> = emptyFlow(),
 ) {
     val navController = rememberNavController()
+    val navGateViewModel: NavGateViewModel = hiltViewModel()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -124,6 +128,16 @@ fun LjApp(
     DisposableEffect(lifecycleOwner) {
         val observer =
             LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_START &&
+                    navController.currentDestination?.route == IDLE_ROUTE &&
+                    entryRouteFor(navGateViewModel.mockLocationState.value) == MAP_ROUTE
+                ) {
+                    // ON_STOP parked us on Home so the map unloaded; spoofing users return to the Map.
+                    navController.navigate(MAP_ROUTE) {
+                        popUpTo(MAP_ROUTE) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
                 if (event == Lifecycle.Event.ON_STOP) {
                     val current = navController.currentDestination?.route
                     if (!shouldSkipIdleRedirect(current)) {

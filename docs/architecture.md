@@ -54,6 +54,8 @@ Data flow: ViewModel → Repository → DataSource (Room / DataStore / LocationM
 - `routes_graph`: Routes + RouteCreator + RouteDetail
 - `favorites_graph`: Favorites + MapPicker
 
+Entry destination (`entryRouteFor`, `LjNavHost.kt`): Map when spoofing is `RUNNING`/`PAUSED`, Idle when `IDLE`/`ERROR`. Onboarding still wins. Chosen once as the start destination from the current state. The `ON_STOP` redirect below is unchanged; on `ON_START`, an Idle landing while spoofing forwards to Map. Idle stays reachable from the drawer.
+
 Drawer nav: `popUpTo(IDLE_ROUTE) { saveState = true }` + `launchSingleTop + restoreState`.
 
 On `ON_STOP` (app switch / recents), `LjApp` navigates back to Idle so MapLibre-heavy screens

@@ -28,6 +28,7 @@ import com.locationjoystick.app.IDLE_ROUTE
 import com.locationjoystick.app.IdleScreen
 import com.locationjoystick.core.common.util.isMockLocationEnabled
 import com.locationjoystick.core.common.util.isOverlayPermissionGranted
+import com.locationjoystick.core.model.MockLocationState
 import com.locationjoystick.feature.favorites.api.FAVORITES_ROUTE
 import com.locationjoystick.feature.favorites.api.MAP_PICKER_ROUTE
 import com.locationjoystick.feature.favorites.impl.FavoritesRoute
@@ -93,12 +94,23 @@ internal fun isNavGateReachable(
     overlayGranted: Boolean,
 ): Boolean = coreGranted && (onboardingComplete || overlayGranted)
 
+/**
+ * Where the app opens (cold start, or returning from background while on Home): the Map while
+ * spoofing is running or paused, Home otherwise (issue #82). Exhaustive so a new state must choose.
+ */
+internal fun entryRouteFor(state: MockLocationState): String =
+    when (state) {
+        MockLocationState.RUNNING, MockLocationState.PAUSED -> MAP_ROUTE
+        MockLocationState.IDLE, MockLocationState.ERROR -> IDLE_ROUTE
+    }
+
 @Composable
 fun LjNavHost(
     navController: NavHostController,
     onOpenDrawer: () -> Unit,
 ) {
     val context = LocalContext.current
+    val navGateViewModel: NavGateViewModel = hiltViewModel()
     // Default false for the first frame — the DataStore-backed value below settles a moment
     // later and, if it flips this decision, corrects it via the LaunchedEffect below.
     val startDestination =
@@ -106,14 +118,13 @@ fun LjNavHost(
             if (corePermissionsGranted(context, bypassMockLocationCheck = false) &&
                 isOverlayPermissionGranted(context)
             ) {
-                IDLE_ROUTE
+                entryRouteFor(navGateViewModel.mockLocationState.value)
             } else {
                 ONBOARDING_ROUTE
             }
         }
 
     if (startDestination == ONBOARDING_ROUTE) {
-        val navGateViewModel: NavGateViewModel = hiltViewModel()
         val bypassMockLocationCheck by navGateViewModel.bypassMockLocationCheck.collectAsStateWithLifecycle()
         val onboardingComplete by navGateViewModel.onboardingComplete.collectAsStateWithLifecycle()
         LaunchedEffect(bypassMockLocationCheck, onboardingComplete) {

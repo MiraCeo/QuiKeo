@@ -1,6 +1,6 @@
 # Map (MapLibre)
 
-Main screen. Raster base map (OpenStreetMap by default) centered on `AppConstants.MapConstants.DEFAULT_LAT` / `AppConstants.MapConstants.DEFAULT_LON` first load. Scroll on by default.
+Main screen. Raster base map (OpenStreetMap by default) centered on `AppConstants.MapConstants.DEFAULT_LAT` / `AppConstants.MapConstants.DEFAULT_LON` first load. Scroll on by default. The app opens on the Map while spoofing is running or paused, and on Home otherwise (see @docs/architecture.md, "Navigation").
 
 Key files: `:feature:map:impl/MapScreen.kt`, `:feature:map:impl/MapViewModel.kt`
 
