@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location Links — locationjoystick</title>
+  <link rel="icon" href="icon.png" type="image/png">
+  <meta name="description" content="Open shared map links in the app, or capture them into a list and save them as a route.">
+  <link rel="canonical" href="https://shortcuts.github.io/locationjoystick/location-links.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="locationjoystick">
+  <meta property="og:title" content="Location Links — locationjoystick">
+  <meta property="og:description" content="Open shared map links in the app, or capture them into a list and save them as a route.">
+  <meta property="og:url" content="https://shortcuts.github.io/locationjoystick/location-links.html">
+  <meta property="og:image" content="https://shortcuts.github.io/locationjoystick/screenshots/01_idle_playstore.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Location Links — locationjoystick">
+  <meta name="twitter:description" content="Open shared map links in the app, or capture them into a list and save them as a route.">
+  <meta name="twitter:image" content="https://shortcuts.github.io/locationjoystick/screenshots/01_idle_playstore.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@4">
+</head>
+<body>
+<div class="layout">
+
+  <main>
+    <h1 id="location-links">Location links</h1>
+    <p>
+      A location link is a map pin sent from another app or another person. The app handles a link in one of two ways:
+    </p>
+    <ul class="section-bullets">
+      <li><strong>Automatic</strong> needs no setup. Tap a link. The app opens on that spot and asks what to do.</li>
+      <li><strong>Capture</strong> is optional. It collects links into a list without leaving your current app. You can then save the list as a route.</li>
+    </ul>
+
+    <h2 id="sharing-a-location">Sharing a location</h2>
+    <ul class="section-bullets">
+      <li>Favorites and routes: use the three-dot menu to copy or send <code>lat, lon</code> text. You can paste it back in later.</li>
+      <li>Map: press and hold a point, then tap <strong>Share this location</strong>. This sends a link that opens this app on that spot.</li>
+    </ul>
+
+    <h2 id="automatic-links">Automatic links</h2>
+    <h3 id="what-happens-when-the-link-is-opened">What happens when you open a link</h3>
+    <ol class="section-bullets">
+      <li>The app opens, or comes to the front if it is already running.</li>
+      <li>The map moves to the linked location.</li>
+      <li>A popup asks what to do:
+        <ul>
+          <li><strong>Teleport here</strong> moves your fake position there at once.</li>
+          <li><strong>Walk here</strong> walks there at your current speed.</li>
+          <li><strong>Walk here via roads</strong> follows real roads.</li>
+          <li><strong>Do nothing</strong> closes the popup. Your position does not change.</li>
+        </ul>
+      </li>
+    </ol>
+    <p>Nothing happens until you choose.</p>
+
+    <h3 id="opening-links-from-other-apps">Opening links from other apps</h3>
+    <p>
+      You do not need this app's share button. If another app has a share location option, choose this app from the list.
+      It opens the spot with the same popup.
+    </p>
+    <p>
+      This works for map links from many apps. It includes the Maps app's <strong>Share</strong> button, which sends a shortened link.
+      This app follows the link to find the coordinates. If the app cannot read a link, a short message appears at the bottom of the screen.
+    </p>
+
+    <h2 id="capture-mode">Capture mode</h2>
+    <p>
+      Capture collects map links from other apps into a list on your device. You can then save the list as a route.
+      With Capture on, opening a map link keeps you in your current app instead of opening Google Maps.
+      The floating widget is not required.
+    </p>
+
+    <h2 id="open-capture">Open Capture</h2>
+    <p>
+      Open <strong>Capture</strong> from the Home screen or the side menu.
+      The page stays open when you leave for Android settings or another app.
+      You can also press and hold the widget's paste button, then tap the Capture shortcut.
+    </p>
+
+    <h2 id="set-up-capture">Set up Capture</h2>
+    <p>
+      Until this app is your default browser, the Capture page shows only these setup steps and a
+      <strong>Setup guide</strong> button. Follow the steps in order.
+    </p>
+    <div class="feature-section" id="capture-setup">
+      <img class="phone-shot" src="screenshots/22_capture_coordinates.png" alt="Capture screen showing the one-time setup steps">
+      <ul class="section-bullets">
+        <li>The rest of the page appears when setup is done.</li>
+      </ul>
+    </div>
+
+    <ol class="section-bullets">
+      <li>
+        Tap <strong>Default browser</strong>. Set this app as your default browser.
+        <br>On Samsung phones, the popup may do nothing. Open Android's default apps settings and pick this app there.
+      </li>
+      <li>
+        Go back to the Capture page. It checks by itself and moves to the next step.
+      </li>
+      <li>
+        In this app's Android settings, turn on <strong>supported links</strong>. The app cannot check this step. Check it yourself.
+      </li>
+      <li>
+        Tap <strong>Turn off Google Maps supported links</strong>. Turn off "open supported links" for Google Maps.
+        If you skip this step, Maps links go to Maps and this app never sees them.
+      </li>
+    </ol>
+    <p>
+      After setup, the Capture switch, List and Jump, the captured list, and <strong>Save as route</strong> appear.
+      Points you captured earlier come back too.
+    </p>
+    <p>
+      To turn Capture off: tap the three dots at the top of the page, choose <strong>Restore default browser</strong>,
+      tick the confirm box, and tap <strong>Restore</strong>.
+      Capture turns off and Android's default apps screen opens. Pick your usual browser there. The app cannot do this for you.
+      Your captured points and pass-through browser choice stay. The same menu has <strong>Setup guide</strong>.
+    </p>
+
+    <h2 id="choose-what-links-do">Choose what captured links do</h2>
+    <ol class="section-bullets">
+      <li>Turn on <strong>Capture mode</strong>.</li>
+      <li>
+        Choose <strong>List</strong> to add each tapped location to your list, <strong>Jump</strong> to move there at once, or both.
+      </li>
+      <li>
+        If the list already has points, choose <strong>Clear</strong> to start again or <strong>Keep</strong> to add to the list.
+      </li>
+    </ol>
+    <p>
+      If Capture mode is off, or List and Jump are both unchecked, links pass through. Nothing is collected and your location does not change.
+      Tap <strong>Pass-through</strong> to pick the browser that opens those links.
+      While Capture mode is off, Google Maps links open in the Google Maps app first. If Maps is not installed, your chosen browser opens them.
+      The browser list refreshes when you return from Android settings.
+    </p>
+
+    <h2 id="collect-and-save">Collect and save a route</h2>
+    <ol class="section-bullets">
+      <li>Tap a map link in another app.</li>
+      <li>
+        List adds the point. Jump moves you there. A short message confirms it. The other app stays open.
+      </li>
+      <li>Open Capture to see your list in an orange box, in capture order.</li>
+      <li>
+        Use <strong>Copy</strong>, <strong>Last</strong> (removes the newest point), or <strong>Clear</strong> above the route name field.
+      </li>
+      <li>Type a route name.</li>
+      <li>Tap <strong>Save as route</strong>. You need at least two points. The route appears under Routes.</li>
+    </ol>
+    <p>
+      <strong>Optimize proximity</strong> is on by default when you copy or save. It reorders points so each stop is near the last.
+      Turn on <strong>Keep original</strong> to save points in capture order.
+    </p>
+    <p>
+      Tapping the same link twice in a row adds it once. Tapping an earlier point again adds it again, so a route can loop.
+    </p>
+
+    <h2 id="url-format">URL format</h2>
+    <p>The link format is:</p>
+    <pre><code>https://locationjoystick.shrtcts.fr/?lat=LAT&amp;lon=LON</code></pre>
+
+    <div class="table-wrap">
+    <table class="option-table">
+      <thead>
+        <tr><th>Parameter</th><th>Type</th><th>Valid range</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>lat</code></td><td>decimal</td><td>−90 to 90</td><td>Latitude</td></tr>
+        <tr><td><code>lon</code></td><td>decimal</td><td>−180 to 180</td><td>Longitude</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>Example:</p>
+    <pre><code>https://locationjoystick.shrtcts.fr/?lat=35.6762&amp;lon=139.6503</code></pre>
+
+    <h2 id="for-third-party-tools">For third-party tools</h2>
+    <p>
+      You can build these links yourself for scripts or automation. No key or sign-in is needed.
+    </p>
+    <ul class="section-bullets">
+      <li>Both <code>lat</code> and <code>lon</code> are required. The app ignores a link that lacks either one.</li>
+      <li>The app ignores a link with coordinates outside the valid range.</li>
+    </ul>
+    <p>A second link format works between apps:</p>
+    <pre><code>locationjoystick://open?lat=LAT&amp;lon=LON</code></pre>
+    <p>Both formats work the same way. Use the <code>https://</code> link when you share with other people.</p>
+  </main>
+
+</div>
+<script src="wiki-init.js"></script>
+</body>
+</html>

@@ -463,7 +463,7 @@ object AppConstants {
         const val GITHUB_ISSUES_URL = "https://github.com/$GITHUB_REPO_SLUG/issues/new?template=bug_report.yml"
         const val DOCS_URL = "https://locationjoystick.shrtcts.fr/"
         const val TROUBLESHOOTING_URL = "https://locationjoystick.shrtcts.fr/troubleshooting.html"
-        const val CAPTURE_GUIDE_URL = "https://locationjoystick.shrtcts.fr/capture-coordinates.html"
+        const val CAPTURE_GUIDE_URL = "https://locationjoystick.shrtcts.fr/location-links.html#set-up-capture"
         const val TAP_TO_WALK_GUIDE_URL = "https://locationjoystick.shrtcts.fr/tap-to-walk.html"
         const val CHANGELOG_URL = "https://locationjoystick.shrtcts.fr/changelog.html"
         const val DEEP_LINK_HOST = "locationjoystick.shrtcts.fr"
@@ -547,6 +547,13 @@ object AppConstants {
     }
 
     object CompassTrackingConstants {
+        // Android rate-limits accessibility screenshots and a game frame can be mid-transition, so
+        // one failed capture is retried after a short wait. The overlay budget covers the worst
+        // case: 3 captures plus 2 delays.
+        const val CAPTURE_ATTEMPTS = 3
+        const val CAPTURE_RETRY_DELAY_MS = 500L
+        const val OVERLAY_HEADING_TIMEOUT_MS = 3000L
+
         // Fixed search window — every tested AR/GPS-spoofing game places its compass top-right,
         // so this needs no per-user calibration. Covers the right 45% / top 35% of the screen.
         const val SEARCH_X_MIN_PCT = 0.55f
